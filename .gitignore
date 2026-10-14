@@ -2,8 +2,11 @@
 /*
 !/.gitignore
 !/README.md
+!/LICENSE
 !/model-audit/
 !/model-audit-design/
 /model-audit-design/_agent/sample-round1/
 __pycache__/
 *.pyc
+/model-audit-design/_agent/check_g1_real.py
+/model-audit-design/_agent/test_extract_g2.py
