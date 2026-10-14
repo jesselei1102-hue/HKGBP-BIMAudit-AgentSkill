@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GBP Model Audit Report</title>
+<!--
+  Model Audit report template (fallback).
+  Preferred: generate with  python report/render_report.py --results audit-results.json --audience bim|ap --out report-<audience>.html
+  Use this template only when the harness cannot run code. Fill each FILL block from audit-results.json
+  (templates/audit-results.schema.json), apply the audience rules in each block, and keep meta.filled_by = "template".
+  The <style id="report-css"> and <script id="report-js"> blocks are also read by render_report.py: edit them here only.
+
+  Audience rules (spec section 4.8):
+    - ap: no element IDs, no tool names, no GAP-nn numbers, nothing with audience = "bim";
+          labels FACT / INFERENCE / GAP become Verified / Inferred / Not determinable;
+          "Decisions required" comes right after the Overview; "Information required" is its own section.
+    - bim: everything; decisions sit inside the Action plan.
+  Every status chip shows its text, not colour alone. All image paths are relative: assets/<file>.
+-->
+<style id="report-css">
+:root{
+  --bg:#f7f7f5;--panel:#ffffff;--ink:#1d2125;--muted:#5d6670;--line:#dfe2e6;--accent:#2f5d8a;
+  --pass:#2e7d4f;--partial:#b7791f;--fail:#c0392b;--missing:#8e2a6b;--na:#5b6b7a;--unclear:#6b5bd6;--nj:#8a8f95;
+  --pass-bg:#e5f3ea;--partial-bg:#fbf0dc;--fail-bg:#f9e3e0;--missing-bg:#f5e1ee;--na-bg:#e8edf2;--unclear-bg:#ebe8fb;--nj-bg:#eeeff0;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#15181b;--panel:#1d2125;--ink:#e6e8ea;--muted:#9aa3ad;--line:#30363d;--accent:#7fb0e0;
+    --pass:#5fc28a;--partial:#e3a948;--fail:#ef7b6d;--missing:#d77bb5;--na:#9fb0c0;--unclear:#a99cf0;--nj:#9aa0a6;
+    --pass-bg:#1f3a2a;--partial-bg:#3d311b;--fail-bg:#43231f;--missing-bg:#3d2233;--na-bg:#263039;--unclear-bg:#2b2645;--nj-bg:#2a2d30;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 -apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+header.top{background:var(--panel);border-bottom:1px solid var(--line);padding:12px 16px;position:sticky;top:0;z-index:5}
+header.top nav{display:flex;flex-wrap:wrap;gap:4px 14px}
+header.top nav a{color:var(--accent);text-decoration:none;font-size:13px;white-space:nowrap}
+main{max-width:1180px;margin:0 auto;padding:16px}
+section,.task{scroll-margin-top:84px}
+section{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:18px 20px;margin:16px 0}
+h1{font-size:24px;margin:0 0 4px}h2{font-size:19px;margin:0 0 12px}h3{font-size:16px;margin:16px 0 8px}
+.muted{color:var(--muted)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+th{color:var(--muted);font-weight:600;cursor:default}
+th.sortable{cursor:pointer}
+.table-wrap{overflow-x:auto}
+.st{display:inline-block;border-radius:4px;padding:1px 7px;font-size:12px;font-weight:600;white-space:nowrap}
+.st-pass{color:var(--pass);background:var(--pass-bg)}.st-partial{color:var(--partial);background:var(--partial-bg)}
+.st-fail{color:var(--fail);background:var(--fail-bg)}.st-missing{color:var(--missing);background:var(--missing-bg)}
+.st-na{color:var(--na);background:var(--na-bg)}.st-unclear{color:var(--unclear);background:var(--unclear-bg)}
+.st-nj{color:var(--nj);background:var(--nj-bg)}
+.sev{font-size:12px;font-weight:700}.sev-Blocker{color:var(--fail)}.sev-Major{color:var(--partial)}.sev-Minor{color:var(--muted)}
+.verdict{border-left:6px solid var(--fail);padding:10px 14px;background:var(--fail-bg);border-radius:4px}
+.verdict.ok{border-color:var(--pass);background:var(--pass-bg)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:12px 0}
+.card{border:1px solid var(--line);border-radius:6px;padding:10px}
+.card .n{font-size:26px;font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:6px}
+.cell{border:1px solid var(--line);border-radius:6px;padding:6px;text-decoration:none;color:var(--ink);font-size:12px}
+.cell b{display:block;font-size:13px}
+.task{border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin:12px 0}
+.task h3{margin:0 0 6px}
+.thumbs{display:flex;flex-wrap:wrap;gap:10px}
+.thumbs figure{margin:0;width:220px}
+.thumbs img{width:220px;height:150px;object-fit:contain;background:var(--bg);border:1px solid var(--line);border-radius:4px}
+.thumbs figcaption{font-size:12px;color:var(--muted)}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.filters select{padding:4px;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:4px}
+.badge{font-size:12px;border:1px solid var(--line);border-radius:10px;padding:0 6px;margin-right:4px}
+@media (max-width:640px){main{padding:8px}section{padding:12px}}
+@media print{header.top{position:static}.filters{display:none}section{break-inside:avoid-page}}
+</style>
+</head>
+<body>
+<header class="top">
+  <nav>
+    <a href="#cover">Cover</a><a href="#overview">Overview</a>
+    <!-- FILL (ap only): <a href="#decisions">Decisions</a> <a href="#inputs">Information required</a> -->
+    <a href="#model-health">Model health</a><a href="#tasks">Tasks</a><a href="#findings">Findings</a>
+    <a href="#action-plan">Action plan</a><a href="#na-table">N/A</a><a href="#not-determinable">Not determinable</a>
+    <!-- FILL (if regression): <a href="#regression">Regression</a> -->
+    <a href="#appendix">Appendix</a>
+  </nav>
+</header>
+<main>
+
+<section id="cover">
+  <!-- FILL: meta.project as <h1>; then a table of meta.model, meta.revit_version, meta.mcp (bim only), meta.harness (bim only),
+       meta.date, meta.round, meta.package_version. Add "Hand-filled from template" when meta.filled_by = "template".
+       Disclaimer (both): "This is a readiness audit of the BIM model against BIMGBPS 2019 and the cited legislation.
+       It is not an approval by the Buildings Department or the Building Authority."
+       ap adds: "It does not replace the professional judgement of the Authorized Person." -->
+</section>
+
+<section id="overview">
+  <h2>Overview</h2>
+  <!-- FILL: verdict box: class "verdict" (or "verdict ok" when verdict.submittable). Text: "Can be submitted as is: Yes/No",
+       verdict.summary, then verdict.reasons[] (max 3) with their finding IDs.
+       Cards: count tasks by l1_status and by l2_status (two rows of cards), and findings by severity.
+       Grid: one .cell per task (36), linking to #task-<id>, showing id, L1 chip and L2 chip.
+       Blocker list: findings with severity Blocker: id, title, tasks. -->
+</section>
+
+<!-- FILL (ap only) <section id="decisions"><h2>Decisions required</h2> table of decisions[]: question, options, affected tasks. </section> -->
+<!-- FILL (ap only) <section id="inputs"><h2>Information required</h2> table of inputs[]: item, affected tasks. </section> -->
+
+<section id="model-health">
+  <h2>Model health</h2>
+  <!-- FILL: table of a1[]: id, title, result chip, evidence, clause, gap.
+       ap: only rows with result Fail, Partial or Unclear; no evidence column if it contains IDs; no gap column. -->
+</section>
+
+<section id="tasks">
+  <h2>Task breakdown</h2>
+  <!-- FILL: filters (category, status, severity) - optional when hand-filled.
+       One <div class="task" id="task-<id>" data-category data-status data-severity> per task:
+       h3 "<id> <name> · <clause>", L1 and L2 chips; applicability (reason + conditions when not applicable);
+       checks[] table (id, item, result, evidence; ap: skip audience=bim rows, omit element_ids);
+       calcs[] table (formula, values, limit, clause, result, basis);
+       evidence thumbnails: <figure><a href="assets/FILE"><img src="assets/FILE" loading="lazy" alt="CAPTION"></a><figcaption>CAPTION</figcaption></figure>;
+       finding IDs; fix[] list with method badge (ap: skip audience=bim); overturn_if. -->
+</section>
+
+<section id="findings">
+  <h2>Findings</h2>
+  <!-- FILL: table of findings[]: id, severity, status, task(s), title, evidence (bim: element_id + value + note; ap: value + note),
+       label (bim: FACT/INFERENCE/GAP; ap: Verified/Inferred/Not determinable), fix, fix_method. -->
+</section>
+
+<section id="action-plan">
+  <h2>Action plan</h2>
+  <!-- FILL: bim: four groups - Manual (Revit), Function B, AP decisions (include decisions[] here as <section id="decisions">), External information;
+       each group ordered by severity (Blocker, Major, Minor). ap: AP decisions and External information groups only,
+       plus one group "Model corrections by the BIM team" listing fix texts with audience both. -->
+</section>
+
+<section id="na-table">
+  <h2>N/A table</h2>
+  <!-- FILL: tasks with applicability.applicable = false: task, clause, reason, conditions, AP confirmed date ("pending" if null). -->
+</section>
+
+<section id="not-determinable">
+  <h2>Not determinable</h2>
+  <!-- FILL: unclear[]: task, reason kind (source / data / tool), detail, what is needed. bim adds gap.
+       bim also lists inputs[] here. -->
+</section>
+
+<!-- FILL (if regression) <section id="regression"><h2>Regression comparison</h2> regression.items[]: finding, before, after, note. </section> -->
+
+<section id="appendix">
+  <h2>Appendix</h2>
+  <!-- FILL: bim: evidence index (id, kind, file link, caption, task), package version, capability binding used, clause list.
+       ap: clause list only. -->
+</section>
+
+</main>
+<script id="report-js">
+(function(){
+  var sel=document.querySelectorAll('.filters select');
+  function apply(){
+    var f={};sel.forEach(function(s){f[s.name]=s.value;});
+    document.querySelectorAll('.task').forEach(function(t){
+      var show=Object.keys(f).every(function(k){return !f[k]||(t.dataset[k]||'').split(' ').indexOf(f[k])>=0;});
+      t.style.display=show?'':'none';
+    });
+  }
+  sel.forEach(function(s){s.addEventListener('change',apply);});
+  document.querySelectorAll('th.sortable').forEach(function(th){
+    th.addEventListener('click',function(){
+      var table=th.closest('table'),i=Array.prototype.indexOf.call(th.parentNode.children,th);
+      var rows=Array.prototype.slice.call(table.tBodies[0].rows);var asc=th.dataset.asc!=='1';th.dataset.asc=asc?'1':'0';
+      rows.sort(function(a,b){var x=a.cells[i].dataset.key||a.cells[i].textContent,y=b.cells[i].dataset.key||b.cells[i].textContent;
+        return (x>y?1:x<y?-1:0)*(asc?1:-1);});
+      rows.forEach(function(r){table.tBodies[0].appendChild(r);});
+    });
+  });
+})();
+</script>
+</body>
+</html>
