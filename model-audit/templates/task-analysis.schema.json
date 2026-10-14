@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "task-analysis.schema.json",
+  "title": "Task-group analysis (G2 onwards)",
+  "description": "Written by tools/<group>/analyze.py from an L3 extract; read by tools/common/task_report.py. One check per object per rule. See AUD-000 section 10.",
+  "type": "object",
+  "required": ["project_info", "checks", "tables", "summary"],
+  "properties": {
+    "project_info": {
+      "type": "object",
+      "required": ["project_name", "model_path", "group", "tasks", "analysis_date", "read_only", "rules"],
+      "properties": {
+        "group": {"type": "string", "description": "e.g. 'G2 room-use'"},
+        "tasks": {"type": "array", "items": {"type": "string", "pattern": "^AUD-"}},
+        "rules": {"type": "object", "description": "rule name -> limit and clause, as applied"}
+      }
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "task", "item", "object", "expected", "actual", "status"],
+        "properties": {
+          "id": {"type": "string"},
+          "task": {"type": "string", "pattern": "^AUD-"},
+          "item": {"type": "string", "description": "what is checked, same text for every object of one rule"},
+          "object": {"type": "string", "description": "the room / element / sheet the check is about"},
+          "object_id": {"type": ["integer", "null"]},
+          "status": {"enum": ["PASS", "FAIL", "UNCLEAR", "N/A", "APPLICABLE"]},
+          "basis": {"type": "string", "description": "severity hint or basis (e.g. Minor, conditional, basis A)"},
+          "cite": {"type": "string"},
+          "method": {"type": "string", "description": "how the actual value was obtained"},
+          "confidence": {"enum": ["high", "medium", "low", ""]},
+          "evidence": {"type": "string"},
+          "fix": {"type": "string", "description": "fix direction; empty when PASS"}
+        }
+      }
+    },
+    "tables": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["title", "columns", "rows"],
+        "properties": {"title": {"type": "string"}, "columns": {"type": "array"}, "rows": {"type": "array"}}
+      }
+    },
+    "summary": {"type": "object", "required": ["data_quality_warnings"]}
+  }
+}

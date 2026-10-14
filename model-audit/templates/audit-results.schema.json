@@ -1,0 +1,228 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "audit-results.schema.json",
+  "title": "Model Audit Results",
+  "description": "The single data source of one audit run. report/render_report.py renders it for two audiences (bim, ap). Text fields with audience 'both' must not contain element IDs; IDs go in element_ids / element_id fields, which the AP report omits and redacts.",
+  "type": "object",
+  "additionalProperties": false,
+  "$defs": {
+    "status": {"type": "string", "enum": ["Pass", "Partial", "Fail", "Missing", "N/A（附条件）", "N/A 待声明", "Unclear", "Not judged"]},
+    "audience": {"type": "string", "enum": ["bim", "both"]},
+    "task_id": {"type": "string", "pattern": "^(A1|AUD-[VSA][0-9]{2})$"},
+    "ids": {"type": "array", "items": {"type": "string"}}
+  },
+  "properties": {
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "project": {"type": "string"},
+        "model": {"type": "string", "description": "Model file path or name."},
+        "revit_version": {"type": "string"},
+        "mcp": {"type": "string"},
+        "harness": {"type": "string"},
+        "date": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+        "round": {"type": "string", "description": "e.g. 'Round 1' or 'Regression 1'."},
+        "package_version": {"type": "string"},
+        "filled_by": {"type": "string", "enum": ["script", "template"]}
+      },
+      "required": ["project", "model", "date", "round"]
+    },
+    "verdict": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "submittable": {"type": "boolean"},
+        "summary": {"type": "string"},
+        "reasons": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {"text": {"type": "string"}, "finding_ids": {"$ref": "#/$defs/ids"}},
+            "required": ["text"]
+          }
+        }
+      },
+      "required": ["submittable", "reasons"]
+    },
+    "a1": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string", "pattern": "^MA-[1-7]\\.[0-9]+$"},
+          "title": {"type": "string"},
+          "result": {"$ref": "#/$defs/status"},
+          "evidence": {"type": "string"},
+          "element_ids": {"$ref": "#/$defs/ids"},
+          "clause": {"type": "string"},
+          "gap": {"type": ["string", "null"]},
+          "audience": {"$ref": "#/$defs/audience"}
+        },
+        "required": ["id", "title", "result"]
+      }
+    },
+    "tasks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string", "pattern": "^AUD-[VSA][0-9]{2}$"},
+          "name": {"type": "string"},
+          "clause": {"type": "string"},
+          "category": {"type": "string", "enum": ["View", "Schedule", "Assembly"]},
+          "applicability": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "applicable": {"type": "boolean"},
+              "reason": {"type": ["string", "null"], "description": "N/A reason sentence (DK-AUD-003 template)."},
+              "conditions": {"type": ["string", "null"]},
+              "ap_confirmed": {"type": ["string", "null"], "description": "Date the AP confirmed the N/A, or null."}
+            },
+            "required": ["applicable"]
+          },
+          "l1_status": {"$ref": "#/$defs/status"},
+          "l2_status": {"$ref": "#/$defs/status"},
+          "summary": {"type": "string"},
+          "checks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "id": {"type": "string"},
+                "item": {"type": "string"},
+                "result": {"$ref": "#/$defs/status"},
+                "evidence": {"type": "string"},
+                "element_ids": {"$ref": "#/$defs/ids"},
+                "audience": {"$ref": "#/$defs/audience"}
+              },
+              "required": ["id", "item", "result"]
+            }
+          },
+          "calcs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "id": {"type": "string"},
+                "formula": {"type": "string"},
+                "values": {"type": "string"},
+                "limit": {"type": "string"},
+                "clause": {"type": "string"},
+                "result": {"$ref": "#/$defs/status"},
+                "basis": {"type": ["string", "null"], "description": "Which basis, when two are computed for the AP to choose."},
+                "audience": {"$ref": "#/$defs/audience"}
+              },
+              "required": ["id", "formula", "result"]
+            }
+          },
+          "evidence_ids": {"$ref": "#/$defs/ids"},
+          "finding_ids": {"$ref": "#/$defs/ids"},
+          "fix": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "text": {"type": "string"},
+                "method": {"type": "string", "enum": ["manual", "function-b", "AP", "external"]},
+                "audience": {"$ref": "#/$defs/audience"}
+              },
+              "required": ["text", "method"]
+            }
+          },
+          "overturn_if": {"type": ["string", "null"]}
+        },
+        "required": ["id", "name", "clause", "category", "applicability", "l1_status", "l2_status", "checks", "evidence_ids", "finding_ids", "fix"]
+      }
+    },
+    "findings": {"type": "array", "items": {"$ref": "finding.schema.json"}},
+    "decisions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string", "pattern": "^INP-[0-9]{2}$"},
+          "question": {"type": "string"},
+          "options": {"type": "array", "items": {"type": "string"}},
+          "tasks": {"type": "array", "items": {"$ref": "#/$defs/task_id"}}
+        },
+        "required": ["id", "question", "tasks"]
+      }
+    },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string", "pattern": "^INP-[0-9]{2}$"},
+          "item": {"type": "string"},
+          "tasks": {"type": "array", "items": {"$ref": "#/$defs/task_id"}}
+        },
+        "required": ["id", "item", "tasks"]
+      }
+    },
+    "unclear": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "task": {"$ref": "#/$defs/task_id"},
+          "reason_kind": {"type": "string", "enum": ["source", "data", "tool"]},
+          "detail": {"type": "string"},
+          "need": {"type": "string"},
+          "gap": {"type": ["string", "null"]}
+        },
+        "required": ["task", "reason_kind", "detail", "need"]
+      }
+    },
+    "regression": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "previous_round": {"type": "string"},
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "finding_id": {"type": "string", "pattern": "^F[0-9]+$"},
+              "before": {"type": "string"},
+              "after": {"type": "string", "enum": ["closed", "partly closed", "open", "new", "not applicable"]},
+              "note": {"type": "string"}
+            },
+            "required": ["finding_id", "before", "after"]
+          }
+        }
+      },
+      "required": ["previous_round", "items"]
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string"},
+          "file": {"type": "string", "description": "Path relative to assets/."},
+          "kind": {"type": "string", "enum": ["view", "sheet", "crop", "swatch", "csv", "table", "report"]},
+          "caption": {"type": "string", "description": "Must not contain element IDs."},
+          "task": {"$ref": "#/$defs/task_id"},
+          "audience": {"$ref": "#/$defs/audience"}
+        },
+        "required": ["id", "file", "kind", "caption", "task"]
+      }
+    }
+  },
+  "required": ["meta", "verdict", "a1", "tasks", "findings", "decisions", "inputs", "unclear", "evidence"]
+}

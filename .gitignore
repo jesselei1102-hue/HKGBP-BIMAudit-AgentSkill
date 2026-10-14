@@ -1,0 +1,9 @@
+# Only the Model Audit package and its design / tests are published from this folder.
+/*
+!/.gitignore
+!/README.md
+!/model-audit/
+!/model-audit-design/
+/model-audit-design/_agent/sample-round1/
+__pycache__/
+*.pyc

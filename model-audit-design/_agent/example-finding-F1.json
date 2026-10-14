@@ -1,0 +1,15 @@
+﻿{
+  "id": "F1",
+  "task": "AUD-S10",
+  "tasks": ["AUD-S01", "AUD-S04", "AUD-S05", "AUD-S08", "AUD-V10"],
+  "title": "Calculation tables on the C-series sheets are inserted raster images, not model schedules.",
+  "status": "Fail",
+  "severity": "Blocker",
+  "clause": "BIMGBPS §4.2(b), §5.1.2 (GEN-01)",
+  "evidence": [{"element_id": "1512245", "value": "690 × 668 mm", "note": "Whole of sheet C007 is one image holding five tables.", "evidence_id": null}],
+  "label": "FACT",
+  "fix": "Rebuild the tables as model schedules and place them on the sheets; then delete the images.",
+  "fix_method": "function-b",
+  "overturn_if": "The images are exports of schedules that still exist in the model.",
+  "gap": null
+}

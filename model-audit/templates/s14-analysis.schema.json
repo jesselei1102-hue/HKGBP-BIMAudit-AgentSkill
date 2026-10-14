@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "s14-analysis.schema.json",
+  "title": "TL-S14 lighting and ventilation analysis",
+  "description": "Written by tools/s14_lv/analyze.py from the R-S14 extract; read by tools/s14_lv/report.py. See AUD-S14 section 9.",
+  "type": "object",
+  "required": ["project_info", "level_correspondence", "rooms_included", "rooms_excluded", "rooms_pending",
+               "rooms_no_area", "openings_all", "openings_unassigned", "openings_fire_service", "summary"],
+  "$defs": {
+    "room": {
+      "type": "object",
+      "required": ["id", "name", "number", "level", "area_sqm", "classification", "classification_reason"],
+      "properties": {
+        "id": {"type": "integer"},
+        "classification": {"enum": ["reg30", "reg36", "excluded", "pending", "no_area"]},
+        "area_sqm": {"type": "number"}
+      }
+    },
+    "assessed_room": {
+      "allOf": [{"$ref": "#/$defs/room"}],
+      "required": ["rule", "rule_cite", "req_light_sqm", "req_vent_sqm", "act_light_sqm", "act_vent_sqm",
+                   "light_pass", "vent_pass", "both_pass", "status", "matched_openings"],
+      "properties": {
+        "status": {"enum": ["PASS", "FAIL", "FAIL*"]},
+        "matched_openings": {
+          "type": "array",
+          "items": {"type": "object",
+                    "required": ["id", "facing", "share", "counted_light_sqm", "counted_vent_sqm", "match_method", "match_confidence"]}
+        }
+      }
+    },
+    "opening": {
+      "type": "object",
+      "required": ["id", "category", "type", "level", "area_sqm", "classification", "facing", "glass_sqm",
+                   "openable_sqm", "louvre_sqm", "counted_lighting", "counted_ventilation", "data_source",
+                   "assumption_note", "matched_room_id", "match_method", "match_confidence", "panels"],
+      "properties": {
+        "facing": {"enum": ["external", "internal", "internal-same-room", "unroomed", "none"]},
+        "match_confidence": {"enum": ["high", "medium", "low", null]}
+      }
+    }
+  },
+  "properties": {
+    "project_info": {"type": "object", "required": ["project_name", "model_path", "analysis_date", "rules", "read_only"]},
+    "level_correspondence": {"type": "array"},
+    "rooms_included": {"type": "array", "items": {"$ref": "#/$defs/assessed_room"}},
+    "rooms_excluded": {"type": "array", "items": {"$ref": "#/$defs/room"}},
+    "rooms_pending": {"type": "array", "items": {"$ref": "#/$defs/room"}},
+    "rooms_no_area": {"type": "array", "items": {"$ref": "#/$defs/room"}},
+    "openings_all": {"type": "array", "items": {"$ref": "#/$defs/opening"}},
+    "openings_unassigned": {"type": "array", "items": {"$ref": "#/$defs/opening"}},
+    "openings_fire_service": {"type": "array"},
+    "summary": {"type": "object", "required": ["total_rooms", "rooms_included_count", "lighting_pass_count",
+                                               "ventilation_pass_count", "both_pass_count", "data_quality_warnings"]}
+  }
+}
