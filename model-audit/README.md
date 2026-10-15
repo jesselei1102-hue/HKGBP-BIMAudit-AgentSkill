@@ -40,6 +40,65 @@ Roadmap **功能 A（Model Audit）** 按四层架构的实现：只读审核一
 
 每组都是两段：先分析（提取文件 → 分析 JSON + 屏幕摘要，操作者确认），再出报告（Excel + HTML，只读分析 JSON）。规则见 [AUD-000 §10](L2-Task-Logic/AUD-000_Audit_Flow.md)。
 
+## 36 个 Task 与法例对照
+
+每个 Task 查什么、对应 BIMGBPS 哪一节、第二层（L2 合规计算）引哪条法例或 PNAP。本表只是索引：数值与原文摘句只在 [DK-AUD-002 限值索引](L1-Domain/DK-AUD-002_Limits_Index.md)（`LIM-nn`），适用性与 N/A 理由句只在 [DK-AUD-003 适用性](L1-Domain/DK-AUD-003_Applicability.md)（`APL-nn`），以那两份和法例原文为准。
+
+- 法例简称：**Cap. 123** = Buildings Ordinance；**B(P)R** = Cap. 123F Building (Planning) Regulations；**Cap. 123H** = Building (Refuse Storage and Material Recovery Chambers and Refuse Chutes) Regulations；**Cap. 123I** = Building (Standards of Sanitary Fitments, Plumbing, Drainage Works and Latrines) Regulations。
+- **FS Code** = Code of Practice for Fire Safety in Buildings 2011，原文不在本包，标 `[GAP]` 的 L2 一律记 Unclear（[DK-AUD-006](L1-Domain/DK-AUD-006_Missing_Sources.md)）。
+- 「只查 BIMGBPS」= 只有图面 / 格式要求（L1），没有法例限值。
+
+### 计算表（Schedules）
+
+| Task | 是什么 | BIMGBPS | 法例 / PNAP 条文 | 引用 |
+| --- | --- | --- | --- | --- |
+| [S01](L2-Task-Logic/Schedules/AUD-S01_Drawing_List.md) | 图纸目录：是不是 Sheet List 明细表，与模型图纸逐张对上 | §5.3.1 | 只查 BIMGBPS | — |
+| [S02](L2-Task-Logic/Schedules/AUD-S02_Site_Area_Calc.md) | 地盘面积计算 | §5.3.2 | B(P)R reg 23(2)（不计街道、后巷）；PNAP ADM-21（取整） | LIM-02、LIM-14 |
+| [S03](L2-Task-Logic/Schedules/AUD-S03_Coordinates.md) | 地界坐标表：HK1980 坐标、方位角、边长 | §5.3.3 | 只查 BIMGBPS（§5.1.3 坐标格式） | LIM-03 |
+| [S04](L2-Task-Logic/Schedules/AUD-S04_Dev_Schedule.md) | 发展摘要表：GFA、SC / PR、绿化、车位、高度、单位数、UFA，逐栏对来源 Task | §5.3.4 | 不另引条文；各栏跟随来源 Task（高度 B(P)R reg 23(1)，绿化 APP-152 Table 2） | LIM-13、LIM-29 |
+| [S05](L2-Task-Logic/Schedules/AUD-S05_SC_PR_Summary.md) | 场地类别 + 上盖面积 / 地积比率汇总 | §5.3.5 | B(P)R reg 18A（场地类别）、reg 20、21 与附表 1（准许 SC / PR）、reg 23(1)–(3)(a)；Cap. 123 s.2（用途） | LIM-11 至 LIM-16、APL-01 |
+| [S06](L2-Task-Logic/Schedules/AUD-S06_Open_Space_Calc.md) | 休憩用地计算（只适用于住用） | §5.3.6 | B(P)R reg 25(1)(a) 与附表 2 | LIM-17、APL-02 |
+| [S07](L2-Task-Logic/Schedules/AUD-S07_GFA_Concession_Req.md) | GFA 豁免前置条件（BEAM Plus、APP-152 等） | §5.3.7 | PNAP APP-151 ¶4（10 % 上限）、¶5(a)（必要设施）、¶6（前置条件）、¶10（生效日期） | LIM-23 至 LIM-25、APL-06 |
+| [S08](L2-Task-Logic/Schedules/AUD-S08_GFA_Concession_List.md) | GFA 豁免清单，与 V10 交叉校验 | §5.3.8 | B(P)R reg 23(3)(a)（GFA 定义）；PNAP APP-151 ¶4 | LIM-15、LIM-23 |
+| [S09](L2-Task-Logic/Schedules/AUD-S09_Lift_Shaft.md) | 电梯井表：井道几何 | §5.3.17 | PNAP APP-89 ¶5（适用建筑类别）、¶8（轿厢 / 井道下限） | LIM-27、APL-05 |
+| [S10](L2-Task-Logic/Schedules/AUD-S10_Exit_Doors_Routes.md) | 最少出口门数与走火通道：人数、要求与实设出口数 / 宽度 | §5.3.10 | FS Code Part B `[GAP]` | LIM-30 |
+| [S11](L2-Task-Logic/Schedules/AUD-S11_Discharge_Value.md) | 逃生楼梯排放值（DV）：每层人数、每梯分担人数 | §5.3.11 | FS Code Part B `[GAP]` | LIM-30 |
+| [S12](L2-Task-Logic/Schedules/AUD-S12_FRR_Compartment.md) | 耐火时效 / 防火分区表：分区面积、体积，与 V08 一一对应 | §5.3.12 | FS Code Part C `[GAP]` | LIM-32 |
+| [S13](L2-Task-Logic/Schedules/AUD-S13_Sanitary_Fitments.md) | 洁具数量：按 UFA 算人数，比实设洁具 | §5.3.13 | Cap. 123I Part II 类别；reg 5(5)（office 每 9 m² 1 人）、reg 6（公众娱乐场所）；Cap. 172 定义 `[GAP]` | LIM-21、LIM-22、APL-08 |
+| [S14](L2-Task-Logic/Schedules/AUD-S14_Window_Area_Calc.md) | 窗面积计算：采光（玻璃 ≥ 1/10）、通风（可开启 ≥ 1/16），与 V13 同审 | §5.3.14 | B(P)R reg 30(2)(a)(i)(ii)、reg 36(2)(3)（便溺房间） | LIM-06、LIM-07、LIM-10、APL-10 |
+| [S15](L2-Task-Logic/Schedules/AUD-S15_Refuse_RMRC.md) | 垃圾房及物料回收房：UFS 门槛、最小面积 | §5.3.15 | Cap. 123H reg 3、3A 与附表；PNAP APP-35 ¶5 | LIM-19、LIM-20、APL-03 |
+| [S16](L2-Task-Logic/Schedules/AUD-S16_TBE_Room.md) | 电讯及广播设备（TBE）房面积 | §5.3.16 | B(P)R reg 28A；PNAP APP-84 注 2（MAF） | LIM-18、APL-04 |
+| [S17](L2-Task-Logic/Schedules/AUD-S17_Lift_Shaft_GFA.md) | 电梯井表：GFA 豁免计算（与 S09 同一张表） | §5.3.17 | PNAP APP-89 ¶5、¶8 | LIM-27、APL-05 |
+| [S18](L2-Task-Logic/Schedules/AUD-S18_List_of_Modifications.md) | 修改清单：须按 Form BA16 申请的修改 / 豁免 | §5.3.9 | Form BA16；B(P)R reg 23(3)(a) 与 23(3)(b) 的区分；PNAP ADM-2 附录 E、ADV-33 附录 A3 | APL-07 |
+
+### 图（Views）
+
+| Task | 是什么 | BIMGBPS | 法例 / PNAP 条文 | 引用 |
+| --- | --- | --- | --- | --- |
+| [V01](L2-Task-Logic/Views/AUD-V01_Block_Key_Plan.md) | 位置图 / 索引图：地界、街道阔度、坐标 | §5.2.2 | B(P)R reg 18A(1)（指明街道 ≥ 4.5 m）；ADM-21（地盘面积取整） | LIM-02、LIM-03、LIM-11 |
+| [V02](L2-Task-Logic/Views/AUD-V02_Floor_Plans.md) | 各层平面图 | §5.2.3 | FS Code Part B `[GAP]`（出口） | LIM-03、LIM-30 |
+| [V03](L2-Task-Logic/Views/AUD-V03_Sections.md) | 剖面图：标高、建筑物高度 | §5.2.4 | B(P)R reg 23(1)（高度由街道平均水平量起） | LIM-03、LIM-13 |
+| [V04](L2-Task-Logic/Views/AUD-V04_Elevations.md) | 立面图：标高、建筑物高度 | §5.2.4 | B(P)R reg 23(1) | LIM-03、LIM-13 |
+| [V05](L2-Task-Logic/Views/AUD-V05_Details.md) | 典型详图 | §5.2.5 | 只查 BIMGBPS | LIM-03 |
+| [V06](L2-Task-Logic/Views/AUD-V06_EVA_Diagram.md) | 紧急车辆通道（EVA）图 | §5.2.6 | PNAP APP-136 ¶6（主要立面 ≥ 周界 1/4）；FS Code Part D `[GAP]` | LIM-26、LIM-31 |
+| [V07](L2-Task-Logic/Views/AUD-V07_Open_Space.md) | 休憩用地图（只适用于住用） | §5.2.7 | B(P)R reg 25(1)(a) 与附表 2；Cap. 123 s.2（用途） | LIM-17、APL-01、APL-02 |
+| [V08](L2-Task-Logic/Views/AUD-V08_Fire_Compartment.md) | 防火分区图 | §5.2.8 | FS Code Part C `[GAP]` | LIM-32 |
+| [V09](L2-Task-Logic/Views/AUD-V09_SC_Diagram.md) | 地盘面积及上盖面积图 | §5.2.9 | B(P)R reg 20、21 与附表 1；ADM-21 | LIM-02、LIM-16 |
+| [V10](L2-Task-Logic/Views/AUD-V10_GFA_Diagram.md) | GFA 图：逐层面积与豁免着色，与 S08 交叉校验 | §5.2.10 | B(P)R reg 23(3)(a)；PNAP APP-151 ¶4 | LIM-15、LIM-23 |
+| [V11](L2-Task-Logic/Views/AUD-V11_UFA_Diagram.md) | 实用楼面面积（UFA）图；数值供 S13、S04 用 | §5.2.11 | 只查 BIMGBPS | — |
+| [V12](L2-Task-Logic/Views/AUD-V12_UFS_Diagram.md) | 实用楼面空间（UFS）图，跟随 S15 | §5.2.12 | Cap. 123H reg 3 与附表 | LIM-19、APL-03 |
+| [V13](L2-Task-Logic/Views/AUD-V13_Prescribed_Windows.md) | 订明的窗图：窗面向的矩形水平面、遮挡斜面，与 S14 同审 | §5.2.13 | B(P)R reg 30、31(1)–(3)、36 | LIM-06 至 LIM-10、APL-10 |
+| [V14](L2-Task-Logic/Views/AUD-V14_SBD_Compliance.md) | 可持续建筑设计图：楼宇间距、后退、绿化 | §5.2.14 | PNAP APP-152 ¶3（间距门槛）、Table 2（绿化）；后退门槛 `[GAP]` | LIM-28、LIM-29、APL-09 |
+
+### 整套与提交（Assembly）
+
+| Task | 是什么 | BIMGBPS | 法例 / PNAP 条文 | 引用 |
+| --- | --- | --- | --- | --- |
+| [A01](L2-Task-Logic/Assembly/AUD-A01_Sheet_Assembly.md) | 图纸组装：图框参数、项目信息、图号 | §4.3(f)、§5.5.1–5.5.2、§6.3–6.4 | 只查 BIMGBPS | DK-AUD-001 G9 |
+| [A02](L2-Task-Logic/Assembly/AUD-A02_Colour_Coding.md) | GFA 着色与修订着色：逐色取样比图例 | §5.1.4、Table 1、§5.4 | 只查 BIMGBPS（GFA 图用 Table 1；楼层平面另用 PNAP ADM-9 色系，逐色 RGB 原文 `[GAP]`） | DK-AUD-004 |
+| [A03](L2-Task-Logic/Assembly/AUD-A03_Export.md) | 导出：文件格式、≤ 500 MB、Revit ≥ 2017、链接、PDF 尺寸 | §4、§6 | 只查 BIMGBPS（§4.3(b)(c)） | LIM-04、LIM-05 |
+| [A04](L2-Task-Logic/Assembly/AUD-A04_Submission_Validation.md) | 提交前总核：汇总 A1 与其余各 Task，判能不能原样提交；含 N/A 汇总表 | §4.2、§5.2.1、§5.3、§5.5 | 不另引条文；汇总上面各项 | DK-AUD-001、DK-AUD-003 |
+
 ## 读取顺序
 
 1. 本文件 → [RUN.md](RUN.md)（运行规则与短 Prompt）。
