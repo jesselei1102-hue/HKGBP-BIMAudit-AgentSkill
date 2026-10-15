@@ -6,6 +6,8 @@ server, and writes an English report in two editions (BIM team, AP / client).
 
 香港 GBP 入则 Revit 模型只读审核包：按 BIMGBPS 36 个 Task 与模型健康 MA-1 至 MA-7，通过 Revit MCP 取数，出 BIM 团队版与 AP / 客户版英文报告。
 
+<video src="https://github.com/user-attachments/assets/你的ID" controls width="800"></video>
+
 ## Contents
 
 | Folder | What |
