@@ -1,3 +1,7 @@
+
+
+https://github.com/user-attachments/assets/44fe4baa-0d27-4de4-acd0-5a41e4b6e952
+
 # GBP Model Audit
 
 A read-only audit package for Revit models prepared for a Hong Kong GBP (general building plans) Stage I submission.
@@ -6,8 +10,7 @@ server, and writes an English report in two editions (BIM team, AP / client).
 
 香港 GBP 入则 Revit 模型只读审核包：按 BIMGBPS 36 个 Task 与模型健康 MA-1 至 MA-7，通过 Revit MCP 取数，出 BIM 团队版与 AP / 客户版英文报告。
 
-<video src="https://github.com/user-attachments/assets/你的ID" controls width="800"></video>
-
+<video src="https://github.com/user-attachments/assets/44fe4baa-0d27-4de4-acd0-5a41e4b6e952" controls width="800"></video>
 ## Contents
 
 | Folder | What |
