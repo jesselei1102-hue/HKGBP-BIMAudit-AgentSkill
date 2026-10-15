@@ -1,5 +1,7 @@
 # Model Audit · 四层包
 
+> 给 AP / 客户看的英文简明版：[README.simple.md](README.simple.md)
+
 Roadmap **功能 A（Model Audit）** 按四层架构的实现：只读审核一个 Revit 模型能不能拿来做 GBP Stage I 提交。范围：
 
 - A1 模型健康
@@ -10,6 +12,8 @@ Roadmap **功能 A（Model Audit）** 按四层架构的实现：只读审核一
 产出一份结构化结果 `audit-results.json` 和两份英文可视化报告：BIM 团队版、AP / 客户版。
 
 本包可在任何能连 BIM MCP 的 harness 里运行（Cursor、Hermes、Claude Code 等），不依赖任何 harness 专有功能。
+
+本文件和 [RUN.md](RUN.md) 命令里的 `Model Audit/` 指本包所在的文件夹（包根 = 同时含 `RUN.md` 和 `L2-Task-Logic/` 的文件夹，例：本 repo 的 `model-audit/`），按实际位置替换。
 
 ## 四层
 
@@ -42,6 +46,17 @@ Roadmap **功能 A（Model Audit）** 按四层架构的实现：只读审核一
 2. [AUD-000](L2-Task-Logic/AUD-000_Audit_Flow.md)（总流程、状态词、项目输入清单、通用检查）。
 3. 按 Task 读对应的 `AUD-*`；执行时查 L3（怎么取）和 L4（工具与缺口）。
 4. 限值、适用性只信 L1；L1 只是索引，原文在 `../Legislation/`、`../source/`。
+
+## 四种跑法
+
+| 跑法 | 什么时候用 | 规则 |
+| --- | --- | --- |
+| 整套审核 | 第一次审一个模型：A1 + 36 个 Task，出两份总报告 | [RUN.md](RUN.md) §2–§6 |
+| 逐组（两段式） | 平时的做法：G1 → G5 依次提取、分析、操作者确认、出组报告，最后汇总 | RUN.md §6b |
+| 单个 Task | 只改了一处、只想复查一项（例：S10）；用 `--tasks` 只跑这一项，再用 `--update` 并回总结果，只有这一项会变 | RUN.md §6c、[AUD-000 §10.4](L2-Task-Logic/AUD-000_Audit_Flow.md) |
+| 回归 | 模型修改后，与上一次的 `audit-results.json` 比 | [AUD-REG](L2-Task-Logic/AUD-REG_Regression.md) |
+
+各跑法的短 Prompt 在 RUN.md §7。
 
 ## Skills（自动触发入口）
 
@@ -79,21 +94,36 @@ Roadmap **功能 A（Model Audit）** 按四层架构的实现：只读审核一
 | 前提 | 没有时 |
 | --- | --- |
 | 已连接 BIM MCP，且 [L4-Capabilities](L4-Capabilities/) 里有它的对照表（现有：`CAP-binding-revit-mcp`） | 先按 Capability Catalog 为该 MCP 做一份对照表和 SOP，再审（RUN.md 规则） |
+| G4、G5 的提取要 revit-mcp（mcp-servers-for-revit 没有房间边界、图纸、图纸上的视图、明细表清单这几类工具）；G1–G3 两个 MCP 都可以，`tools/extract/` 转出的提取文件相同 | 只连 mcp-servers-for-revit 时，G4、G5 缺的项记 Unclear |
 | 法例原文在 `../Legislation/`（cap123、cap123f、cap123h、cap123i） | L2 一律 Unclear；限值索引不能代替原文 |
 | BIMGBPS corpus、PNAP 在 `../source/` | 同上 |
 | harness 能执行 Python 3 | 颜色取样改人工（L3 manual）；报告改用 HTML 模板手填，封面注明 |
 
 ## 报告
 
-每次审核一个文件夹：
+每次审核一个文件夹。整套审核（汇总后）：
 
 ```
 audit-<date>/
   audit-results.json    审核结果（按 templates/audit-results.schema.json）
+  decisions.json        AP 决定清单（可选；build_results.py --decisions）
   assets/               截图、裁切图、取色对比图、CSV
   report-bim.html       BIM 团队版
   report-ap.html        AP / 客户版
 ```
+
+逐组或单个 Task 跑时，每组另有：
+
+```
+audit-<date>-<组>/
+  _raw/                 MCP 原样回传（不手抄）和 tools/extract/ 转出的提取文件
+  *_analysis_*.json     分析结果（G1 按 s14-analysis.schema.json，G2–G5 按 task-analysis.schema.json）
+  analysis_console.txt  屏幕摘要，含「Readings to check」
+  GBP_*.html / .xlsx    组报告（HTML 内嵌待核对的裁切图；Excel 有 Readings 表）
+  assets/               有证据图时
+```
+
+样例模型的运行结果（2026-10-13 的整套审核和 G1–G5 各组）不随本 repo 发布。
 
 生成（优先）：
 
@@ -113,10 +143,11 @@ python "Model Audit/report/render_report.py" --results audit-<date>/audit-result
 | 尺寸覆盖值读不到 | §5.1.2 只能查图片表；手改尺寸要人工抽查 | [CAP-gaps](L4-Capabilities/CAP-gaps.md) GAP-01 |
 | 面积边界端点读不到 | 小缝隙、重叠、隐藏边界查不出（退件高风险） | GAP-02 |
 | CAD 导入查不到 | V05、自包含检查可能漏 | GAP-03 |
-| Revit 版本、插件依赖读不到 | MA-1.1、MA-1.6 只能推断 | GAP-04 |
+| Revit 版本、插件依赖读不到 | 版本：harness 能读模型文件时由 `tools/drawings/rvt_info.py` 补上，否则只能推断；插件依赖（MA-1.6）仍只能推断 | GAP-04 |
 | 无 LOD 判据 | MA-3.3 只能人工抽查 | GAP-05 |
 | 明细表不能导出图像 | 截图用整张图纸代替 | GAP-06 |
-| 开口不能归到房间 | S14、V13 的实设窗面积不能由几何复核 | GAP-07 |
+| MCP 不回传开口所属房间 | 已由 `tools/s14_lv/analyze.py` 按几何补上（每条带匹配方式与置信度）；仍缺 reg 31「面向室外」检查和百叶净通风面积，要人工核对 V13 图、向 AP 取百叶资料（INP-17） | GAP-07 |
+| 图纸上的读数（表值、坐标、街道、附录等）靠读图 | 脚本判不了裁切图是否满足条文：组报告的「Readings to check」要操作者对着裁切图逐条核对；无裁切图的 PASS 一律改记 Unclear | RUN.md §6b |
 | FS Code 2011 Part B / C / D | V02、V06、V08、S10–S12 的 L2 = Unclear | [DK-AUD-006](L1-Domain/DK-AUD-006_Missing_Sources.md) M-01 至 M-03 |
 | Cap. 172、APP-2、APP-130、APP-151 附录 A 准则、APP-152 后退、ADM-9 色表 | S13、S18、V13、S07 (g)、V14、V02–V05 的部分判定 | DK-AUD-006 M-04 至 M-09 |
 | BIMGBPS 新版 / ESH 介质；附表 1 电子版 | G9、A03、S05 | DK-AUD-006 M-10、M-11 |
@@ -127,7 +158,8 @@ python "Model Audit/report/render_report.py" --results audit-<date>/audit-result
 ## 验证依据
 
 - 已在 BD 样例模型（`GBP_Revit_Templates_R27`，2026-10-12 至 13，第 1 轮功能 A 与功能 B 后回归准备）上验证：第 1 轮的每个发现都能对应到本包的检查项。
-- 「常见坑」来自该样例。正常项目模型上，最常见的情况可能是图表根本不存在：按各 AUD 的「没有该图 / 表时」判。
+- 2026-10-14 至 15 在 Cursor 里用同一模型跑了整套（revit-mcp 和 mcp-servers-for-revit 两种 MCP）：找出的三个包内错误（制表符分隔的明细表 CSV、G5 车位计数、G4 未读读数被当作已读）已修；修后 G2 结果与原有运行逐项相同。
+- 只在这一个模型上验证过，还没在其他项目上试。「常见坑」来自该样例。正常项目模型上，最常见的情况可能是图表根本不存在：按各 AUD 的「没有该图 / 表时」判。
 
 ## 维护
 
@@ -135,3 +167,4 @@ python "Model Audit/report/render_report.py" --results audit-<date>/audit-result
 - 换 MCP：加 `L3-SOP/SOP-AUD-mcp-<名称>.md` 和 `L4-Capabilities/CAP-binding-<名称>.md`。
 - 发现新坑：加进对应 AUD 的「常见坑」。
 - 报告格式：改 `templates/`（样式在 `report-template.html` 的 `report-css`）与 `report/render_report.py`，两者一起改。
+- 改完跑测试和包检查（在 repo 的 `model-audit-design/_agent/`，只用标准库）：每个 `python -I test_*.py` 单独跑；`python -I check_package.py --layer all` 查文件、链接、Skill。
