@@ -1,6 +1,5 @@
 
 
-https://github.com/user-attachments/assets/44fe4baa-0d27-4de4-acd0-5a41e4b6e952
 
 # GBP Model Audit
 
