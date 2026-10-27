@@ -115,6 +115,8 @@ Layer 3（MCP 专属）。MCP：Autodesk「Revit MCP Experimental Technical Prev
 
 **取全部 id**：revit-mcp 的 `query_model` 设 `maxResults` 为大数（例 10000）——设 0 时**一个 id 都不回**；mcp-servers-for-revit 设 0 = 全部。存下的 `query_*` 被截断或没有 id，转换脚本会停下并说明。
 
+本节是**基准配方**：其他 MCP 的 SOP 只写与它不同的步骤。每一步的「能力」栏是该步要的能力（[CAP-catalog](../L4-Capabilities/CAP-catalog.md)）：换 MCP 时，按它的对照表找到提供同一能力的工具代替本栏的调用。提取文件的列与单位见 [EXTRACT-FILES](EXTRACT-FILES.md)。
+
 配方把 MCP 回传值存成提取文件，分析脚本只读这些文件（[AUD-000 §10](../L2-Task-Logic/AUD-000_Audit_Flow.md)）。长度、坐标一律英尺，面积用显示值（m²，三位小数）。文件用 UTF-8、Tab 分隔，首行是表头。一次回传太多时分几份（`cw_part1.tsv`、`cw_part2.tsv`……），脚本会合并。
 
 <a id="r-s14"></a>
@@ -122,15 +124,15 @@ Layer 3（MCP 专属）。MCP：Autodesk「Revit MCP Experimental Technical Prev
 
 每次调用的回传**原样**存进 `<run>/_raw/mcp/`（文件名决定用途，可分多份 `<种类>_<份>.json`），再用脚本转换；不手抄、不自己写转换脚本。
 
-| 步 | 调用（只读） | 存成 `_raw/mcp/` |
-| --- | --- | --- |
-| 1 | 房间：同 R-G2 第 1 步（可直接复用 G2 存下的回传） | `query_rooms*`、`rooms*`、`room_boundaries*` |
-| 2 | `query_model` 类别 `OST_Walls`、名称含 glass / louvre（取全部 id，见下）→ `get_element_data`（basic + boundingBox + `Area`、`Mark`） | `query_cw*`、`cw*` |
-| 3 | `query_model` 类别 `OST_CurtainWallPanels` → `get_element_data`（basic + boundingBox + `Area`）；全部嵌板都取，H / L 由脚本按族名与类型名判 | `query_pn*`、`pn*` |
-| 4 | `query_model` 类别 `OST_Windows` → `get_element_data`（basic + boundingBox + `Area`、`Mark`） | `query_windows*`、`windows*` |
-| 5 | `query_model` 类别 `OST_Doors` → `get_element_data`（basic + boundingBox + `Area`、`Mark`；与 R-G2 第 3 步合并成一次，再加 `width_MOE`、`Level`） | `query_doors*`、`doors*` |
-| 6 | 模型里的 S14 明细表：`export_views`（CSV，`directoryPath` = `_raw`） | `_raw/` 下的 S14 CSV（给 `--schedule`） |
-| 7 | `python "Model Audit/tools/extract/g1_extract.py" --mcp <run>/_raw/mcp --out <run>/_raw` | 写 `rooms.tsv`、`room_polygons.json`、`cw_part1.tsv`、`pn_part1.tsv`、`pn_bbox_sample.tsv`、`fs_windows.tsv`、`doors.tsv`、`doors_other.tsv` |
+| 步 | 调用（只读） | 存成 `_raw/mcp/` | 能力 |
+| --- | --- | --- | --- |
+| 1 | 房间：同 R-G2 第 1 步（可直接复用 G2 存下的回传） | `query_rooms*`、`rooms*`、`room_boundaries*` | `CAP-EXTRACT-ROOMS` |
+| 2 | `query_model` 类别 `OST_Walls`、名称含 glass / louvre（取全部 id，见下）→ `get_element_data`（basic + boundingBox + `Area`、`Mark`） | `query_cw*`、`cw*` | `CAP-EXTRACT-OPENINGS` |
+| 3 | `query_model` 类别 `OST_CurtainWallPanels` → `get_element_data`（basic + boundingBox + `Area`）；全部嵌板都取，H / L 由脚本按族名与类型名判 | `query_pn*`、`pn*` | `CAP-EXTRACT-OPENINGS` |
+| 4 | `query_model` 类别 `OST_Windows` → `get_element_data`（basic + boundingBox + `Area`、`Mark`） | `query_windows*`、`windows*` | `CAP-EXTRACT-OPENINGS` |
+| 5 | `query_model` 类别 `OST_Doors` → `get_element_data`（basic + boundingBox + `Area`、`Mark`；与 R-G2 第 3 步合并成一次，再加 `width_MOE`、`Level`） | `query_doors*`、`doors*` | `CAP-EXTRACT-OPENINGS`、`CAP-MEASURE-WIDTH` |
+| 6 | 模型里的 S14 明细表：`export_views`（CSV，`directoryPath` = `_raw`） | `_raw/` 下的 S14 CSV（给 `--schedule`） | `CAP-LIST-VIEWS-SHEETS`、`CAP-EXPORT-TABLE` |
+| 7 | `python "Model Audit/tools/extract/g1_extract.py" --mcp <run>/_raw/mcp --out <run>/_raw` | 写 `rooms.tsv`、`room_polygons.json`、`cw_part1.tsv`、`pn_part1.tsv`、`pn_bbox_sample.tsv`、`fs_windows.tsv`、`doors.tsv`、`doors_other.tsv` | 转换（不调 MCP） |
 
 第 7 步的脚本：
 - 嵌板：族名含 Louvre → L；类型名含 hung → H；其余是固定玻璃（玻璃已算在幕墙面积里），不收、列出数量。每块嵌板的包围盒都写进 `pn_bbox_sample.tsv`（开口顶高），不再抽样。
@@ -156,13 +158,13 @@ python "Model Audit/tools/s14_lv/report.py" --analysis <run>/C14_analysis_<名>.
 
 每次调用的回传**原样**存进 `<run>/_raw/mcp/`（文件名决定用途，可分多份），再用脚本转成提取文件；不手抄、不自己写转换脚本。
 
-| 步 | 调用（只读） | 存成 `_raw/mcp/` |
-| --- | --- | --- |
-| 1 | `query_model` 类别 `OST_Rooms`（取全部 id，见下）→ `get_element_data`（basic + boundingBox + SpecificParameters `Name`、`Number`、`Area`、`Level`）；`get_room_boundaries`（MCP 有此工具时；至少非矩形房间和洗手间） | `query_rooms*.json`、`rooms*.json`、`room_boundaries*.json` |
-| 2 | `query_model` 类别 `OST_PlumbingFixtures` → `get_element_data`（basic + boundingBox） | `query_fixtures*.json`、`fixtures*.json` |
-| 3 | `query_model` 类别 `OST_Doors` → `get_element_data`（basic + boundingBox + SpecificParameters `width_MOE`、`Level`） | `query_doors*.json`、`doors*.json` |
-| 4 | `get_all_schedules` → `export_views`（CSV，`directoryPath` = 本次 `_raw`） | `_raw/` 下的 GBP S10 / S11 / S13 CSV（模型直接写文件） |
-| 5 | `python "Model Audit/tools/extract/g2_extract.py" --mcp <run>/_raw/mcp --out <run>/_raw` | 写 `rooms.tsv`、`fixtures.tsv`、`doors_all.tsv`、`room_polygons.json` |
+| 步 | 调用（只读） | 存成 `_raw/mcp/` | 能力 |
+| --- | --- | --- | --- |
+| 1 | `query_model` 类别 `OST_Rooms`（取全部 id，见下）→ `get_element_data`（basic + boundingBox + SpecificParameters `Name`、`Number`、`Area`、`Level`）；`get_room_boundaries`（MCP 有此工具时；至少非矩形房间和洗手间） | `query_rooms*.json`、`rooms*.json`、`room_boundaries*.json` | `CAP-EXTRACT-ROOMS` |
+| 2 | `query_model` 类别 `OST_PlumbingFixtures` → `get_element_data`（basic + boundingBox） | `query_fixtures*.json`、`fixtures*.json` | `CAP-QUERY-ELEMENTS`（洁具位置，供 `CAP-ASSOCIATE-FIXTURES-DOORS`） |
+| 3 | `query_model` 类别 `OST_Doors` → `get_element_data`（basic + boundingBox + SpecificParameters `width_MOE`、`Level`） | `query_doors*.json`、`doors*.json` | `CAP-EXTRACT-OPENINGS`、`CAP-MEASURE-WIDTH` |
+| 4 | `get_all_schedules` → `export_views`（CSV，`directoryPath` = 本次 `_raw`） | `_raw/` 下的 GBP S10 / S11 / S13 CSV（模型直接写文件） | `CAP-LIST-VIEWS-SHEETS`、`CAP-EXPORT-TABLE` |
+| 5 | `python "Model Audit/tools/extract/g2_extract.py" --mcp <run>/_raw/mcp --out <run>/_raw` | 写 `rooms.tsv`、`fixtures.tsv`、`doors_all.tsv`、`room_polygons.json` | 转换（不调 MCP） |
 
 第 5 步的脚本：
 - 按回传的形状认格式（revit-mcp 与 mcp-servers-for-revit 都认得）；不认得就停，说明要加适配器。
@@ -185,14 +187,14 @@ python "Model Audit/tools/common/task_report.py" --analysis <run>/G2_analysis_<�
 
 每次调用的回传**原样**存进 `<run>/_raw/mcp/`（文件名决定用途），再用脚本转换；不手抄、不自己写转换脚本。
 
-| 步 | 调用（只读） | 存成 `_raw/mcp/` |
-| --- | --- | --- |
-| 1 | `query_model` 类别 `OST_Areas`（取全部 id，见下） | `query_areas*` |
-| 2 | `get_element_data` 全部 Area：boundingBox + 下面的面积参数（SpecificParameters；revit-mcp 每次约 40 个，可分多份；同一 Area 分在几份里也可以，脚本按 id 合并） | `areas*` |
-| 3 | `get_element_data` 全部面积方案（`OST_AreaSchemes`，basic）与地界（`OST_SiteProperty`，`Area`）——也可以和第 2 步放在同一批 | `area_schemes*`、`property_lines*`（或在 `areas*` 里） |
-| 4 | `query_model` 类别 `OST_RasterImages` → `get_element_data`（basic + `Width`、`Height`） | `query_rasters*`、`rasters*` |
-| 5 | `python "Model Audit/tools/extract/g3_extract.py" --mcp <run>/_raw/mcp --out <run>/_raw` | 写 `areas.tsv`、`area_schemes.tsv`、`rasters.tsv` |
-| 6 | `export_views`（PNG）C001–C008、A001 → 读图，必要时裁切放大 | `sheets/*.png`、`table_values.tsv`（见下面「读数规则」） |
+| 步 | 调用（只读） | 存成 `_raw/mcp/` | 能力 |
+| --- | --- | --- | --- |
+| 1 | `query_model` 类别 `OST_Areas`（取全部 id，见下） | `query_areas*` | `CAP-QUERY-ELEMENTS` |
+| 2 | `get_element_data` 全部 Area：boundingBox + 下面的面积参数（SpecificParameters；revit-mcp 每次约 40 个，可分多份；同一 Area 分在几份里也可以，脚本按 id 合并） | `areas*` | `CAP-EXTRACT-AREAS` |
+| 3 | `get_element_data` 全部面积方案（`OST_AreaSchemes`，basic）与地界（`OST_SiteProperty`，`Area`）——也可以和第 2 步放在同一批 | `area_schemes*`、`property_lines*`（或在 `areas*` 里） | `CAP-EXTRACT-AREAS`、`CAP-EXTRACT-SITE` |
+| 4 | `query_model` 类别 `OST_RasterImages` → `get_element_data`（basic + `Width`、`Height`） | `query_rasters*`、`rasters*` | `CAP-QUERY-ELEMENTS`（光栅图，GEN-01） |
+| 5 | `python "Model Audit/tools/extract/g3_extract.py" --mcp <run>/_raw/mcp --out <run>/_raw` | 写 `areas.tsv`、`area_schemes.tsv`、`rasters.tsv` | 转换（不调 MCP） |
+| 6 | `export_views`（PNG）C001–C008、A001 → 读图，必要时裁切放大 | `sheets/*.png`、`table_values.tsv`（见下面「读数规则」） | `CAP-EXPORT-IMAGE`；读图 |
 
 面积参数（BD GBP 样板名）：Area Scheme Id、Area、Number、Name、Level、Common Area、GFA SUMMARY、GFA DEDUCT 2.2 / 2.3 / 21 / 25 / 27、SERVED FACADE、FRR minutes、FRC COMPARTMENT、FRC HEIGHT、Perimeter、Area Type。别的样板参数名不同：`--param-map map.json`。第 5 步核对 `query_model` 的 id 一个不少、每个 Area 的方案都读到；没放置的地界（无面积）不收并列出。2026-10-14 用它重转 2026-10-13 的回传，`areas.tsv`、`area_schemes.tsv` 与原提取逐字节相同。
 
@@ -217,17 +219,17 @@ python "Model Audit/tools/common/task_report.py" --analysis <run>/G3_analysis_<�
 
 第 1–4 步的回传**原样**存进 `<run>/_raw/mcp/`，再用第 4b 步的脚本转换；不手抄、不自己写转换脚本。
 
-| 步 | 调用（只读） | 存成 | 核对 |
-| --- | --- | --- | --- |
-| 1 | `get_sheets` → `get_views_on_sheets`（全部图纸） | `mcp/sheets*`、`mcp/views_on_sheets*` | — |
-| 2 | 每个图上视图（图例、明细表除外）一次 `query_model`（`searchScope: SpecificView`、`maxResults: 1`） | `mcp/view_counts_<视图 id>.json`（回传不含视图 id，所以写进文件名） | 脚本列出没有计数的视图 |
-| 3 | `get_element_data` 图上视图（basic + SpecificParameters：View Scale、View Template、Title on Sheet、Sheet Number） | `mcp/view_props*` | 脚本列出没有属性的视图 |
-| 4 | `query_model` 类别 `OST_TitleBlocks`、`OST_ProjectInformation` → `get_element_data`（AllParameters）；`query_model` 类别 `OST_RvtLinks`（TypesAndInstances，`maxResults` 大数） | `mcp/titleblocks.json`（分析脚本直接读）、`mcp/query_rvtlinks*` | 图框数 = 图纸数 |
-| 4b | `python "Model Audit/tools/extract/g4_extract.py" --mcp <run>/_raw/mcp --out <run>/_raw` | 写 `views_on_sheets.tsv`、`view_props.tsv`、`view_counts.json`、`model_counts.json` | 图框里的修订明细表不列（`--keep-revision-schedules` 可保留）；类型名前的控制字符（系统剖面 / 立面类型）清掉并加视图类别，如 `Section (ARC_gbp)`；自定义比例记 `custom` |
-| 5 | `export_views`（PNG）要取色或读字的图纸 | `sheets/*.png` | — |
-| 6 | `python sample_colours.py --sheets sheets --out colour_samples.json [--regions regions.json]` | `colour_samples.json` | 不给区域框也行：每张图出一份整图统计，足以判粉红有无、Table 1 是否完全相等；半色调要区域框（`regions.json`），否则 UNCLEAR |
-| 7 | `python rvt_info.py <模型.rvt> --out rvt_info.json`（只读模型文件） | `rvt_info.json` | 读不到文件 → GAP-04 照旧 |
-| 8 | 读图：地段号、街道、坐标表、标高标头、邻街标高；坐标格式、方位角与边长、修改清单、N/A 表 | `readings.tsv`、`coords.tsv` | 每行写图纸与可信度；判断类加 `finding`（PASS / FAIL）。key：`streets`、`level_heads`、`coords_table`、`coords_format`、`coords_bearings`、`modification_list`、`na_table` |
+| 步 | 调用（只读） | 存成 | 核对 | 能力 |
+| --- | --- | --- | --- | --- |
+| 1 | `get_sheets` → `get_views_on_sheets`（全部图纸） | `mcp/sheets*`、`mcp/views_on_sheets*` | — | `CAP-LIST-VIEWS-SHEETS` |
+| 2 | 每个图上视图（图例、明细表除外）一次 `query_model`（`searchScope: SpecificView`、`maxResults: 1`） | `mcp/view_counts_<视图 id>.json`（回传不含视图 id，所以写进文件名） | 脚本列出没有计数的视图 | `CAP-QUERY-ELEMENTS`（按视图计数） |
+| 3 | `get_element_data` 图上视图（basic + SpecificParameters：View Scale、View Template、Title on Sheet、Sheet Number） | `mcp/view_props*` | 脚本列出没有属性的视图 | `CAP-LIST-VIEWS-SHEETS` |
+| 4 | `query_model` 类别 `OST_TitleBlocks`、`OST_ProjectInformation` → `get_element_data`（AllParameters）；`query_model` 类别 `OST_RvtLinks`（TypesAndInstances，`maxResults` 大数） | `mcp/titleblocks.json`（分析脚本直接读）、`mcp/query_rvtlinks*` | 图框数 = 图纸数 | `CAP-LIST-VIEWS-SHEETS`（图框）、`CAP-PROJECT-CONTEXT`、`CAP-QUERY-ELEMENTS`（链接数） |
+| 4b | `python "Model Audit/tools/extract/g4_extract.py" --mcp <run>/_raw/mcp --out <run>/_raw` | 写 `views_on_sheets.tsv`、`view_props.tsv`、`view_counts.json`、`model_counts.json` | 图框里的修订明细表不列（`--keep-revision-schedules` 可保留）；类型名前的控制字符（系统剖面 / 立面类型）清掉并加视图类别，如 `Section (ARC_gbp)`；自定义比例记 `custom` | 转换（不调 MCP） |
+| 5 | `export_views`（PNG）要取色或读字的图纸 | `sheets/*.png` | — | `CAP-EXPORT-IMAGE` |
+| 6 | `python sample_colours.py --sheets sheets --out colour_samples.json [--regions regions.json]` | `colour_samples.json` | 不给区域框也行：每张图出一份整图统计，足以判粉红有无、Table 1 是否完全相等；半色调要区域框（`regions.json`），否则 UNCLEAR | `AGENT-IMAGE-SAMPLE` |
+| 7 | `python rvt_info.py <模型.rvt> --out rvt_info.json`（只读模型文件） | `rvt_info.json` | 读不到文件 → GAP-04 照旧 | `AGENT-FILE-INFO` |
+| 8 | 读图：地段号、街道、坐标表、标高标头、邻街标高；坐标格式、方位角与边长、修改清单、N/A 表 | `readings.tsv`、`coords.tsv` | 每行写图纸与可信度；判断类加 `finding`（PASS / FAIL）。key：`streets`、`level_heads`、`coords_table`、`coords_format`、`coords_bearings`、`modification_list`、`na_table` | 读图（人或 agent） |
 
 ```
 python "Model Audit/tools/drawings/analyze.py" --raw <run>/_raw --project <名> --model <路径> --out <run>/G4_analysis_<名>.json [--s14 <S14 JSON>] [--g3 <G3 JSON>]
@@ -241,14 +243,14 @@ python "Model Audit/tools/common/task_report.py" --analysis <run>/G4_analysis_<�
 
 每次调用的回传**原样**存进 `<g5>/_raw/mcp/`，再用脚本转换。
 
-| 步 | 调用（只读） | 存成 `_raw/mcp/` |
-| --- | --- | --- |
-| 1 | `query_model` 类别 `OST_Levels`（取全部 id）→ `get_element_data`（basic + `Elevation`、`Building Story`） | `query_levels*`、`levels*` |
-| 2 | `query_model` 类别 `OST_ProjectBasePoint`、`OST_SharedBasePoint`、`OST_SiteProperty` → `get_element_data`（basic + boundingBox + `E/W`、`N/S`、`Elev`、`Angle to True North`、`Area`） | `query_points*`、`points*` |
-| 3 | `get_all_schedules` | `schedules*` |
-| 4 | `python "Model Audit/tools/extract/g5_extract.py" --mcp <g5>/_raw/mcp --out <g5>/_raw` | 写 `levels.tsv`、`points.tsv`、`all_schedules.tsv`（图框里的修订明细表不列，`--keep-revision-schedules` 可保留） |
-| 5 | 读 A001 图纸目录（图上读，不是提取） | `drawing_list.tsv` |
-| 6 | 已有：G2、G3、G4、S14 的分析 JSON；G3 `table_values.tsv`、`rasters.tsv`；G4 `coords.tsv`、`readings.tsv`、`rvt_info.json`；G2 停车明细表 CSV | — |
+| 步 | 调用（只读） | 存成 `_raw/mcp/` | 能力 |
+| --- | --- | --- | --- |
+| 1 | `query_model` 类别 `OST_Levels`（取全部 id）→ `get_element_data`（basic + `Elevation`、`Building Story`） | `query_levels*`、`levels*` | `CAP-PROJECT-CONTEXT` |
+| 2 | `query_model` 类别 `OST_ProjectBasePoint`、`OST_SharedBasePoint`、`OST_SiteProperty` → `get_element_data`（basic + boundingBox + `E/W`、`N/S`、`Elev`、`Angle to True North`、`Area`） | `query_points*`、`points*` | `CAP-EXTRACT-COORDINATES`、`CAP-EXTRACT-SITE` |
+| 3 | `get_all_schedules` | `schedules*` | `CAP-LIST-VIEWS-SHEETS`（明细表清单） |
+| 4 | `python "Model Audit/tools/extract/g5_extract.py" --mcp <g5>/_raw/mcp --out <g5>/_raw` | 写 `levels.tsv`、`points.tsv`、`all_schedules.tsv`（图框里的修订明细表不列，`--keep-revision-schedules` 可保留） | 转换（不调 MCP） |
+| 5 | 读 A001 图纸目录（图上读，不是提取） | `drawing_list.tsv` | 读图（人或 agent） |
+| 6 | 已有：G2、G3、G4、S14 的分析 JSON；G3 `table_values.tsv`、`rasters.tsv`；G4 `coords.tsv`、`readings.tsv`、`rvt_info.json`；G2 停车明细表 CSV | — | 已有（其他组的结果） |
 
 2026-10-14 实测（只读，约 5 次调用）：用 g5_extract 转出的 `levels.tsv`、`all_schedules.tsv` 与原提取逐字节相同，`points.tsv` 逐值相同，G5 分析 57 项结论相同。
 

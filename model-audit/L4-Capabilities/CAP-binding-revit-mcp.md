@@ -1,12 +1,12 @@
 # CAP-binding-revit-mcp · 能力对照（功能 A）
 
-Layer 4。把 [Capability Catalog](../../HK%20GBP%20MCP%20Capability%20Catalog.md) 的能力 ID 对应到 Autodesk revit-mcp（Experimental Technical Preview）的工具。只列功能 A（审核）用到的能力；写入类能力不在本表。
+Layer 4。把 [CAP-catalog](CAP-catalog.md) 的能力 ID（摘自知识库 Capability Catalog v3.0） 对应到 Autodesk revit-mcp（Experimental Technical Preview）的工具。只列功能 A（审核）用到的能力；写入类能力不在本表。
 
 - 状态：**Full** 能完整取得 / **Partial** 能取得一部分 / **Missing** 没有工具。
 - 标记：`实测`（2026-10-12 至 13，BD 样例模型）/ `待试`。
 - 缺口详情见 [CAP-gaps](CAP-gaps.md)；调用细节见 [SOP-AUD-mcp-revit-mcp](../L3-SOP/SOP-AUD-mcp-revit-mcp.md)。
 
-换 MCP：新建 `CAP-binding-<名称>.md`，按同样的行填工具与状态。RUN.md 规定：当前 MCP 没有对照表时，先做对照表再审。
+换 MCP：按 [CAP-onboarding](CAP-onboarding.md) 新建 `CAP-binding-<名称>.md`。RUN.md 规定：当前 MCP 没有对照表时，先做对照表再审。
 
 ## Host 能力
 

@@ -12,7 +12,7 @@
 1. 确认打开的模型：文件名、路径；记下会话标识（如进程 ID）。确认是**副本或可只读的文件**，不是要交付的中心文件。
 2. 确认这是**只读审核**。本包对模型不包含任何写入步骤（第 0 步装 Skill 只写项目文件夹）。
 3. 选对照表：在 [L4-Capabilities/](L4-Capabilities/) 找当前 MCP 的 `CAP-binding-*`。
-   - **当前 MCP 没有对照表**：停下来，告诉操作者。先按 Capability Catalog 为它做对照表和 `L3-SOP/SOP-AUD-mcp-*`，再开始。不要拿别的 MCP 的工具名硬套。
+   - **当前 MCP 没有对照表**：停下来，告诉操作者。先按 [CAP-onboarding](L4-Capabilities/CAP-onboarding.md) 为它做对照表和 `L3-SOP/SOP-AUD-mcp-*`，再开始。不要拿别的 MCP 的工具名硬套。
 4. 检查前提：法例原文（`../Legislation/`）、代码执行能力。缺哪项，按 README 的「没有时」处理，并写进报告的 Not determinable。
 5. 读 [AUD-000](L2-Task-Logic/AUD-000_Audit_Flow.md)，向操作者收集或确认「项目输入清单」（INP-01 至 INP-17）里已有的项。
 

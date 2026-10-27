@@ -1,6 +1,6 @@
 # CAP-binding-mcp-servers-for-revit · 能力对照（功能 A）
 
-Layer 4。把 [Capability Catalog](../../HK%20GBP%20MCP%20Capability%20Catalog.md) 的能力 ID 对应到 mcp-servers-for-revit（开源 Revit MCP，约 40 个工具）的工具。只列功能 A（审核）用到的能力；写入类工具（`operate_element`、`delete_element`、`create_*`、`send_code_to_revit` 等）不属于审核，不用。
+Layer 4。把 [CAP-catalog](CAP-catalog.md) 的能力 ID（摘自知识库 Capability Catalog v3.0） 对应到 mcp-servers-for-revit（开源 Revit MCP，约 40 个工具）的工具。只列功能 A（审核）用到的能力；写入类工具（`operate_element`、`delete_element`、`create_*`、`send_code_to_revit` 等）不属于审核，不用。
 
 - 状态：**Full** 能完整取得 / **Partial** 能取得一部分 / **Missing** 没有工具。
 - 标记：`实测`（日期，BD 样例模型）/ `待试`（工具存在，未在本项目实测）。

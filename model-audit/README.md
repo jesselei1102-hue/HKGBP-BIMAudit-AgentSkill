@@ -21,8 +21,8 @@ Roadmap **功能 A（Model Audit）** 按四层架构的实现：只读审核一
 | --- | --- | --- | --- |
 | L1 行业知识 | [L1-Domain/](L1-Domain/) | 硬性要求、限值索引、适用性判定、颜色标准、勘误、缺少的原文 | 法例 / PNAP 更新 |
 | L2 任务逻辑 | [L2-Task-Logic/](L2-Task-Logic/) | 总流程、模型健康、36 个 Task 的审核逻辑、回归；软件无关，不出现工具名 | 判定逻辑改变 |
-| L3 SOP | [L3-SOP/](L3-SOP/) | 人工在 Revit 里怎么取；用某个 MCP 怎么取 | 换 Revit 版本、换 MCP |
-| L4 能力 | [L4-Capabilities/](L4-Capabilities/) | 能力 ID → MCP 工具对照、能力缺口 | 换 MCP |
+| L3 SOP | [L3-SOP/](L3-SOP/) | 人工在 Revit 里怎么取；用某个 MCP 怎么取（基准配方每步标能力）；提取文件的约定 [EXTRACT-FILES](L3-SOP/EXTRACT-FILES.md) | 换 Revit 版本、换 MCP |
+| L4 能力 | [L4-Capabilities/](L4-Capabilities/) | 能力清单 [CAP-catalog](L4-Capabilities/CAP-catalog.md)、接入新 MCP 的步骤 [CAP-onboarding](L4-Capabilities/CAP-onboarding.md)、各 MCP 的能力对照、能力缺口 | 换 MCP |
 | 模板与报告 | [templates/](templates/)、[report/](report/) | 结果 schema、finding schema、N/A 表、HTML 模板、报告生成脚本 | 报告格式改变 |
 | Skills | [skills/](skills/) | 6 个 `SKILL.md`：给支持 Skill 的 harness 自动触发；只指向本包，不含规则 | 加组、改命令 |
 | 提取转换 | [tools/extract/](tools/extract/) | 把 MCP 原样回传转成提取文件（`g1_extract.py`、`g2_extract.py`、`g3_extract.py`、`g4_extract.py`、`g5_extract.py`，共用 `mcp_formats.py`；认 revit-mcp 与 mcp-servers-for-revit 两种格式） | 换 MCP 时加适配器 |
@@ -225,7 +225,7 @@ python "Model Audit/report/render_report.py" --results audit-<date>/audit-result
 ## 维护
 
 - 法例更新：改 L1（DK-AUD-002 的行与原文）。
-- 换 MCP：加 `L3-SOP/SOP-AUD-mcp-<名称>.md` 和 `L4-Capabilities/CAP-binding-<名称>.md`（例：mcp-servers-for-revit 的两份）；回传格式不认得时在 `tools/extract/` 加适配器。
+- 换 MCP：按 [CAP-onboarding](L4-Capabilities/CAP-onboarding.md) 加 `L3-SOP/SOP-AUD-mcp-<名称>.md` 和 `L4-Capabilities/CAP-binding-<名称>.md`（例：mcp-servers-for-revit 的两份）；回传格式不认得时在 `tools/extract/` 加适配器，输出对齐 [EXTRACT-FILES](L3-SOP/EXTRACT-FILES.md)。
 - 发现新坑：加进对应 AUD 的「常见坑」。
 - 报告格式：改 `templates/`（样式在 `report-template.html` 的 `report-css`）与 `report/render_report.py`，两者一起改。
 - 改完跑测试和包检查（在 repo 的 `model-audit-design/_agent/`，只用标准库）：每个 `python -I test_*.py` 单独跑；`python -I check_package.py --layer all` 查文件、链接、Skill。
