@@ -26,6 +26,7 @@ Roadmap **功能 A（Model Audit）** 按四层架构的实现：只读审核一
 | 模板与报告 | [templates/](templates/)、[report/](report/) | 结果 schema、finding schema、N/A 表、HTML 模板、报告生成脚本 | 报告格式改变 |
 | Skills | [skills/](skills/) | 6 个 `SKILL.md`：给支持 Skill 的 harness 自动触发；只指向本包，不含规则 | 加组、改命令 |
 | 提取转换 | [tools/extract/](tools/extract/) | 把 MCP 原样回传转成提取文件（`g1_extract.py`、`g2_extract.py`、`g3_extract.py`、`g4_extract.py`、`g5_extract.py`，共用 `mcp_formats.py`；认 revit-mcp 与 mcp-servers-for-revit 两种格式） | 换 MCP 时加适配器 |
+| 对话窗口（可选） | [app/](app/) | `gbp-audit` MCP server：在对话里弹出「选检查」和「总览 / 确认关口」两个窗口；要 Node.js ≥ 20。见 [app/README.md](app/README.md)、RUN.md §6d | 改窗口或任务清单 |
 | 执行工具 | [tools/](tools/) | 每组的分析脚本（只读提取文件 → 分析 JSON + 屏幕摘要）、通用 Excel / HTML 报告、汇总成 audit-results.json；只用 Python 标准库（取色要 Pillow） | 规则或提取格式改变 |
 
 ### 合并同类项后的六组
@@ -156,6 +157,7 @@ Roadmap **功能 A（Model Audit）** 按四层架构的实现：只读审核一
 | G4、G5 的提取要 revit-mcp（mcp-servers-for-revit 没有房间边界、图纸、图纸上的视图、明细表清单这几类工具）；G1–G3 两个 MCP 都可以，`tools/extract/` 转出的提取文件相同 | 只连 mcp-servers-for-revit 时，G4、G5 缺的项记 Unclear |
 | 法例原文在 `../Legislation/`（cap123、cap123f、cap123h、cap123i） | L2 一律 Unclear；限值索引不能代替原文 |
 | BIMGBPS corpus、PNAP 在 `../source/` | 同上 |
+| 想用对话窗口：Node.js ≥ 20，并注册 `app/` 的 server | 用 RUN.md §7 的文字指令，流程相同 |
 | harness 能执行 Python 3 | 颜色取样改人工（L3 manual）；报告改用 HTML 模板手填，封面注明 |
 
 ## 报告

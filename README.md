@@ -17,13 +17,14 @@ https://github.com/user-attachments/assets/f34f77bf-a4f4-4862-89c0-07189c292e10
 
 | Folder | What |
 | --- | --- |
-| [model-audit/](model-audit/) | The package: four layers (L1 domain, L2 task logic, L3 Revit SOP, L4 MCP capabilities), executable tools, report templates and Agent Skills. Start with [model-audit/README.md](model-audit/README.md) and [model-audit/RUN.md](model-audit/RUN.md). |
+| [model-audit/](model-audit/) | The package: four layers (L1 domain, L2 task logic, L3 Revit SOP, L4 MCP capabilities), executable tools, report templates, Agent Skills and an optional chat window (`model-audit/app/`, an MCP App). Start with [model-audit/README.md](model-audit/README.md) and [model-audit/RUN.md](model-audit/RUN.md). |
 | [model-audit-design/](model-audit-design/) | Design and plan documents; `_agent/` holds the tests, validation scripts, real-response fixtures and the progress ledger. |
 
 ## Requirements
 
 - A Revit model opened in Revit with a Revit MCP server connected to your agent (revit-mcp; mcp-servers-for-revit for element data).
 - Python 3 (standard library; Pillow for colour sampling).
+- Optional: Node.js 20 or later for the chat window ([model-audit/app/](model-audit/app/README.md)).
 - The legislation and BIMGBPS source texts are **not** included; the package expects them next to it (`../Legislation/`, `../source/`) and reports UNCLEAR without them.
 
 ## Tests
@@ -32,6 +33,8 @@ https://github.com/user-attachments/assets/f34f77bf-a4f4-4862-89c0-07189c292e10
 cd model-audit-design/_agent
 python -I test_s14.py
 ```
+
+The chat window has its own tests: `cd model-audit/app && npm install && npm test`.
 
 Each `test_*.py` runs on its own (standard library `unittest`). Tests that compare with the original sample audit runs are
 skipped when those runs are not present.

@@ -15,6 +15,10 @@ description: Use when asked to audit a Revit model for a Hong Kong GBP (general 
 2. 读 `<PKG>/L2-Task-Logic/AUD-000_Audit_Flow.md`：状态词、项目输入清单（INP-01–17）、§10 两段式规则。
 3. 向操作者确认已有的项目输入。
 
+## 1b. 有对话窗口时
+
+当前会话有 `choose_checks` 工具（对话窗口 server，见 `<PKG>/app/README.md`）：先调它，让操作者在窗口里选检查，照窗口发来的指令执行；分析完调 `show_overview(run)` 等确认。完整步骤见 `<PKG>/RUN.md` §6d。没有这个工具就照下文。
+
 ## 2. 选组
 
 | 操作者要的 | 用哪个 Skill |

@@ -86,6 +86,18 @@
 4. 已有整次审核时并回去：`build_results.py` 用上次的全部参数，再加 `--update <run>/G2_S10.json`（`--group` 里要有 G2 的完整 JSON）；然后重出 bim / ap 两份总报告。只有 S10 的结果会变。
 5. S14 本身就是一组（G1），单独跑即 R-S14 + `tools/s14_lv/`，并回时给 `--s14` 新的 audit-results.json。
 
+## 6d. 用对话窗口（有 `gbp-audit` 工具时）
+
+`app/` 是一个可选的 MCP server（见 [app/README.md](app/README.md)），在对话里弹出窗口。有 `choose_checks` 工具时：
+
+1. 操作者要做 GBP 审核 → 先调 `choose_checks`，等窗口发来的指令，照指令执行（§6b 整套 / §6c 部分 Task）。
+2. 所有组的分析 JSON 放在指令写的同一个审核文件夹。
+3. 分析完调 `show_overview(run)`，然后停下，等窗口发来的下一句：
+   - 「Gate confirmed …」：出报告（§6b 第 3–4 步），再调 `show_overview(run)`。
+   - 「These readings … were marked wrong」：按列出的读数重读、重跑相关组的分析，再调 `show_overview(run)`。
+   - 「Build the reports … without a full reading review」：照样出报告；`build_results.py` 会读 `gate-confirmation.json`，报告列出没人核对的读数。再调 `show_overview(run)`。
+4. 没有窗口时照 §6b / §6c / §7。
+
 ## 7. 短 Prompt
 
 - **整套审核**：「Run a full Model Audit on the open model. Follow `Model Audit/RUN.md`. Read-only. Produce `audit-<date>/` with audit-results.json, assets and both reports.」
