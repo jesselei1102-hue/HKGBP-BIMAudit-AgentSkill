@@ -73,7 +73,7 @@ tr.detail-row table td, tr.detail-row table th { background: var(--s1); font-siz
 .pane-why { margin: 4px 0 10px; color: var(--tx2); font-size: 12px; }
 .group { border: 0.5px solid var(--line2); border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; }
 .group-head { display: flex; align-items: center; gap: 8px; cursor: pointer; }
-.group-head .tl { font-family: var(--mono); font-size: 11px; color: var(--tx3); }
+.group-head .tl { font-family: var(--mono); font-size: 11px; color: var(--tx3); white-space: nowrap; }
 .group-head .gi { font-weight: 500; }
 .group .objs, .group .fix { font-size: 12px; margin-top: 4px; overflow-wrap: anywhere; }
 .group .objs { color: var(--tx2); }
