@@ -6,9 +6,9 @@ import { copyText, sendToChat } from "./chat";
 import { groupChecks, type CheckGroup } from "./logic/groups";
 import { markPayload, preloadMarks } from "./logic/marks";
 import { confirmPrompt, joinPath, openReportPrompt, rereadPrompt, unreviewedPrompt } from "./logic/prompts";
-import { reviewState, type Seen } from "./logic/review";
+import { restoreSeen, reviewState, type Seen } from "./logic/review";
 import { escapeHtml } from "./ui/html";
-import { navHtml, stepsHtml, type NavItem } from "./ui/steps";
+import { navHtml, seenButtonHtml, stepsHtml, type NavItem } from "./ui/steps";
 
 export type OverviewData = {
   view: "overview";
@@ -52,7 +52,6 @@ export function renderOverview(
   const hasReports = ov.reportsCurrent;
   const anyReports = !!(ov.reports.bim || ov.reports.ap);
   const marks = preloadMarks(ov.readings, ov.gate?.readings ?? []);
-  const seen: Seen = { failures: false, check_yourself: false, inputs: false, ...ov.gate?.reviewed };
   const taskOrder = ov.tasks.map((t) => t.task);
   const tlOf = new Map(ov.tasks.map((t) => [t.task, t.tl]));
   const nameOf = new Map(ov.tasks.map((t) => [t.task, t.name]));
@@ -61,6 +60,8 @@ export function renderOverview(
   const nFail = failures.reduce((n, g) => n + g.checks.length, 0);
   const nYourself = yourself.reduce((n, g) => n + g.checks.length, 0);
   const nInputs = ov.inputs.length + ov.warnings.length;
+  const listCounts = { failures: nFail, check_yourself: nYourself, inputs: nInputs };
+  const seen: Seen = restoreSeen(ov.gate?.reviewed, ov.gate?.reviewed_counts, listCounts);
   const openGroups = new Set<string>();
   const allObjects = new Set<string>();
   const expanded = new Set(ov.tasks.filter((t) => t.counts.FAIL || t.counts.UNCLEAR).map((t) => t.task));
@@ -115,9 +116,7 @@ export function renderOverview(
   // ---------------------------------------------------------------- pane
   function paneHead(key: ListKey | "readings") {
     const l = LISTS[key];
-    const btn = key !== "readings" && l.button && !hasReports
-      ? `<button class="db${seen[key as ListKey] ? "" : " pri"}" type="button" data-seen="${key}">${seen[key as ListKey] ? "Seen ✓" : l.button}</button>`
-      : "";
+    const btn = key !== "readings" && l.button && !hasReports ? seenButtonHtml(key, l.button, seen[key as ListKey]) : "";
     return `<div class="pane-head"><h2>${l.title}</h2>${btn}</div><p class="pane-why">${l.why}</p>`;
   }
 
@@ -306,7 +305,7 @@ export function renderOverview(
     const { done } = review();
     const reviewed = { failures: done.failures, check_yourself: done.check_yourself, inputs: done.inputs };
     try {
-      const r = (await app.callServerTool({ name: "save_gate", arguments: { run: ov.run, marks: payload, mode, reviewed } })) as ToolResult;
+      const r = (await app.callServerTool({ name: "save_gate", arguments: { run: ov.run, marks: payload, mode, reviewed, reviewed_counts: listCounts } })) as ToolResult;
       if (r.isError) throw new Error(errText(r));
       return true;
     } catch (err) {

@@ -1,6 +1,7 @@
 // Window 1: choose which checks to run (steps bar, sections on the left, tasks on the right), then say what happens next.
 import type { App } from "@modelcontextprotocol/ext-apps";
 import { sendToChat } from "./chat";
+import { singleFlight } from "./logic/once";
 import { joinPath, runPrompt } from "./logic/prompts";
 import { groupsFor, sectionState, toggleSection, toggleTask } from "./logic/selection";
 import { escapeHtml, plural } from "./ui/html";
@@ -162,6 +163,15 @@ export function renderChoose(app: App, data: ChooseData, view: HTMLElement, onSt
     onState(`GBP Model Audit window: ${sent ? "instruction sent to the chat" : "instruction shown for copying"} (${plural(names.length, "check")}, run ${runName()}).`);
   }
 
+  const run = singleFlight(async () => {
+    const name = runName();
+    const text = runPrompt({ tasks: picked().map((x) => x.task), groups: groupsFor(sel, cat), run: name,
+                             runDir: joinPath(data.runsRoot, name), mode, all: all() });
+    $<HTMLButtonElement>("run").disabled = true;
+    const ok = await sendToChat(app, text, view);
+    renderNext(text, ok, ok ? null : view.querySelector(".prompt-box"));
+  });
+
   view.addEventListener("click", async (e) => {
     const t = e.target as HTMLElement;
     const nav = t.closest<HTMLElement>("[data-nav]");
@@ -193,13 +203,7 @@ export function renderChoose(app: App, data: ChooseData, view: HTMLElement, onSt
       mode = "new";
       return render(false);
     }
-    if (t.closest('[data-k="run"]') && sel.size) {
-      const run = runName();
-      const text = runPrompt({ tasks: picked().map((x) => x.task), groups: groupsFor(sel, cat), run,
-                               runDir: joinPath(data.runsRoot, run), mode, all: all() });
-      const ok = await sendToChat(app, text, view);
-      renderNext(text, ok, ok ? null : view.querySelector(".prompt-box"));
-    }
+    if (t.closest('[data-k="run"]') && sel.size) return run();
   });
   view.addEventListener("change", (e) => {
     const t = e.target as HTMLElement;

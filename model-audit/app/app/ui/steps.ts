@@ -22,3 +22,8 @@ export function navHtml(items: NavItem[], selected: string): string {
       `${count}<span class="side-label">${escapeHtml(it.label)}</span>${tick}</button>`;
   }).join("")}</nav>`;
 }
+
+/** The tick button at the top of a review list; secondary, since the dock holds the one primary button. */
+export function seenButtonHtml(key: string, label: string, seen: boolean): string {
+  return `<button class="db" type="button" data-seen="${escapeHtml(key)}">${seen ? "Seen ✓" : escapeHtml(label)}</button>`;
+}

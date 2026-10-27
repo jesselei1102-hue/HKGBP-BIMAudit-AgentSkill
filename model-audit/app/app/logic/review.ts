@@ -1,4 +1,5 @@
 // What the review window still needs before the reports: each list looked at once, every sheet reading marked.
+import type { ReviewCounts, Reviewed } from "../../src/types";
 
 export type Seen = { failures: boolean; check_yourself: boolean; inputs: boolean };
 export type ReviewInput = {
@@ -32,4 +33,10 @@ export function reviewState(i: ReviewInput): ReviewState {
              label: `${i.readingsWrong} ${i.readingsWrong === 1 ? "reading" : "readings"} marked wrong` };
   if (doneCount === 4) return { done, doneCount, dock: "ready", label: "All reviewed" };
   return { done, doneCount, dock: "partial", label: `${doneCount} of 4 reviewed` };
+}
+
+/** Ticks from a saved review, kept only for lists that still hold as many items (an audit added to since starts unticked). */
+export function restoreSeen(reviewed: Reviewed | undefined, counts: ReviewCounts | undefined, now: ReviewCounts): Seen {
+  const keep = (k: keyof Seen) => !!reviewed?.[k] && !!counts && counts[k] === now[k];
+  return { failures: keep("failures"), check_yourself: keep("check_yourself"), inputs: keep("inputs") };
 }

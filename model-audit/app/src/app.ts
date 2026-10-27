@@ -139,12 +139,16 @@ export async function registerApp(
           .object({ failures: z.boolean(), check_yourself: z.boolean(), inputs: z.boolean() })
           .optional()
           .describe("Which review lists were looked at before the reports."),
+        reviewed_counts: z
+          .object({ failures: z.number().int().min(0), check_yourself: z.number().int().min(0), inputs: z.number().int().min(0) })
+          .optional()
+          .describe("How many items each list held when it was looked at."),
       },
       _meta: { ui: { visibility: ["app"] } },
     },
-    async ({ run, marks, mode, reviewed }) => {
+    async ({ run, marks, mode, reviewed, reviewed_counts }) => {
       try {
-        const saved = await saveGate(runsRoot, run, await loadCatalogue(packageRoot), marks, mode, undefined, reviewed);
+        const saved = await saveGate(runsRoot, run, await loadCatalogue(packageRoot), marks, mode, undefined, reviewed, reviewed_counts);
         return result(saved);
       } catch (e) {
         return failure((e as Error).message);

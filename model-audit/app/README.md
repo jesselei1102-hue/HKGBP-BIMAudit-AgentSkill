@@ -72,7 +72,7 @@ when they connect.
 | `choose_checks` | agent | Opens the Choose checks window (task list from `../tasks.json`, earlier audits in the runs folder) |
 | `show_overview(run)` | agent | Opens the Overview window for one run folder |
 | `get_crop(run, file)` | window only | One crop image as base64 (png / jpg, at most 5 MB, inside the run folder) |
-| `save_gate(run, marks, mode, reviewed?)` | window only | Writes `<run>/gate-confirmation.json` (`confirmed` needs every reading marked correct; `reviewed` records which lists were looked at) |
+| `save_gate(run, marks, mode, reviewed?, reviewed_counts?)` | window only | Writes `<run>/gate-confirmation.json` (`confirmed` needs every reading marked correct; `reviewed` records which lists were looked at, `reviewed_counts` how long each was, so a tick only carries over while its list is unchanged) |
 
 ## Develop
 
@@ -82,7 +82,7 @@ python -m http.server 8790      # from the model-audit folder
 ```
 
 Open `http://localhost:8790/app/dev/harness.html` (parameters: `theme=dark`, `view=overview`, `reports=0`, `reports=old`, `error=1`,
-`nomessage=1`, `cursor=1`, `gatefail=1`, `xss=1`, `reviewed=1`). The harness simulates the four tools and records `window.calls`,
+`nomessage=1`, `cursor=1`, `gatefail=1`, `xss=1`, `reviewed=1`, `reviewed=stale`). The harness simulates the four tools and records `window.calls`,
 `window.messages` and `window.lastContext`.
 
 `../tasks.json` is generated: after changing an analyser's `GROUP` list or an L2 card title, run

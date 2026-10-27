@@ -3,7 +3,7 @@ import path from "node:path";
 import type { Catalogue } from "./catalogue.js";
 import { readOverview } from "./overview.js";
 import { resolveInside } from "./paths.js";
-import type { GateMode, GateRecord, Mark, Reviewed } from "./types.js";
+import type { GateMode, GateRecord, Mark, ReviewCounts, Reviewed } from "./types.js";
 
 /** The review cannot be saved as asked; the message says why. */
 export class GateError extends Error {
@@ -29,7 +29,8 @@ export async function saveGate(
   marks: Record<string, { mark: Mark; note?: string; value?: string; sheet?: string }>,
   mode: GateMode,
   now: () => Date = () => new Date(),
-  reviewed?: Reviewed
+  reviewed?: Reviewed,
+  counts?: ReviewCounts
 ): Promise<{ path: string; record: GateRecord }> {
   if (mode !== "confirmed" && mode !== "unreviewed") throw new GateError(`Unknown mode: ${String(mode)}`);
   const { readings } = await readOverview(runsRoot, run, catalogue);
@@ -45,6 +46,7 @@ export async function saveGate(
     }),
   };
   if (reviewed) record.reviewed = reviewed;
+  if (counts) record.reviewed_counts = counts;
   if (mode === "confirmed") {
     const left = record.readings.filter((r) => r.mark !== "ok").map((r) => r.id);
     if (left.length)

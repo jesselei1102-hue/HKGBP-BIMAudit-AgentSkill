@@ -52,7 +52,9 @@ export type GateReading = {
 };
 /** Which review lists the operator looked at before the reports (absent in records saved before this existed). */
 export type Reviewed = { failures: boolean; check_yourself: boolean; inputs: boolean };
-export type GateRecord = { mode: GateMode; saved: string; readings: GateReading[]; reviewed?: Reviewed };
+/** How many items each list held when it was looked at: a tick only carries over while its list is unchanged. */
+export type ReviewCounts = { failures: number; check_yourself: number; inputs: number };
+export type GateRecord = { mode: GateMode; saved: string; readings: GateReading[]; reviewed?: Reviewed; reviewed_counts?: ReviewCounts };
 
 export type Overview = {
   run: string;
