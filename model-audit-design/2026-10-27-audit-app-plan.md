@@ -6,7 +6,7 @@
 
 **Architecture**：
 
-- 从 `C:\Users\Datech\Claude Projects\Design Theme\template\` 复制出 `work/model-audit/app/`（Node / TypeScript，stdio）。
+- 从 Ultraviolet MCP App 模板（`Design Theme/template/`）复制出 `work/model-audit/app/`（Node / TypeScript，stdio）。
 - server 的纯逻辑分文件：路径守卫、任务清单、审核列表、总览读取、确认记录。每个文件先写 vitest 测试。
 - 窗口是一个 `app.html`，按工具结果里的 `view` 显示「选检查」或「总览」。发给对话的指令由纯函数生成，可单测。
 - Python 端只加两处：生成 `tasks.json` 的脚本；`build_results.py` / `render_report.py` 读确认记录并在报告里提醒。
