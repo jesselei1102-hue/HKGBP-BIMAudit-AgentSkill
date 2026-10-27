@@ -24,7 +24,7 @@ description: Use when checking area schemes and area calculation tables in a Rev
 
 ## 第一段：提取 → 分析 → 停
 
-1. 按 `<PKG>/L3-SOP/SOP-AUD-mcp-revit-mcp.md` §10「R-G3」提取到 `<run>/_raw/`：
+1. 按当前 MCP 的 L3 SOP（见 L4 对照表；基准 `<PKG>/L3-SOP/SOP-AUD-mcp-revit-mcp.md`，其他 MCP 的 SOP 只写不同的步骤）§10「R-G3」提取到 `<run>/_raw/`：
    - MCP 回传原样存进 `_raw/mcp/*.json`（AllParameters 每次最多 20 个元素），再跑 `python "<PKG>/tools/extract/g3_extract.py" --mcp <run>/_raw/mcp --out <run>/_raw` 生成 `areas.tsv`、`area_schemes.tsv`、`rasters.tsv`（不要自己写转换脚本）。
    - 图纸导出 PNG 读表值，写 `table_values.tsv`。
 2. 跑：

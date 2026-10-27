@@ -26,7 +26,7 @@ G1–G4 已跑完，手上有四份分析 JSON 和 G3 / G4 的 `_raw/`。缺哪�
 
 ## 第一段：提取 → 分析 → 停
 
-1. 按 `<PKG>/L3-SOP/SOP-AUD-mcp-revit-mcp.md` §10「R-G5」提取到 `<g5>/_raw/`：MCP 回传原样存进 `_raw/mcp/`，再跑 `python "<PKG>/tools/extract/g5_extract.py" --mcp <g5>/_raw/mcp --out <g5>/_raw`（不要自己写转换脚本）；图纸目录在 A001 上读。
+1. 按当前 MCP 的 L3 SOP（见 L4 对照表；基准 `<PKG>/L3-SOP/SOP-AUD-mcp-revit-mcp.md`，其他 MCP 的 SOP 只写不同的步骤）§10「R-G5」提取到 `<g5>/_raw/`：MCP 回传原样存进 `_raw/mcp/`，再跑 `python "<PKG>/tools/extract/g5_extract.py" --mcp <g5>/_raw/mcp --out <g5>/_raw`（不要自己写转换脚本）；图纸目录在 A001 上读。
 2. 跑：
 
    ```

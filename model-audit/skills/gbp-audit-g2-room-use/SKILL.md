@@ -20,7 +20,7 @@ description: Use when checking room-use schedules in a Revit model for a Hong Ko
 
 ## 第一段：提取 → 分析 → 停
 
-1. 按 `<PKG>/L3-SOP/SOP-AUD-mcp-revit-mcp.md` §10「R-G2」提取到 `<run>/_raw/`（房间可复用 G1 的 `rooms.tsv`、`room_polygons.json`）。MCP 回传原样存进 `_raw/mcp/`（文件名见 R-G2），再跑 `python "<PKG>/tools/extract/g2_extract.py" --mcp <run>/_raw/mcp --out <run>/_raw` 转成提取文件——不要自己写转换脚本；它会核对 `query_model` 的 id 一个不少。明细表用 `export_views` 让模型直接写 CSV。
+1. 按当前 MCP 的 L3 SOP（见 L4 对照表；基准 `<PKG>/L3-SOP/SOP-AUD-mcp-revit-mcp.md`，其他 MCP 的 SOP 只写不同的步骤）§10「R-G2」提取到 `<run>/_raw/`（房间可复用 G1 的 `rooms.tsv`、`room_polygons.json`）。MCP 回传原样存进 `_raw/mcp/`（文件名见 R-G2），再跑 `python "<PKG>/tools/extract/g2_extract.py" --mcp <run>/_raw/mcp --out <run>/_raw` 转成提取文件——不要自己写转换脚本；它会核对 `query_model` 的 id 一个不少。明细表用 `export_views` 让模型直接写 CSV。
 2. 跑：
 
    ```

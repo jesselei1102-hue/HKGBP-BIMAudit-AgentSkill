@@ -1,6 +1,6 @@
 # G3 面积方案组 · 可执行规格（AUD-S02、V09、S05、V10、S08、S07、V11、V12、V14、V06、V08、S12、V07、S06）
 
-按 [AUD-000 §10](../AUD-000_Audit_Flow.md) 两段执行。工具：`tools/area_scheme/analyze.py`（分析）、`tools/common/task_report.py`（报告）。提取配方：[SOP-AUD-mcp-revit-mcp §10 R-G3](../../L3-SOP/SOP-AUD-mcp-revit-mcp.md)。JSON：[task-analysis.schema.json](../../templates/task-analysis.schema.json)。范例：`work/model-audit-runs/audit-2026-10-13-g3/`。
+按 [AUD-000 §10](../AUD-000_Audit_Flow.md) 两段执行。工具：`tools/area_scheme/analyze.py`（分析）、`tools/common/task_report.py`（报告）。提取配方：当前 MCP 的 L3 SOP 的 R-G3（基准：[SOP-AUD-mcp-revit-mcp §10 R-G3](../../L3-SOP/SOP-AUD-mcp-revit-mcp.md)；其他 MCP 的 SOP 只写不同的步骤，见 L4 对照表）。JSON：[task-analysis.schema.json](../../templates/task-analysis.schema.json)。范例：`work/model-audit-runs/audit-2026-10-13-g3/`。
 
 这 14 个 Task 都从同一组 Area（各面积方案）和地界算数，计算表都在 C001–C008 上，所以合成一组。
 

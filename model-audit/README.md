@@ -153,8 +153,8 @@ Roadmap **功能 A（Model Audit）** 按四层架构的实现：只读审核一
 
 | 前提 | 没有时 |
 | --- | --- |
-| 已连接 BIM MCP，且 [L4-Capabilities](L4-Capabilities/) 里有它的对照表（现有：`CAP-binding-revit-mcp`） | 先按 Capability Catalog 为该 MCP 做一份对照表和 SOP，再审（RUN.md 规则） |
-| G4、G5 的提取要 revit-mcp（mcp-servers-for-revit 没有房间边界、图纸、图纸上的视图、明细表清单这几类工具）；G1–G3 两个 MCP 都可以，`tools/extract/` 转出的提取文件相同 | 只连 mcp-servers-for-revit 时，G4、G5 缺的项记 Unclear |
+| 已连接 BIM MCP，且 [L4-Capabilities](L4-Capabilities/) 里有它的能力对照表（现有：`CAP-binding-revit-mcp`、`CAP-binding-mcp-servers-for-revit`） | 先按 Capability Catalog 为该 MCP 做一份对照表和 SOP，再审（RUN.md 规则） |
+| 各组要用的能力在对照表里是 Full 或 Partial；agent 按当前 MCP 暴露的工具对照，不按 MCP 名称选 | 对照表里 Missing 或 Partial 缺的部分，相关检查记 Unclear，并引 [CAP-gaps](L4-Capabilities/CAP-gaps.md) 的 GAP 编号 |
 | 法例原文在 `../Legislation/`（cap123、cap123f、cap123h、cap123i） | L2 一律 Unclear；限值索引不能代替原文 |
 | BIMGBPS corpus、PNAP 在 `../source/` | 同上 |
 | 想用对话窗口：Node.js ≥ 20，并注册 `app/` 的 server | 用 RUN.md §7 的文字指令，流程相同 |
@@ -225,7 +225,7 @@ python "Model Audit/report/render_report.py" --results audit-<date>/audit-result
 ## 维护
 
 - 法例更新：改 L1（DK-AUD-002 的行与原文）。
-- 换 MCP：加 `L3-SOP/SOP-AUD-mcp-<名称>.md` 和 `L4-Capabilities/CAP-binding-<名称>.md`。
+- 换 MCP：加 `L3-SOP/SOP-AUD-mcp-<名称>.md` 和 `L4-Capabilities/CAP-binding-<名称>.md`（例：mcp-servers-for-revit 的两份）；回传格式不认得时在 `tools/extract/` 加适配器。
 - 发现新坑：加进对应 AUD 的「常见坑」。
 - 报告格式：改 `templates/`（样式在 `report-template.html` 的 `report-css`）与 `report/render_report.py`，两者一起改。
 - 改完跑测试和包检查（在 repo 的 `model-audit-design/_agent/`，只用标准库）：每个 `python -I test_*.py` 单独跑；`python -I check_package.py --layer all` 查文件、链接、Skill。

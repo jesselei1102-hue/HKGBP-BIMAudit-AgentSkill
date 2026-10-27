@@ -1,6 +1,6 @@
 # G5 清单组与 G6 模型健康 · 可执行规格（AUD-S01、S03、S04、S09、S17、S18、A04；AUD-A1）
 
-按 [AUD-000 §10](../AUD-000_Audit_Flow.md) 两段执行。工具：`tools/lists_health/analyze.py`（分析，读其他组的分析 JSON）、`tools/common/task_report.py`（报告）。提取配方：[SOP-AUD-mcp-revit-mcp §10 R-G5](../../L3-SOP/SOP-AUD-mcp-revit-mcp.md)。范例：`work/model-audit-runs/audit-2026-10-13-g5/`。
+按 [AUD-000 §10](../AUD-000_Audit_Flow.md) 两段执行。工具：`tools/lists_health/analyze.py`（分析，读其他组的分析 JSON）、`tools/common/task_report.py`（报告）。提取配方：当前 MCP 的 L3 SOP 的 R-G5（基准：[SOP-AUD-mcp-revit-mcp §10 R-G5](../../L3-SOP/SOP-AUD-mcp-revit-mcp.md)；其他 MCP 的 SOP 只写不同的步骤，见 L4 对照表）。范例：`work/model-audit-runs/audit-2026-10-13-g5/`。
 
 G5 的表大多是「别处已算出的数」的汇总，G6 与 A04 是全部结果的汇总，所以放在最后跑，并直接读 G2、G3、G4、S14 的 JSON。
 

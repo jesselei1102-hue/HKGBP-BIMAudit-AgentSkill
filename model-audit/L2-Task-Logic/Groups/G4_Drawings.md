@@ -1,6 +1,6 @@
 # G4 图面组 · 可执行规格（AUD-V01–V05、V13、A01–A03；V08 / V10 / V11 的图面项）
 
-按 [AUD-000 §10](../AUD-000_Audit_Flow.md) 两段执行。工具：`tools/drawings/analyze.py`（分析）、`tools/drawings/sample_colours.py`（取色）、`tools/drawings/rvt_info.py`（读文件版本）、`tools/common/task_report.py`（报告）。提取配方：[SOP-AUD-mcp-revit-mcp §10 R-G4](../../L3-SOP/SOP-AUD-mcp-revit-mcp.md)。范例：`work/model-audit-runs/audit-2026-10-13-g4/`。
+按 [AUD-000 §10](../AUD-000_Audit_Flow.md) 两段执行。工具：`tools/drawings/analyze.py`（分析）、`tools/drawings/sample_colours.py`（取色）、`tools/drawings/rvt_info.py`（读文件版本）、`tools/common/task_report.py`（报告）。提取配方：当前 MCP 的 L3 SOP 的 R-G4（基准：[SOP-AUD-mcp-revit-mcp §10 R-G4](../../L3-SOP/SOP-AUD-mcp-revit-mcp.md)；其他 MCP 的 SOP 只写不同的步骤，见 L4 对照表）。范例：`work/model-audit-runs/audit-2026-10-13-g4/`。
 
 ## 1. 数据范围
 

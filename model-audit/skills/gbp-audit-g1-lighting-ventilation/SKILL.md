@@ -18,7 +18,7 @@ description: Use when checking natural lighting and ventilation of rooms in a Re
 
 ## 第一段：提取 → 分析 → 停
 
-1. 按 `<PKG>/L3-SOP/SOP-AUD-mcp-revit-mcp.md` §10「R-S14」提取，存进 `<run>/_raw/`。要用 `--fixtures`（推荐：含 WC 的房间按 reg 36 判，不靠房名）就先做 R-G2 第 2 步取洁具。MCP 回传原样存进 `_raw/mcp/`（文件名见 R-S14），再跑 `python "<PKG>/tools/extract/g1_extract.py" --mcp <run>/_raw/mcp --out <run>/_raw`——它按族名判嵌板 H / L、核对数量；不要自己写转换脚本。
+1. 按当前 MCP 的 L3 SOP（见 L4 对照表；基准 `<PKG>/L3-SOP/SOP-AUD-mcp-revit-mcp.md`，其他 MCP 的 SOP 只写不同的步骤）§10「R-S14」提取，存进 `<run>/_raw/`。要用 `--fixtures`（推荐：含 WC 的房间按 reg 36 判，不靠房名）就先做 R-G2 第 2 步取洁具。MCP 回传原样存进 `_raw/mcp/`（文件名见 R-S14），再跑 `python "<PKG>/tools/extract/g1_extract.py" --mcp <run>/_raw/mcp --out <run>/_raw`——它按族名判嵌板 H / L、核对数量；不要自己写转换脚本。
 2. 跑：
 
    ```

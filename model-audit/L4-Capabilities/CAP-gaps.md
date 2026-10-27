@@ -1,6 +1,6 @@
-# CAP-gaps · 能力缺口（功能 A，revit-mcp）
+# CAP-gaps · 能力缺口（功能 A）
 
-Layer 4。每个缺口写：影响哪些检查、后果、人工补法。按规则，工具读不到的信息记 Unclear / `[GAP]`，不推断成 Pass（[AUD-000](../L2-Task-Logic/AUD-000_Audit_Flow.md) §7 规则 5）。
+Layer 4。每个缺口写：影响哪些检查、后果、人工补法。GAP-01 至 GAP-07 两个 MCP 都有；GAP-08、GAP-09 只在 mcp-servers-for-revit（见各 MCP 的 `CAP-binding-*`）。按规则，工具读不到的信息记 Unclear / `[GAP]`，不推断成 Pass（[AUD-000](../L2-Task-Logic/AUD-000_Audit_Flow.md) §7 规则 5）。
 
 | ID | 缺口 | 影响的检查 | 后果 | 人工补法 |
 | --- | --- | --- | --- | --- |
@@ -10,6 +10,8 @@ Layer 4。每个缺口写：影响哪些检查、后果、人工补法。按规�
 | GAP-04 | 不回传 Revit 版本；无法判插件依赖（版本部分：harness 能读模型文件时由 AGENT-FILE-INFO 补上，2026-10-13 实测 Format 2027） | MA-1.1、MA-1.6、A03-L3、A03-L6 | 只能从文件名推断，记 `[INFERENCE]` | [版本检查](../L3-SOP/SOP-AUD-manual.md#man-version) |
 | GAP-05 | 没有 LOD 判据 | MA-3.3 | 只能不判，或人工抽查后记结论 | [LOD 抽查](../L3-SOP/SOP-AUD-manual.md#man-lod) |
 | GAP-07 | MCP 不回传开口（窗、幕墙嵌板）所属房间 | S14-C、V13-C1、V13-C2 | 已由 AGENT-GEOMETRY 补上（`tools/s14_lv/analyze.py`，每条带 match_method / match_confidence）。仍缺：① reg 31「面向室外」的街道 / 矩形水平面检查（要地界、邻楼几何）；② 百叶净通风面积；③ 嵌板顶高按每组一个样本 | ① 人工按 V13 图核对；② 向 AP 取百叶资料（INP-17）；③ 有疑问的组补取包围盒 |
+| GAP-08 | （mcp-servers-for-revit）没有房间边界工具 | S14、S10、S13、V13 的房间归属；MA-4.1 | 房间轮廓用包围盒：非矩形房间的开口、门、洁具归属可信度降低（脚本标 `shape_source: bbox`） | 连 revit-mcp 取 `get_room_boundaries`；或人工核对标为 bbox 的房间 |
+| GAP-09 | （mcp-servers-for-revit）拿不到视口在图纸上的位置框 | 视图 / 明细表是否在图框内（GEN 类人工核对） | `views_on_sheets.tsv` 的 outline 两列留空；现有分析脚本未用这两列 | 导出图纸 PNG 目视核对 |
 | GAP-06 | 明细表不能导出图像，只能 CSV | GEN-01、GEN-06、报告截图 | 「表在图上的样子」要导出整张图纸看；报告里的表截图用图纸截图代替 | 导出整张图纸 PNG（[SOP-AUD-mcp-revit-mcp §6](../L3-SOP/SOP-AUD-mcp-revit-mcp.md)） |
 
 ## 不算缺口、但会限制 L2 的

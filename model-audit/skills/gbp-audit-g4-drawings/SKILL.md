@@ -24,7 +24,7 @@ description: Use when checking the drawings themselves in a Revit model for a Ho
 
 ## 第一段：提取 → 分析 → 停
 
-1. 按 `<PKG>/L3-SOP/SOP-AUD-mcp-revit-mcp.md` §10「R-G4」提取到 `<run>/_raw/`：MCP 回传原样存进 `_raw/mcp/`（每个视图的计数存成 `view_counts_<视图 id>.json`），再跑 `python "<PKG>/tools/extract/g4_extract.py" --mcp <run>/_raw/mcp --out <run>/_raw`（不要自己写转换脚本）；其中：
+1. 按当前 MCP 的 L3 SOP（见 L4 对照表；基准 `<PKG>/L3-SOP/SOP-AUD-mcp-revit-mcp.md`，其他 MCP 的 SOP 只写不同的步骤）§10「R-G4」提取到 `<run>/_raw/`：MCP 回传原样存进 `_raw/mcp/`（每个视图的计数存成 `view_counts_<视图 id>.json`），再跑 `python "<PKG>/tools/extract/g4_extract.py" --mcp <run>/_raw/mcp --out <run>/_raw`（不要自己写转换脚本）；其中：
 
    ```
    python "<PKG>/tools/drawings/sample_colours.py" --sheets <run>/_raw/sheets --out <run>/_raw/colour_samples.json [--regions <run>/_raw/regions.json]

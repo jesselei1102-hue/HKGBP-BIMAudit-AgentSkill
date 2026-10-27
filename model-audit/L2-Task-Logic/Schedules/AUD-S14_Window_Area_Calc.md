@@ -56,7 +56,7 @@ INP-05、INP-12、INP-17。
 
 ## 9. 可执行规格
 
-按 [AUD-000 §10](../AUD-000_Audit_Flow.md) 两段执行。工具：`tools/s14_lv/analyze.py`（分析）、`tools/s14_lv/report.py`（报告）。提取配方：[SOP-AUD-mcp-revit-mcp §10 R-S14](../../L3-SOP/SOP-AUD-mcp-revit-mcp.md)。JSON 结构：[s14-analysis.schema.json](../../templates/s14-analysis.schema.json)。范例：`work/model-audit-runs/audit-2026-10-13-s14/`。
+按 [AUD-000 §10](../AUD-000_Audit_Flow.md) 两段执行。工具：`tools/s14_lv/analyze.py`（分析）、`tools/s14_lv/report.py`（报告）。提取配方：当前 MCP 的 L3 SOP 的 R-S14（基准：[SOP-AUD-mcp-revit-mcp §10 R-S14](../../L3-SOP/SOP-AUD-mcp-revit-mcp.md)；其他 MCP 的 SOP 只写不同的步骤，见 L4 对照表）。JSON 结构：[s14-analysis.schema.json](../../templates/s14-analysis.schema.json)。范例：`work/model-audit-runs/audit-2026-10-13-s14/`。
 
 ### 9.1 数据范围
 

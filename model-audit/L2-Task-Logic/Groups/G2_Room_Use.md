@@ -1,6 +1,6 @@
 # G2 房间-用途组 · 可执行规格（AUD-S13、S10、S11、S15、S16）
 
-按 [AUD-000 §10](../AUD-000_Audit_Flow.md) 两段执行。工具：`tools/room_use/analyze.py`（分析）、`tools/common/task_report.py`（报告）。提取配方：[SOP-AUD-mcp-revit-mcp §10 R-G2](../../L3-SOP/SOP-AUD-mcp-revit-mcp.md)。JSON：[task-analysis.schema.json](../../templates/task-analysis.schema.json)。范例：`work/model-audit-runs/audit-2026-10-13-g2/`。
+按 [AUD-000 §10](../AUD-000_Audit_Flow.md) 两段执行。工具：`tools/room_use/analyze.py`（分析）、`tools/common/task_report.py`（报告）。提取配方：当前 MCP 的 L3 SOP 的 R-G2（基准：[SOP-AUD-mcp-revit-mcp §10 R-G2](../../L3-SOP/SOP-AUD-mcp-revit-mcp.md)；其他 MCP 的 SOP 只写不同的步骤，见 L4 对照表）。JSON：[task-analysis.schema.json](../../templates/task-analysis.schema.json)。范例：`work/model-audit-runs/audit-2026-10-13-g2/`。
 
 五个 Task 共用同一组房间、洁具、门和三张模型明细表，所以合成一组：一次提取，一次分析，一份报告。
 

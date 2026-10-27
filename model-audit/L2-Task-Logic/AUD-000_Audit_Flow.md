@@ -121,7 +121,7 @@ Findings 按 [finding.schema.json](../templates/finding.schema.json) 记录。
 
 ### 10.1 第一段：分析（只读）
 
-1. **提取**：按 L3 配方（[SOP-AUD-mcp-revit-mcp §10](../L3-SOP/SOP-AUD-mcp-revit-mcp.md)）调用 MCP，把原始值存成提取文件（`_raw/*.tsv` / `*.json`）。提取文件只放 MCP 回传的值，不放推算值。
+1. **提取**：按当前 MCP 的 L3 配方（L4 对照表 `CAP-binding-*` 指向它；基准 [SOP-AUD-mcp-revit-mcp §10](../L3-SOP/SOP-AUD-mcp-revit-mcp.md)）调用 MCP，把原始值存成提取文件（`_raw/*.tsv` / `*.json`）。提取文件只放 MCP 回传的值，不放推算值。
 2. **分析脚本**：`tools/<组>/analyze.py` 只读提取文件，写分析 JSON，打印屏幕摘要。脚本不调 MCP、不编数值；提取文件没有的值写进 `data_quality_warnings`，不补。
 3. **分析 JSON** 的共同要求：
    - `project_info`：项目名、模型路径、分析时间、所用规则（含限值与法例出处）、勘误说明。
