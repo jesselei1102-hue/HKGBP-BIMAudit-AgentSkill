@@ -13,7 +13,8 @@
     "build": "tsc && vite build",
     "build:app": "vite build",
     "test": "vitest run",
-    "start": "node build/index.js"
+    "start": "node build/index.js",
+    "fixture:overview": "node dev/make-overview-fixture.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/ext-apps": "^1.7.5",
