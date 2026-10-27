@@ -1,4 +1,5 @@
 import type { App } from "@modelcontextprotocol/ext-apps";
+import { postToChat } from "./logic/post";
 import { escapeHtml } from "./ui/html";
 
 /**
@@ -36,19 +37,12 @@ export async function copyText(text: string, view: HTMLElement): Promise<boolean
 }
 
 /**
- * Send an instruction to the chat. Hosts without the message capability (or a failed send) get a box with the
- * text and a Copy link above the dock instead. Resolves true when the host took the message.
+ * Send an instruction to the chat. It is always tried (Cursor accepts it without declaring the capability); only
+ * when the host refuses does a box with the text and a Copy link appear above the dock. Resolves true when sent.
  */
 export async function sendToChat(app: App, text: string, view: HTMLElement): Promise<boolean> {
   view.querySelector(".prompt-box")?.remove();
-  if (app.getHostCapabilities()?.message) {
-    try {
-      const r = (await app.sendMessage({ role: "user", content: [{ type: "text", text }] })) as { isError?: boolean };
-      if (!r?.isError) return true;
-    } catch {
-      // fall through to the copy box
-    }
-  }
+  if (await postToChat(app, text)) return true;          // tried even when not declared (Cursor), as the Schedule app does
   const box = document.createElement("div");
   box.className = "prompt-box";
   box.innerHTML =
