@@ -16,7 +16,9 @@ import re
 import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "common"))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "extract"))
 from geom import read_tsv  # noqa: E402
+from mcp_formats import elements as mcp_elements  # noqa: E402
 import readings  # noqa: E402
 import tasks as T  # noqa: E402
 
@@ -60,13 +62,6 @@ def load_json(path, default=None):
         return json.load(f)
 
 
-def params(v):
-    P = {}
-    for p in v["InstanceParameters"]:
-        P.setdefault(p["name"], p.get("displayValue", p.get("value")))
-    return P
-
-
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--raw", required=True)
@@ -89,7 +84,8 @@ def main():
     vos = read_tsv(R("views_on_sheets.tsv")) if views_ok else []
     counts = {k: v for k, v in load_json(R("view_counts.json"), {}).items() if not k.startswith("_")} if views_ok else {}
     props = {r["view_id"]: r for r in read_tsv(R("view_props.tsv"))} if views_ok else {}
-    tb = load_json(R("mcp/titleblocks.json"), {"results": {}})["results"]
+    tb_path = R("mcp/titleblocks.json")
+    title_els = mcp_elements(tb_path) if os.path.exists(tb_path) else []
     col = load_json(R("colour_samples.json"), {})
     rvt = load_json(R("rvt_info.json"), {})
     rasters = read_tsv(R("rasters.tsv")) if os.path.exists(R("rasters.tsv")) else []
@@ -377,9 +373,9 @@ def main():
     # ------------------------------------------------------------ A01 sheet assembly
     sheets = sorted({r["sheet"] for r in vos})
     tbs, pinfo = [], {}
-    for k, v in tb.items():
-        P = params(v)
-        if v["BasicElementInfo"]["category"] == "Project Information":
+    for e in title_els:
+        P = {k: v.get("display") for k, v in e["params"].items()}
+        if re.search(r"project\s*information", e.get("category") or "", re.I):
             pinfo = P
         else:
             tbs.append(P)
@@ -487,7 +483,11 @@ def main():
            "summary": {"per_task": per, "checks": len(O.checks), "fail": sum(1 for c in O.checks if c["status"] == "FAIL"),
                        "unclear": sum(1 for c in O.checks if c["status"] == "UNCLEAR"), "data_quality_warnings": O.warnings}}
     out["readings"] = readings.listing(rd, a.raw)
+    tb_table = tables["titleblocks"]
     T.finish(out, wanted, GROUP, gp, TABLE_TASKS)
+    # S01 reads this table from the G4 JSON. A partial run that is not A01 would otherwise drop it.
+    if tb_table["rows"] and "titleblocks" not in out["tables"]:
+        out["tables"]["titleblocks"] = tb_table
     with open(a.out, "w", encoding="utf-8") as f:
         json.dump(out, f, indent=1, ensure_ascii=False)
     T.print_summary(out, "G4 drawings")

@@ -43,7 +43,10 @@ def schedules(mcp):
     out = []
     for f in files_for(mcp, "schedules"):
         d = load(f)
-        rows = d.get("schedules", d.get("results", d)) if isinstance(d, dict) else d
+        if isinstance(d, dict) and isinstance(d.get("elements"), list):
+            rows = d["elements"]                                          # mcp-servers-for-revit get_element_data
+        else:
+            rows = d.get("schedules", d.get("results", d)) if isinstance(d, dict) else d
         if not isinstance(rows, list) or not all(isinstance(r, dict) for r in rows):
             raise Stop("%s: unknown schedule list format - add an adapter in g5_extract.py" % os.path.basename(f))
         for r in rows:
