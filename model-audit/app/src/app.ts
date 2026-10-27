@@ -87,8 +87,9 @@ export async function registerApp(
     },
     async ({ run }) => {
       try {
-        const overview = await readOverview(runsRoot, run, await loadCatalogue(packageRoot));
-        return result({ view: "overview", overview, runsRoot });
+        const catalogue = await loadCatalogue(packageRoot);
+        const overview = await readOverview(runsRoot, run, catalogue);
+        return result({ view: "overview", overview, sections: catalogue.sections, runsRoot });
       } catch (e) {
         return failure((e as Error).message, { view: "overview", runsRoot });
       }

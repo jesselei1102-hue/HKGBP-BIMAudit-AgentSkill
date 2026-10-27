@@ -2,15 +2,15 @@
 import type { App } from "@modelcontextprotocol/ext-apps";
 import { sendToChat } from "./chat";
 import { joinPath, runPrompt } from "./logic/prompts";
-import { groupState, groupsFor, toggleGroup, toggleTask } from "./logic/selection";
+import { groupsFor, sectionState, toggleSection, toggleTask } from "./logic/selection";
 import { escapeHtml, pad3, plural } from "./ui/html";
 import { initTabs } from "./ui/tabs";
 
-type Task = { task: string; tl: string; name: string; summary: string; groups: string[] };
+type Task = { task: string; tl: string; name: string; summary: string; groups: string[]; section: string };
 type Run = { name: string; groups: string[]; partial: boolean; hasReports: boolean; modified: string };
 export type ChooseData = {
   view: "choose";
-  catalogue: { groups: { id: string; name: string }[]; tasks: Task[] };
+  catalogue: { sections: { id: string; name: string; clause: string }[]; groups: { id: string; name: string }[]; tasks: Task[] };
   runs: Run[];
   runsRoot: string;
   today: string;
@@ -46,7 +46,7 @@ export function renderChoose(app: App, data: ChooseData, view: HTMLElement, onSt
     <section class="stats" aria-label="Summary">
       <div class="stat"><b>${pad3(cat.tasks.length)}</b><span>tasks</span></div>
       <div class="stat"><b data-k="sel">000</b><span>selected</span></div>
-      <div class="stat"><b data-k="groups">000</b><span>groups</span></div>
+      <div class="stat"><b data-k="groups">000</b><span>analysis groups</span></div>
     </section>
     <div class="toolbar">
       <label class="search">
@@ -55,11 +55,11 @@ export function renderChoose(app: App, data: ChooseData, view: HTMLElement, onSt
       </label>
     </div>
     <nav class="tabs" role="tablist">
-      ${cat.groups.map((g, i) => `<button class="tab" type="button" role="tab" data-tab="${escapeHtml(g.id)}"><span class="n">${String(i + 1).padStart(2, "0")}</span>${escapeHtml(g.name)} <span class="tab-count" data-count="${escapeHtml(g.id)}"></span></button>`).join("")}
+      ${cat.sections.map((g, i) => `<button class="tab" type="button" role="tab" data-tab="${escapeHtml(g.id)}"><span class="n">${String(i + 1).padStart(2, "0")}</span>${escapeHtml(g.name)} <span class="tab-count" data-count="${escapeHtml(g.id)}"></span></button>`).join("")}
     </nav>
-    ${cat.groups.map((g) => `<section class="panel" id="panel-${escapeHtml(g.id)}" role="tabpanel" hidden>
-      <div class="group-bar"><p class="meta">${escapeHtml(g.id)} · ${escapeHtml(g.name)}</p>
-        <button class="text-link" type="button" data-group="${escapeHtml(g.id)}">Select group</button></div>
+    ${cat.sections.map((g) => `<section class="panel" id="panel-${escapeHtml(g.id)}" role="tabpanel" hidden>
+      <div class="group-bar"><p class="meta">${escapeHtml(g.name)} · ${escapeHtml(g.clause)}</p>
+        <button class="text-link" type="button" data-section="${escapeHtml(g.id)}">Select section</button></div>
       <div class="table-wrap" data-table="${escapeHtml(g.id)}"></div></section>`).join("")}
     <section class="run-mode" aria-label="Where to put the results">
       <label><input type="radio" name="mode" value="new" checked /> New audit <span class="mono" data-k="folder"></span></label>
@@ -86,30 +86,30 @@ export function renderChoose(app: App, data: ChooseData, view: HTMLElement, onSt
     if (ready) onState(state());
   }, view);
 
-  function rows(group: string) {
+  function rows(section: string) {
     const q = search.trim().toLowerCase();
-    const list = cat.tasks.filter((t) => t.groups.includes(group) &&
+    const list = cat.tasks.filter((t) => t.section === section &&
       (!q || [t.task, t.tl, t.name, t.summary].some((v) => v.toLowerCase().includes(q))));
     if (!list.length) return `<div class="empty"><b>No tasks match</b><span>Try another number or name.</span></div>`;
     return `<table><thead><tr><th class="check-col"></th><th>TL</th><th>Task</th><th>Clause</th></tr></thead><tbody>${list
       .map((t) => {
-        const others = t.groups.filter((g) => g !== group);
         return `<tr class="task-row${sel.has(t.task) ? " sel" : ""}" data-task="${escapeHtml(t.task)}">
           <td class="check-col"><input type="checkbox" ${sel.has(t.task) ? "checked" : ""} aria-label="Select ${escapeHtml(t.tl)}" /></td>
           <td class="tl">${escapeHtml(t.tl)}</td>
-          <td>${escapeHtml(t.name)}${others.map((g) => `<span class="chip">Also in ${escapeHtml(g)}</span>`).join("")}</td>
+          <td>${escapeHtml(t.name)}</td>
           <td class="muted">${escapeHtml(t.summary)}</td></tr>`;
       })
       .join("")}</tbody></table>`;
   }
 
   function render() {
-    for (const g of cat.groups) {
+    for (const g of cat.sections) {
       view.querySelector(`[data-table="${g.id}"]`)!.innerHTML = rows(g.id);
-      const n = cat.tasks.filter((t) => t.groups.includes(g.id) && sel.has(t.task)).length;
-      view.querySelector(`[data-count="${g.id}"]`)!.textContent = n ? String(n) : "";
-      view.querySelector(`[data-group="${g.id}"]`)!.textContent =
-        groupState(sel, cat, g.id) === "all" ? "Clear group" : "Select group";
+      const total = cat.tasks.filter((t) => t.section === g.id).length;
+      const n = cat.tasks.filter((t) => t.section === g.id && sel.has(t.task)).length;
+      view.querySelector(`[data-count="${g.id}"]`)!.textContent = n ? `${n}/${total}` : String(total);
+      view.querySelector(`[data-section="${g.id}"]`)!.textContent =
+        sectionState(sel, cat, g.id) === "all" ? "Clear section" : "Select section";
     }
     const groups = groupsFor(sel, cat);
     $("sel").textContent = pad3(sel.size);
@@ -135,9 +135,9 @@ export function renderChoose(app: App, data: ChooseData, view: HTMLElement, onSt
 
   view.addEventListener("click", (e) => {
     const t = e.target as HTMLElement;
-    const g = t.closest<HTMLElement>("[data-group]");
+    const g = t.closest<HTMLElement>("[data-section]");
     if (g) {
-      sel = toggleGroup(sel, cat, g.dataset.group!);
+      sel = toggleSection(sel, cat, g.dataset.section!);
       return render();
     }
     const row = t.closest<HTMLElement>("tr[data-task]");

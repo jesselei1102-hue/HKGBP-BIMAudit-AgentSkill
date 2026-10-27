@@ -5,7 +5,6 @@
 /* ---------- Choose checks ---------- */
 td.tl, td.num { font-family: var(--mono); font-size: 12px; }
 td.wrap { white-space: normal; }
-td .chip { margin-left: 8px; cursor: default; }
 tr.task-row { cursor: pointer; }
 .group-bar { display: flex; align-items: center; justify-content: space-between; padding: 8px 20px; }
 .group-bar .meta { margin: 0; }
@@ -25,6 +24,7 @@ tr.task-row { cursor: pointer; }
 /* ---------- Overview ---------- */
 .st { font-family: var(--mono); font-size: 11px; color: var(--tx2); display: inline-flex; align-items: center; gap: 6px; }
 .st .sig { margin: 0; }
+tr.section-row > td { font-family: var(--mono); font-size: 11px; color: var(--tx3); background: var(--bg); padding: 14px 12px 6px; }
 tr.detail-row > td { padding: 0 0 8px 20px; background: var(--s1); white-space: normal; }
 tr.detail-row table td, tr.detail-row table th { background: var(--s1); font-size: 12px; white-space: normal; vertical-align: top; }
 .yourself { display: block; color: var(--accent-tx); font-size: 12px; margin-top: 2px; }

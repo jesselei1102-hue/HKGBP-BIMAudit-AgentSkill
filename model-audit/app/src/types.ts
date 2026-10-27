@@ -29,7 +29,14 @@ export type Reading = {
   crop: string | null;
 };
 
-export type TaskRow = { task: string; tl: string; name: string; groups: string[]; counts: Record<Status, number> };
+export type TaskRow = {
+  task: string;
+  tl: string;
+  name: string;
+  section: string;
+  groups: string[];
+  counts: Record<Status, number>;
+};
 
 export type Mark = "ok" | "wrong" | "none";
 export type GateMode = "confirmed" | "unreviewed";

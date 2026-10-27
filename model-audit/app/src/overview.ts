@@ -125,7 +125,7 @@ export async function readOverview(runsRoot: string, run: string, catalogue: Cat
       const counts = { PASS: 0, FAIL: 0, UNCLEAR: 0, "N/A": 0 } as Record<Status, number>;
       for (const c of checks) if (c.task === task) counts[c.status]++;
       const m = meta.get(task);
-      return { task, tl: m?.tl ?? task, name: m?.name ?? task, groups: m?.groups ?? [], counts };
+      return { task, tl: m?.tl ?? task, name: m?.name ?? task, section: m?.section ?? "", groups: m?.groups ?? [], counts };
     });
 
   const gate = files.includes("gate-confirmation.json")

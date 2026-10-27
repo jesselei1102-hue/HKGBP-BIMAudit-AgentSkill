@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Write model-audit/tasks.json, the task list the audit window shows (groups, task numbers, names, clauses).
+"""Write model-audit/tasks.json, the task list the audit window shows (BIMGBPS sections, groups, task numbers, names,
+clauses).
 
 Usage:
   python make_tasks_json.py           write tasks.json
@@ -23,6 +24,15 @@ GROUPS = [("G1", "Lighting and ventilation", None), ("G2", "Room use", "room_use
           ("G3", "Area schemes", "area_scheme"), ("G4", "Drawings", "drawings"),
           ("G5", "Lists and model health", "lists_health")]
 A1 = {"task": "AUD-A1", "tl": "MA-1 to MA-7", "name": "Model health", "summary": "Roadmap MA-1 to MA-7"}
+# How the window lists tasks: by BIMGBPS section, then TL number. The groups above only decide which analysers run.
+SECTIONS = [("views", "Views", "BIMGBPS §5.2"), ("schedules", "Schedules", "BIMGBPS §5.3"),
+            ("assembly", "Assembly and export", "BIMGBPS §4, §5.5, §6"), ("health", "Model health", "Roadmap MA-1 to MA-7")]
+
+
+def section(task):
+    if task == "AUD-A1":
+        return "health"
+    return {"V": "views", "S": "schedules", "A": "assembly"}[task[4]]
 
 
 def group_list(tool):
@@ -57,7 +67,12 @@ def build():
                     name, clause = card(t)
                     tasks[t] = {"task": t, "tl": "TL-" + t[4:], "name": name, "summary": clause, "groups": []}
             tasks[t]["groups"].append(gid)
-    return {"groups": [{"id": g, "name": n} for g, n, _ in GROUPS], "tasks": list(tasks.values())}
+    order = [sid for sid, _, _ in SECTIONS]
+    for t in tasks.values():
+        t["section"] = section(t["task"])
+    listed = sorted(tasks.values(), key=lambda t: (order.index(t["section"]), int(re.sub(r"\D", "", t["task"]) or 0)))
+    return {"sections": [{"id": i, "name": n, "clause": c} for i, n, c in SECTIONS],
+            "groups": [{"id": g, "name": n} for g, n, _ in GROUPS], "tasks": listed}
 
 
 def main(argv):

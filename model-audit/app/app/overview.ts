@@ -7,7 +7,13 @@ import { confirmPrompt, joinPath, rereadPrompt, unreviewedPrompt } from "./logic
 import { escapeHtml, pad3 } from "./ui/html";
 import { initTabs } from "./ui/tabs";
 
-export type OverviewData = { view: "overview"; overview: Overview; runsRoot: string; error?: string };
+export type OverviewData = {
+  view: "overview";
+  overview: Overview;
+  sections?: { id: string; name: string; clause: string }[];
+  runsRoot: string;
+  error?: string;
+};
 type ToolResult = { isError?: boolean; structuredContent?: unknown; content?: { type: string; text?: string }[] };
 
 const ORDER: Status[] = ["FAIL", "UNCLEAR", "N/A", "PASS"];
@@ -83,14 +89,20 @@ export function renderOverview(
       $("tasks").innerHTML = `<div class="empty"><b>No results in this run yet</b><span>The run folder has no analysis files. Run the analysis, then open the overview again.</span></div>`;
       return;
     }
+    const sectionOf = new Map((data.sections ?? []).map((x) => [x.id, x]));
+    let shown = "";
     $("tasks").innerHTML = `<table><thead><tr><th>TL</th><th>Task</th><th>PASS</th><th>FAIL</th><th>UNCLEAR</th><th>N/A</th></tr></thead><tbody>${ov.tasks
       .map((t) => {
+        const sec = sectionOf.get(t.section);
+        const heading = sec && t.section !== shown
+          ? `<tr class="section-row"><td colspan="6">${e(sec.name)} · ${e(sec.clause)}</td></tr>` : "";
+        shown = t.section;
         const open = expanded.has(t.task);
         const row = `<tr class="task-row${open ? " sel" : ""}" data-task="${e(t.task)}"><td class="tl">${e(t.tl)}</td><td>${e(t.name)}</td>
           ${(["PASS", "FAIL", "UNCLEAR", "N/A"] as Status[]).map((s) => `<td class="num">${t.counts[s] || "·"}</td>`).join("")}</tr>`;
-        if (!open) return row;
+        if (!open) return heading + row;
         const list = ov.checks.filter((c) => c.task === t.task);
-        return row + `<tr class="detail-row"><td colspan="6"><table><thead><tr><th>Status</th><th>Item</th><th>Object</th><th>Expected</th><th>Actual</th><th>Clause</th></tr></thead><tbody>${checkRows(list)}</tbody></table></td></tr>`;
+        return heading + row + `<tr class="detail-row"><td colspan="6"><table><thead><tr><th>Status</th><th>Item</th><th>Object</th><th>Expected</th><th>Actual</th><th>Clause</th></tr></thead><tbody>${checkRows(list)}</tbody></table></td></tr>`;
       })
       .join("")}</tbody></table>`;
   }

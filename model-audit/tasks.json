@@ -1,4 +1,26 @@
 {
+ "sections": [
+  {
+   "id": "views",
+   "name": "Views",
+   "clause": "BIMGBPS §5.2"
+  },
+  {
+   "id": "schedules",
+   "name": "Schedules",
+   "clause": "BIMGBPS §5.3"
+  },
+  {
+   "id": "assembly",
+   "name": "Assembly and export",
+   "clause": "BIMGBPS §4, §5.5, §6"
+  },
+  {
+   "id": "health",
+   "name": "Model health",
+   "clause": "Roadmap MA-1 to MA-7"
+  }
+ ],
  "groups": [
   {
    "id": "G1",
@@ -23,151 +45,54 @@
  ],
  "tasks": [
   {
-   "task": "AUD-S14",
-   "tl": "TL-S14",
-   "name": "Window Area Calculation",
-   "summary": "BIMGBPS §5.3.14",
+   "task": "AUD-V01",
+   "tl": "TL-V01",
+   "name": "Block / Key Plan",
+   "summary": "BIMGBPS §5.2.2",
    "groups": [
-    "G1"
-   ]
-  },
-  {
-   "task": "AUD-S13",
-   "tl": "TL-S13",
-   "name": "Sanitary Fitment Provisions",
-   "summary": "BIMGBPS §5.3.13",
-   "groups": [
-    "G2"
-   ]
-  },
-  {
-   "task": "AUD-S10",
-   "tl": "TL-S10",
-   "name": "Min Exit Doors & Routes",
-   "summary": "BIMGBPS §5.3.10",
-   "groups": [
-    "G2"
-   ]
-  },
-  {
-   "task": "AUD-S11",
-   "tl": "TL-S11",
-   "name": "Discharge Value Schedule",
-   "summary": "BIMGBPS §5.3.11",
-   "groups": [
-    "G2"
-   ]
-  },
-  {
-   "task": "AUD-S15",
-   "tl": "TL-S15",
-   "name": "Refuse Storage & RMRC",
-   "summary": "BIMGBPS §5.3.15",
-   "groups": [
-    "G2"
-   ]
-  },
-  {
-   "task": "AUD-S16",
-   "tl": "TL-S16",
-   "name": "TBE Room Floor Area",
-   "summary": "BIMGBPS §5.3.16",
-   "groups": [
-    "G2"
-   ]
-  },
-  {
-   "task": "AUD-A1",
-   "tl": "MA-1 to MA-7",
-   "name": "Model health",
-   "summary": "Roadmap MA-1 to MA-7",
-   "groups": [
-    "G2",
-    "G5"
-   ]
-  },
-  {
-   "task": "AUD-S02",
-   "tl": "TL-S02",
-   "name": "Site Area Calculation",
-   "summary": "BIMGBPS §5.3.2",
-   "groups": [
-    "G3"
-   ]
-  },
-  {
-   "task": "AUD-V09",
-   "tl": "TL-V09",
-   "name": "Site Area & SC Diagram",
-   "summary": "BIMGBPS §5.2.9",
-   "groups": [
-    "G3"
-   ]
-  },
-  {
-   "task": "AUD-S05",
-   "tl": "TL-S05",
-   "name": "Site Classification + SC / PR Summary",
-   "summary": "BIMGBPS §5.3.5",
-   "groups": [
-    "G3"
-   ]
-  },
-  {
-   "task": "AUD-V10",
-   "tl": "TL-V10",
-   "name": "GFA Diagram",
-   "summary": "BIMGBPS §5.2.10",
-   "groups": [
-    "G3",
     "G4"
-   ]
+   ],
+   "section": "views"
   },
   {
-   "task": "AUD-S08",
-   "tl": "TL-S08",
-   "name": "List of GFA Concessions",
-   "summary": "BIMGBPS §5.3.8",
+   "task": "AUD-V02",
+   "tl": "TL-V02",
+   "name": "Floor Plans",
+   "summary": "BIMGBPS §5.2.3",
    "groups": [
-    "G3"
-   ]
-  },
-  {
-   "task": "AUD-S07",
-   "tl": "TL-S07",
-   "name": "GFA Concession Requirements",
-   "summary": "BIMGBPS §5.3.7",
-   "groups": [
-    "G3"
-   ]
-  },
-  {
-   "task": "AUD-V11",
-   "tl": "TL-V11",
-   "name": "UFA Diagram",
-   "summary": "BIMGBPS §5.2.11",
-   "groups": [
-    "G3",
     "G4"
-   ]
+   ],
+   "section": "views"
   },
   {
-   "task": "AUD-V12",
-   "tl": "TL-V12",
-   "name": "UFS Diagram",
-   "summary": "BIMGBPS §5.2.12",
+   "task": "AUD-V03",
+   "tl": "TL-V03",
+   "name": "Sections",
+   "summary": "BIMGBPS §5.2.4",
    "groups": [
-    "G3"
-   ]
+    "G4"
+   ],
+   "section": "views"
   },
   {
-   "task": "AUD-V14",
-   "tl": "TL-V14",
-   "name": "SBD Compliance Diagrams",
-   "summary": "BIMGBPS §5.2.14",
+   "task": "AUD-V04",
+   "tl": "TL-V04",
+   "name": "Elevations",
+   "summary": "BIMGBPS §5.2.4",
    "groups": [
-    "G3"
-   ]
+    "G4"
+   ],
+   "section": "views"
+  },
+  {
+   "task": "AUD-V05",
+   "tl": "TL-V05",
+   "name": "Typical Details",
+   "summary": "BIMGBPS §5.2.5",
+   "groups": [
+    "G4"
+   ],
+   "section": "views"
   },
   {
    "task": "AUD-V06",
@@ -176,7 +101,18 @@
    "summary": "BIMGBPS §5.2.6",
    "groups": [
     "G3"
-   ]
+   ],
+   "section": "views"
+  },
+  {
+   "task": "AUD-V07",
+   "tl": "TL-V07",
+   "name": "Open Space Diagram",
+   "summary": "BIMGBPS §5.2.7",
+   "groups": [
+    "G3"
+   ],
+   "section": "views"
   },
   {
    "task": "AUD-V08",
@@ -186,79 +122,50 @@
    "groups": [
     "G3",
     "G4"
-   ]
+   ],
+   "section": "views"
   },
   {
-   "task": "AUD-S12",
-   "tl": "TL-S12",
-   "name": "FRR / Compartment Schedule",
-   "summary": "BIMGBPS §5.3.12",
+   "task": "AUD-V09",
+   "tl": "TL-V09",
+   "name": "Site Area & SC Diagram",
+   "summary": "BIMGBPS §5.2.9",
    "groups": [
     "G3"
-   ]
+   ],
+   "section": "views"
   },
   {
-   "task": "AUD-V07",
-   "tl": "TL-V07",
-   "name": "Open Space Diagram",
-   "summary": "BIMGBPS §5.2.7",
+   "task": "AUD-V10",
+   "tl": "TL-V10",
+   "name": "GFA Diagram",
+   "summary": "BIMGBPS §5.2.10",
+   "groups": [
+    "G3",
+    "G4"
+   ],
+   "section": "views"
+  },
+  {
+   "task": "AUD-V11",
+   "tl": "TL-V11",
+   "name": "UFA Diagram",
+   "summary": "BIMGBPS §5.2.11",
+   "groups": [
+    "G3",
+    "G4"
+   ],
+   "section": "views"
+  },
+  {
+   "task": "AUD-V12",
+   "tl": "TL-V12",
+   "name": "UFS Diagram",
+   "summary": "BIMGBPS §5.2.12",
    "groups": [
     "G3"
-   ]
-  },
-  {
-   "task": "AUD-S06",
-   "tl": "TL-S06",
-   "name": "Open Space Calculation",
-   "summary": "BIMGBPS §5.3.6",
-   "groups": [
-    "G3"
-   ]
-  },
-  {
-   "task": "AUD-V01",
-   "tl": "TL-V01",
-   "name": "Block / Key Plan",
-   "summary": "BIMGBPS §5.2.2",
-   "groups": [
-    "G4"
-   ]
-  },
-  {
-   "task": "AUD-V02",
-   "tl": "TL-V02",
-   "name": "Floor Plans",
-   "summary": "BIMGBPS §5.2.3",
-   "groups": [
-    "G4"
-   ]
-  },
-  {
-   "task": "AUD-V03",
-   "tl": "TL-V03",
-   "name": "Sections",
-   "summary": "BIMGBPS §5.2.4",
-   "groups": [
-    "G4"
-   ]
-  },
-  {
-   "task": "AUD-V04",
-   "tl": "TL-V04",
-   "name": "Elevations",
-   "summary": "BIMGBPS §5.2.4",
-   "groups": [
-    "G4"
-   ]
-  },
-  {
-   "task": "AUD-V05",
-   "tl": "TL-V05",
-   "name": "Typical Details",
-   "summary": "BIMGBPS §5.2.5",
-   "groups": [
-    "G4"
-   ]
+   ],
+   "section": "views"
   },
   {
    "task": "AUD-V13",
@@ -267,34 +174,18 @@
    "summary": "BIMGBPS §5.2.13",
    "groups": [
     "G4"
-   ]
+   ],
+   "section": "views"
   },
   {
-   "task": "AUD-A01",
-   "tl": "TL-A01",
-   "name": "Sheet Assembly",
-   "summary": "BIMGBPS §4.3(f), §5.5.1–5.5.2, §6.3–6.4",
+   "task": "AUD-V14",
+   "tl": "TL-V14",
+   "name": "SBD Compliance Diagrams",
+   "summary": "BIMGBPS §5.2.14",
    "groups": [
-    "G4"
-   ]
-  },
-  {
-   "task": "AUD-A02",
-   "tl": "TL-A02",
-   "name": "Colour Coding (GFA)",
-   "summary": "BIMGBPS §5.1.4, Table 1, §5.4",
-   "groups": [
-    "G4"
-   ]
-  },
-  {
-   "task": "AUD-A03",
-   "tl": "TL-A03",
-   "name": "Export",
-   "summary": "BIMGBPS §4, §6",
-   "groups": [
-    "G4"
-   ]
+    "G3"
+   ],
+   "section": "views"
   },
   {
    "task": "AUD-S01",
@@ -303,7 +194,18 @@
    "summary": "BIMGBPS §5.3.1",
    "groups": [
     "G5"
-   ]
+   ],
+   "section": "schedules"
+  },
+  {
+   "task": "AUD-S02",
+   "tl": "TL-S02",
+   "name": "Site Area Calculation",
+   "summary": "BIMGBPS §5.3.2",
+   "groups": [
+    "G3"
+   ],
+   "section": "schedules"
   },
   {
    "task": "AUD-S03",
@@ -312,7 +214,8 @@
    "summary": "BIMGBPS §5.3.3",
    "groups": [
     "G5"
-   ]
+   ],
+   "section": "schedules"
   },
   {
    "task": "AUD-S04",
@@ -321,7 +224,48 @@
    "summary": "BIMGBPS §5.3.4",
    "groups": [
     "G5"
-   ]
+   ],
+   "section": "schedules"
+  },
+  {
+   "task": "AUD-S05",
+   "tl": "TL-S05",
+   "name": "Site Classification + SC / PR Summary",
+   "summary": "BIMGBPS §5.3.5",
+   "groups": [
+    "G3"
+   ],
+   "section": "schedules"
+  },
+  {
+   "task": "AUD-S06",
+   "tl": "TL-S06",
+   "name": "Open Space Calculation",
+   "summary": "BIMGBPS §5.3.6",
+   "groups": [
+    "G3"
+   ],
+   "section": "schedules"
+  },
+  {
+   "task": "AUD-S07",
+   "tl": "TL-S07",
+   "name": "GFA Concession Requirements",
+   "summary": "BIMGBPS §5.3.7",
+   "groups": [
+    "G3"
+   ],
+   "section": "schedules"
+  },
+  {
+   "task": "AUD-S08",
+   "tl": "TL-S08",
+   "name": "List of GFA Concessions",
+   "summary": "BIMGBPS §5.3.8",
+   "groups": [
+    "G3"
+   ],
+   "section": "schedules"
   },
   {
    "task": "AUD-S09",
@@ -330,7 +274,78 @@
    "summary": "BIMGBPS §5.3.17",
    "groups": [
     "G5"
-   ]
+   ],
+   "section": "schedules"
+  },
+  {
+   "task": "AUD-S10",
+   "tl": "TL-S10",
+   "name": "Min Exit Doors & Routes",
+   "summary": "BIMGBPS §5.3.10",
+   "groups": [
+    "G2"
+   ],
+   "section": "schedules"
+  },
+  {
+   "task": "AUD-S11",
+   "tl": "TL-S11",
+   "name": "Discharge Value Schedule",
+   "summary": "BIMGBPS §5.3.11",
+   "groups": [
+    "G2"
+   ],
+   "section": "schedules"
+  },
+  {
+   "task": "AUD-S12",
+   "tl": "TL-S12",
+   "name": "FRR / Compartment Schedule",
+   "summary": "BIMGBPS §5.3.12",
+   "groups": [
+    "G3"
+   ],
+   "section": "schedules"
+  },
+  {
+   "task": "AUD-S13",
+   "tl": "TL-S13",
+   "name": "Sanitary Fitment Provisions",
+   "summary": "BIMGBPS §5.3.13",
+   "groups": [
+    "G2"
+   ],
+   "section": "schedules"
+  },
+  {
+   "task": "AUD-S14",
+   "tl": "TL-S14",
+   "name": "Window Area Calculation",
+   "summary": "BIMGBPS §5.3.14",
+   "groups": [
+    "G1"
+   ],
+   "section": "schedules"
+  },
+  {
+   "task": "AUD-S15",
+   "tl": "TL-S15",
+   "name": "Refuse Storage & RMRC",
+   "summary": "BIMGBPS §5.3.15",
+   "groups": [
+    "G2"
+   ],
+   "section": "schedules"
+  },
+  {
+   "task": "AUD-S16",
+   "tl": "TL-S16",
+   "name": "TBE Room Floor Area",
+   "summary": "BIMGBPS §5.3.16",
+   "groups": [
+    "G2"
+   ],
+   "section": "schedules"
   },
   {
    "task": "AUD-S17",
@@ -339,7 +354,8 @@
    "summary": "BIMGBPS §5.3.17",
    "groups": [
     "G5"
-   ]
+   ],
+   "section": "schedules"
   },
   {
    "task": "AUD-S18",
@@ -348,7 +364,38 @@
    "summary": "BIMGBPS §5.3.9",
    "groups": [
     "G5"
-   ]
+   ],
+   "section": "schedules"
+  },
+  {
+   "task": "AUD-A01",
+   "tl": "TL-A01",
+   "name": "Sheet Assembly",
+   "summary": "BIMGBPS §4.3(f), §5.5.1–5.5.2, §6.3–6.4",
+   "groups": [
+    "G4"
+   ],
+   "section": "assembly"
+  },
+  {
+   "task": "AUD-A02",
+   "tl": "TL-A02",
+   "name": "Colour Coding (GFA)",
+   "summary": "BIMGBPS §5.1.4, Table 1, §5.4",
+   "groups": [
+    "G4"
+   ],
+   "section": "assembly"
+  },
+  {
+   "task": "AUD-A03",
+   "tl": "TL-A03",
+   "name": "Export",
+   "summary": "BIMGBPS §4, §6",
+   "groups": [
+    "G4"
+   ],
+   "section": "assembly"
   },
   {
    "task": "AUD-A04",
@@ -357,7 +404,19 @@
    "summary": "BIMGBPS §4.2, §5.2.1, §5.3, §5.5",
    "groups": [
     "G5"
-   ]
+   ],
+   "section": "assembly"
+  },
+  {
+   "task": "AUD-A1",
+   "tl": "MA-1 to MA-7",
+   "name": "Model health",
+   "summary": "Roadmap MA-1 to MA-7",
+   "groups": [
+    "G2",
+    "G5"
+   ],
+   "section": "health"
   }
  ]
 }
