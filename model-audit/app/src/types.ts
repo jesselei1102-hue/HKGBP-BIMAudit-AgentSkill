@@ -50,7 +50,9 @@ export type GateReading = {
   mark: Mark;
   note: string;
 };
-export type GateRecord = { mode: GateMode; saved: string; readings: GateReading[] };
+/** Which review lists the operator looked at before the reports (absent in records saved before this existed). */
+export type Reviewed = { failures: boolean; check_yourself: boolean; inputs: boolean };
+export type GateRecord = { mode: GateMode; saved: string; readings: GateReading[]; reviewed?: Reviewed };
 
 export type Overview = {
   run: string;

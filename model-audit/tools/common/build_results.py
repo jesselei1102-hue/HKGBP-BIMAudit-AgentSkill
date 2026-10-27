@@ -139,7 +139,9 @@ def load_gate(run_dir, current):
         print("ERROR: %s: %s" % (p, e))
         sys.exit(2)
     keep = ("group", "key", "sheet", "item", "value", "note")
-    out = {"mode": mode, "saved": str(g.get("saved") or ""), "checked": 0, "unreviewed": [], "disputed": [], "stale": 0}
+    rv = g.get("reviewed") if isinstance(g.get("reviewed"), dict) else {}
+    out = {"mode": mode, "saved": str(g.get("saved") or ""), "checked": 0, "unreviewed": [], "disputed": [], "stale": 0,
+           "not_reviewed": [k for k in ("failures", "check_yourself", "inputs") if k in rv and not rv[k]]}
     seen = set()
     for r in rows:
         k = (r["group"], r["key"])

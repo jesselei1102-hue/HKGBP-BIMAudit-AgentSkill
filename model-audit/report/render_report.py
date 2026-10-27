@@ -201,8 +201,21 @@ def s_overview(c):
     return "".join(out) + "</section>"
 
 
+NOT_REVIEWED = {"failures": "failures", "check_yourself": "items to check yourself", "inputs": "missing inputs"}
+
+
 def gate_note(c):
-    """Reading review state from the audit window; nothing when the audit ran without it."""
+    """Review state from the audit window: the sheet readings, and review lists not looked at; nothing without it."""
+    g = c.r.get("gate")
+    if not g:
+        return ""
+    skipped = [NOT_REVIEWED[k] for k in g.get("not_reviewed", []) if k in NOT_REVIEWED]
+    extra = ("<p><b>Not looked at before the reports: %s.</b></p>" % html.escape(", ".join(skipped))) if skipped else ""
+    return readings_note(c) + extra
+
+
+def readings_note(c):
+    """Sheet readings part of the review state."""
     g = c.r.get("gate")
     if not g:
         return ""

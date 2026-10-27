@@ -135,12 +135,16 @@ export async function registerApp(
           })
         ),
         mode: z.enum(["confirmed", "unreviewed"]),
+        reviewed: z
+          .object({ failures: z.boolean(), check_yourself: z.boolean(), inputs: z.boolean() })
+          .optional()
+          .describe("Which review lists were looked at before the reports."),
       },
       _meta: { ui: { visibility: ["app"] } },
     },
-    async ({ run, marks, mode }) => {
+    async ({ run, marks, mode, reviewed }) => {
       try {
-        const saved = await saveGate(runsRoot, run, await loadCatalogue(packageRoot), marks, mode);
+        const saved = await saveGate(runsRoot, run, await loadCatalogue(packageRoot), marks, mode, undefined, reviewed);
         return result(saved);
       } catch (e) {
         return failure((e as Error).message);
