@@ -80,12 +80,15 @@ def method_of(fix):
     return "manual"
 
 
-def group_reports(gdir, gname, ext):
-    """The group's full report files, newest first; reports of a --tasks run (GBP_G2_S10_...) are left out."""
+def group_reports(gdir, gname, ext, tasks=None):
+    """The group's full report files, newest first; reports of a --tasks run (GBP_G2_S10_...) are left out.
+    tasks: the group JSON is itself a --tasks run (a new audit of a few tasks) - then only its own report
+    (GBP_G2_S10-S13_...) counts."""
+    want = "-".join(t[4:] for t in tasks) if tasks else None
     out = []
     for p in glob.glob(os.path.join(gdir, "GBP_%s_*.%s" % (gname, ext))):
         parts = os.path.basename(p).split("_")
-        if len(parts) > 2 and not T.PARTIAL_NAME.match(parts[2]):
+        if len(parts) > 2 and (parts[2] == want if want else not T.PARTIAL_NAME.match(parts[2])):
             out.append(p)
     return sorted(out, key=os.path.getmtime)
 
@@ -195,10 +198,13 @@ def main():
     version = "not read"
     group_ev = {}
     current = {}
+    partial_tasks = []
     for gjson, gdir in a.group:
         with open(gjson, encoding="utf-8") as f:
             G = json.load(f)
         gname = G["project_info"]["group"].split()[0]
+        if G["project_info"].get("partial"):
+            partial_tasks += G["project_info"]["tasks"]
         for r in G.get("readings") or []:
             current[(gname, str(r.get("key") or ""))] = (str(r.get("value") or ""), str(r.get("sheet") or ""),
                                                         str(r.get("item") or ""))
@@ -207,7 +213,8 @@ def main():
             version = str(v["actual"])
         evs = []
         for ext, kind in (("xlsx", "table"), ("html", "report")):
-            hits = group_reports(gdir, gname, ext)
+            pi = G["project_info"]
+            hits = group_reports(gdir, gname, ext, pi["tasks"] if pi.get("partial") else None)
             if hits:
                 shutil.copyfile(hits[-1], os.path.join(assets, os.path.basename(hits[-1])))
                 eid = "ev-%s-%s" % (gname.lower(), kind)
@@ -314,8 +321,10 @@ def main():
                  "round": "Audit by group (G1–G6)%s" % ("; updated: " + ", ".join(
                      os.path.basename(u) for u in a.update) if a.update else ""),
                  "package_version": "Model Audit package 2026-10-14 (executable specs, --tasks)", "filled_by": "script"},
-        "verdict": {"submittable": not blockers and not majors,
-                    "summary": "%d tasks audited by measurement; %d findings (%d Blocker, %d Major). Group reports hold every check."
+        "verdict": {"submittable": not blockers and not majors and not partial_tasks,
+                    "summary": ("Partial audit: only %s checked, so this report cannot say whether the package can be "
+                                "submitted. " % ", ".join(t.replace("AUD-", "") for t in partial_tasks) if partial_tasks else "")
+                               + "%d tasks audited by measurement; %d findings (%d Blocker, %d Major). Group reports hold every check."
                                % (len(tasks), len(findings), len(blockers), len(majors)),
                     "reasons": reasons},
         "a1": a1, "tasks": sorted(tasks.values(), key=lambda t: t["id"]), "findings": findings,

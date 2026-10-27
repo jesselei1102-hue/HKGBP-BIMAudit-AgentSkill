@@ -210,6 +210,8 @@ def gate_note(c):
     plural = lambda n: "reading was" if n == 1 else "readings were"
     row = lambda x: (html.escape(x["item"] or x["key"]), html.escape(x["sheet"]), html.escape(x["value"]),
                      html.escape(x["key"]))
+    if not unrev and not disp and not g["checked"]:
+        return "<h3>Sheet readings</h3><p>No sheet readings were taken in this audit.</p>"
     if not unrev and not disp:
         return (f'<h3>Sheet readings</h3><p>All {g["checked"]} sheet {"reading was" if g["checked"] == 1 else "readings were"}'
                 f' checked by the operator ({html.escape(g["saved"])}).</p>')
