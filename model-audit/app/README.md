@@ -1,15 +1,27 @@
 # gbp-audit · chat window for the GBP Model Audit
 
-A small MCP server that shows two windows inside the chat (an MCP App):
+A small MCP server that shows two windows inside the chat (an MCP App).
 
-1. **Choose checks** – the operator ticks tasks (grouped G1–G5), chooses a new audit or an existing one, and the
-   window sends the matching instruction to the chat. The agent then runs the audit as `../RUN.md` says, using the
-   Revit MCP that is connected.
-2. **Overview** – after the analysis the agent opens this window: counts per task, every FAIL / UNCLEAR check
-   ("Check this yourself"), the sheet readings with their crops to mark *Correct* or *Wrong*, and missing inputs.
-   This is the confirmation gate: *Confirm and build reports*, *Send back for re-reading*, or *Build reports without
-   full review*. The review is saved as `gate-confirmation.json` in the run folder and the reports list any reading
-   nobody checked. After the reports are built the same window lists them.
+Both windows show the four steps at the top (1 Choose › 2 Analyse › 3 Review › 4 Reports), a list on the left and
+the selected list on the right (on narrow windows the left list becomes a row of tabs).
+
+1. **Choose checks** – the left list holds the BIMGBPS sections (Views, Schedules, Assembly and export, Model
+   health) with selected / total, plus *Full audit* and *Clear*. The right side lists the section's tasks
+   (name, `TL-xx · §clause`) with search and *Select all*; the line underneath names the new audit, or picks an
+   earlier one with *Add to an earlier audit instead*. *Run n checks* sends the matching instruction to the chat
+   and the window then says what happens next (the agent runs the audit as `../RUN.md` says, using the Revit MCP
+   tools it finds; a review window follows; then the reports). If the host refuses the message, the window shows
+   the instruction to paste.
+2. **Overview** – after the analysis the agent opens this window. It is the confirmation gate, laid out as a
+   to-do list: *Failures*, *Check yourself* (UNCLEAR), *Missing inputs* (`-INPUT` checks and data warnings),
+   *Sheet readings*, and *All checks* (the per-task table). Checks with the same task and item show as one card
+   (first 4 objects, `+n more`, then `Fix:` or `Look at:`; click for the details). The first three lists are
+   ticked with *I've seen these* / *I've checked these*; the readings are done when each one is marked
+   *Correct* (marked ones fold away). *Build reports* opens once all four are done; *Send back for re-reading*
+   replaces it while a reading is marked *Wrong*; *Build without full review* is always there. The review is
+   saved as `gate-confirmation.json` (with `reviewed`: which lists were looked at) and the reports name any
+   reading nobody checked and any list not looked at. After the reports are built the same window opens on
+   *Reports* (step 4).
 
 The server does not talk to Revit and does not use the network. It reads and writes only the package and the runs
 folder. Without it the audit still runs from the text prompts in `../RUN.md` §7.
@@ -60,7 +72,7 @@ when they connect.
 | `choose_checks` | agent | Opens the Choose checks window (task list from `../tasks.json`, earlier audits in the runs folder) |
 | `show_overview(run)` | agent | Opens the Overview window for one run folder |
 | `get_crop(run, file)` | window only | One crop image as base64 (png / jpg, at most 5 MB, inside the run folder) |
-| `save_gate(run, marks, mode)` | window only | Writes `<run>/gate-confirmation.json` (`confirmed` needs every reading marked correct) |
+| `save_gate(run, marks, mode, reviewed?)` | window only | Writes `<run>/gate-confirmation.json` (`confirmed` needs every reading marked correct; `reviewed` records which lists were looked at) |
 
 ## Develop
 
@@ -70,7 +82,7 @@ python -m http.server 8790      # from the model-audit folder
 ```
 
 Open `http://localhost:8790/app/dev/harness.html` (parameters: `theme=dark`, `view=overview`, `reports=0`, `reports=old`, `error=1`,
-`nomessage=1`, `cursor=1`, `gatefail=1`, `xss=1`). The harness simulates the four tools and records `window.calls`,
+`nomessage=1`, `cursor=1`, `gatefail=1`, `xss=1`, `reviewed=1`). The harness simulates the four tools and records `window.calls`,
 `window.messages` and `window.lastContext`.
 
 `../tasks.json` is generated: after changing an analyser's `GROUP` list or an L2 card title, run
