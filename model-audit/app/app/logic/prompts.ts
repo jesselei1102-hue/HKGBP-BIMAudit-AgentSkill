@@ -53,6 +53,11 @@ export function rereadPrompt(run: string, wrong: { id: string; sheet: string; it
   );
 }
 
+/** Hosts do not let the window open local files, so the agent opens the report. */
+export function openReportPrompt(path: string): string {
+  return `Open this report in my default browser: ${path}`;
+}
+
 export function unreviewedPrompt(run: string, unchecked: number): string {
   return (
     `Build the reports for run "${run}" without a full reading review ` +

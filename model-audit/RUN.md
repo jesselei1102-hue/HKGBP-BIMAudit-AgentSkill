@@ -96,6 +96,7 @@
    - 「Gate confirmed …」：出报告（§6b 第 3–4 步），再调 `show_overview(run)`。
    - 「These readings … were marked wrong」：按列出的读数重读、重跑相关组的分析，再调 `show_overview(run)`。
    - 「Build the reports … without a full reading review」：照样出报告；`build_results.py` 会读 `gate-confirmation.json`，报告列出没人核对的读数。再调 `show_overview(run)`。
+   - 「Open this report in my default browser: <路径>」：宿主不让窗口打开本机文件，由 agent 打开（Windows：`start "" "<路径>"`；macOS：`open "<路径>"`）。只开审核文件夹里的报告。
 4. 没有窗口时照 §6b / §6c / §7。
 
 ## 7. 短 Prompt

@@ -81,7 +81,8 @@ async function reportFiles(runDir: string): Promise<Overview["reports"]> {
   return {
     bim: top.includes("report-bim.html") ? "report-bim.html" : null,
     ap: top.includes("report-ap.html") ? "report-ap.html" : null,
-    groups: [...top.filter(isGroup), ...assets.filter(isGroup).map((f) => `assets/${f}`)],
+    // build_results.py copies each group report into assets/: list a report once
+    groups: [...top.filter(isGroup), ...assets.filter((f) => isGroup(f) && !top.includes(f)).map((f) => `assets/${f}`)],
   };
 }
 

@@ -1,9 +1,9 @@
 // Window 2/3: the results of one run, the reading review (the confirmation gate), and the reports once built.
 import type { App } from "@modelcontextprotocol/ext-apps";
 import type { Check, Mark, Overview, Reading, Status } from "../src/types";
-import { sendToChat } from "./chat";
+import { copyText, sendToChat } from "./chat";
 import { markPayload, preloadMarks } from "./logic/marks";
-import { confirmPrompt, joinPath, rereadPrompt, unreviewedPrompt } from "./logic/prompts";
+import { confirmPrompt, joinPath, openReportPrompt, rereadPrompt, unreviewedPrompt } from "./logic/prompts";
 import { escapeHtml, pad3 } from "./ui/html";
 import { initTabs } from "./ui/tabs";
 
@@ -171,12 +171,11 @@ export function renderOverview(
   }
 
   function reports() {
-    const canOpen = !!app.getHostCapabilities()?.openLinks;
     const label = (p: string) =>
       p.endsWith("report-bim.html") ? "BIM team report" : p.endsWith("report-ap.html") ? "AP / client report" : "Group report";
     return `<table><thead><tr><th>Report</th><th>Path</th><th></th></tr></thead><tbody>${reportPaths()
       .map((p) => `<tr><td>${label(p)}</td><td class="report-path">${e(p)}</td><td>
-        ${canOpen ? `<button class="text-link" type="button" data-open="${e(p)}">Open</button> ` : ""}
+        <button class="text-link" type="button" data-open="${e(p)}" title="Asks the agent to open it">Open</button>
         <button class="text-link" type="button" data-copypath="${e(p)}">Copy path</button></td></tr>`)
       .join("")}</tbody></table>`;
   }
@@ -240,8 +239,8 @@ export function renderOverview(
           .map((r) => ({ id: r.id, sheet: r.sheet, item: r.item, note: marks.get(r.id)!.note }));
         await post(rereadPrompt(ov.run, wrong), "Sent back to the chat for re-reading.");
       } else if (kind === "copy-reports") {
-        await copy(reportPaths().join("\n"));
-        say("Report paths copied.");
+        const ok = await copyText(reportPaths().join("\n"), view);
+        say(ok ? "Report paths copied." : "Press Ctrl+C to copy the selected paths.");
       }
       lastAction = kind;
     } finally {
@@ -255,14 +254,6 @@ export function renderOverview(
     const ok = await sendToChat(app, text, view);
     say(ok ? okMessage : "Paste the instruction into the chat to continue.");
     sent = ok;
-  }
-
-  async function copy(text: string) {
-    try {
-      await navigator.clipboard.writeText(text);
-    } catch {
-      say(text);
-    }
   }
 
   function state() {
@@ -308,14 +299,16 @@ export function renderOverview(
     }
     const open = t.closest<HTMLElement>("[data-open]");
     if (open) {
-      const r = await app.openLink({ url: "file:///" + open.dataset.open!.replaceAll("\\", "/") }).catch(() => ({ isError: true }));
-      if ((r as { isError?: boolean }).isError) say("This chat cannot open local files. Copy the path instead.");
-      return;
+      // hosts do not let the window open local files: the agent opens it
+      const ok = await sendToChat(app, openReportPrompt(open.dataset.open!), view);
+      say(ok ? "Asked the agent to open the report." : "Paste the instruction into the chat to open the report.");
+      lastAction = "open report";
+      return state();
     }
     const cp = t.closest<HTMLElement>("[data-copypath]");
     if (cp) {
-      await copy(cp.dataset.copypath!);
-      say("Path copied.");
+      const ok = await copyText(cp.dataset.copypath!, view);
+      say(ok ? "Path copied." : "Press Ctrl+C to copy the selected path.");
     }
   });
   view.addEventListener("input", (ev) => {
