@@ -1,0 +1,30 @@
+{
+  "name": "gbp-audit",
+  "version": "0.1.0",
+  "description": "GBP Model Audit chat window (MCP App): choose checks, review results",
+  "type": "module",
+  "bin": {
+    "gbp-audit": "./build/index.js"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "build": "tsc && vite build",
+    "build:app": "vite build",
+    "test": "vitest run",
+    "start": "node build/index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/ext-apps": "^1.7.5",
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "typescript": "^5.8.2",
+    "vite": "^7.1.5",
+    "vite-plugin-singlefile": "^2.3.0",
+    "vitest": "^3.2.4"
+  }
+}
