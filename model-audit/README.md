@@ -228,4 +228,4 @@ python "Model Audit/report/render_report.py" --results audit-<date>/audit-result
 - 换 MCP：按 [CAP-onboarding](L4-Capabilities/CAP-onboarding.md) 加 `L3-SOP/SOP-AUD-mcp-<名称>.md` 和 `L4-Capabilities/CAP-binding-<名称>.md`（例：mcp-servers-for-revit 的两份）；回传格式不认得时在 `tools/extract/` 加适配器，输出对齐 [EXTRACT-FILES](L3-SOP/EXTRACT-FILES.md)。
 - 发现新坑：加进对应 AUD 的「常见坑」。
 - 报告格式：改 `templates/`（样式在 `report-template.html` 的 `report-css`）与 `report/render_report.py`，两者一起改。
-- 改完跑测试和包检查（在 repo 的 `model-audit-design/_agent/`，只用标准库）：每个 `python -I test_*.py` 单独跑；`python -I check_package.py --layer all` 查文件、链接、Skill。
+- 改完跑测试和包检查（`model-audit-design/_agent/`，只用标准库；只在维护者本地，不随 repo 发布）：每个 `python -I test_*.py` 单独跑；`python -I check_package.py --layer all` 查文件、链接、Skill。

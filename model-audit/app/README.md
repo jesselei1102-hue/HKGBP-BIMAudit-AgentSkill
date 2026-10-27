@@ -33,7 +33,6 @@ Needs Node.js 20 or later.
 ```bash
 npm install
 npm run build
-npm test
 ```
 
 ## Register
@@ -76,14 +75,8 @@ when they connect.
 
 ## Develop
 
-```bash
-npm run build && npm run fixture:overview
-python -m http.server 8790      # from the model-audit folder
-```
-
-Open `http://localhost:8790/app/dev/harness.html` (parameters: `theme=dark`, `view=overview`, `reports=0`, `reports=old`, `error=1`,
-`nomessage=1`, `cursor=1`, `gatefail=1`, `xss=1`, `reviewed=1`, `reviewed=stale`). The harness simulates the four tools and records `window.calls`,
-`window.messages` and `window.lastContext`.
+The tests (`test/`, `npm test`) and the browser harness (`dev/`, `npm run fixture:overview`) are kept locally by the
+maintainer and are not published in this repository.
 
 `../tasks.json` is generated: after changing an analyser's `GROUP` list or an L2 card title, run
 `python ../tools/common/make_tasks_json.py`.

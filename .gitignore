@@ -1,12 +1,14 @@
-# Only the Model Audit package and its design / tests are published from this folder.
+# Only the Model Audit package and its design documents are published from this folder.
+# Tests, validation scripts, fixtures and the dev harness stay local.
 /*
 !/.gitignore
 !/README.md
 !/LICENSE
 !/model-audit/
 !/model-audit-design/
-/model-audit-design/_agent/sample-round1/
+/model-audit-design/_agent/
+/model-audit/app/test/
+/model-audit/app/dev/
+/model-audit/app/vitest.config.ts
 __pycache__/
 *.pyc
-/model-audit-design/_agent/check_g1_real.py
-/model-audit-design/_agent/test_extract_g2.py

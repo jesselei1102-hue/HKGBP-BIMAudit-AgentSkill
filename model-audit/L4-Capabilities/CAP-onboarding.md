@@ -32,14 +32,14 @@ Layer 4。当前连着的 BIM MCP 在本文件夹还没有 `CAP-binding-<名称>
 - 每项记 `实测 <日期>`；没试的记 `待试`，不要推测成 Full。
 - 回传原样存进一个试验运行文件夹的 `_raw/mcp/`，跑对应的 `tools/extract/g*_extract.py`：
   - 脚本认得格式并写出提取文件 → 与 [EXTRACT-FILES](../L3-SOP/EXTRACT-FILES.md) 的列和单位核对；有已有运行时，逐行比对。
-  - 脚本停下并说「unknown … format – add an adapter」→ 在 `tools/extract/mcp_formats.py`（或该组脚本）加适配器，先在 `model-audit-design/_agent/test_extract_g*.py` 写会失败的测试，再实现。不要手抄值、不要每次另写转换脚本。
+  - 脚本停下并说「unknown … format – add an adapter」→ 在 `tools/extract/mcp_formats.py`（或该组脚本）加适配器，先写会失败的测试（维护者本地的 `model-audit-design/_agent/test_extract_g*.py`，不随 repo 发布），再实现。不要手抄值、不要每次另写转换脚本。
 
 ## 4. 写对照表与 SOP
 
 - `L4-Capabilities/CAP-binding-<名称>.md`：照 [CAP-binding-revit-mcp](CAP-binding-revit-mcp.md) 的列（能力 ID、用于、工具、状态、标记、备注），加一张「各组需要的能力与本 MCP 的情况」表（照 [CAP-binding-mcp-servers-for-revit](CAP-binding-mcp-servers-for-revit.md)）。
 - `L3-SOP/SOP-AUD-mcp-<名称>.md`：只写与基准配方不同的步骤（调用、要存的文件名、限制），照 [SOP-AUD-mcp-mcp-servers-for-revit](../L3-SOP/SOP-AUD-mcp-mcp-servers-for-revit.md)。
 - 新出现的缺口加进 [CAP-gaps](CAP-gaps.md)（写明只在哪个 MCP）。
-- `model-audit-design/_agent/check_package.py` 的文件清单与能力检查加上这两个新文件。
+- 包检查脚本（维护者本地的 `model-audit-design/_agent/check_package.py`，不随 repo 发布）的文件清单与能力检查加上这两个新文件。
 
 ## 5. 判定各组能不能跑
 
