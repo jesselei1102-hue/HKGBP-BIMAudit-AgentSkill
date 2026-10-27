@@ -56,6 +56,8 @@ export type Overview = {
   inputs: Check[];
   warnings: string[];
   reports: { bim: string | null; ap: string | null; groups: string[] };
+  /** True when the run's reports are newer than every analysis file and the review: the reports show these results. */
+  reportsCurrent: boolean;
   gate: GateRecord | null;
   counts: { checks: number; fail: number; unclear: number; readings: number };
 };

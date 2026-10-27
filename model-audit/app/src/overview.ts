@@ -132,9 +132,17 @@ export async function readOverview(runsRoot: string, run: string, catalogue: Cat
     ? ((await readJson(runDir, "gate-confirmation.json")) as GateRecord)
     : null;
 
+  const mtime = async (f: string) => (await fs.stat(path.join(runDir, f))).mtimeMs;
+  const reports = await reportFiles(runDir);
+  const made = [reports.bim, reports.ap].filter((f): f is string => !!f);
+  const inputs = [...kinds.keys(), ...(gate ? ["gate-confirmation.json"] : [])];
+  const reportsCurrent =
+    made.length > 0 &&
+    Math.min(...(await Promise.all(made.map(mtime)))) > Math.max(0, ...(await Promise.all(inputs.map(mtime))));
+
   return {
     run, project, groups: [...groups].sort(), partial, tasks, checks, readings: allReadings,
-    inputs: checks.filter((c) => c.id.endsWith("-INPUT")), warnings, reports: await reportFiles(runDir), gate,
+    inputs: checks.filter((c) => c.id.endsWith("-INPUT")), warnings, reports, reportsCurrent, gate,
     counts: { checks: checks.length, fail: checks.filter((c) => c.status === "FAIL").length,
               unclear: checks.filter((c) => c.status === "UNCLEAR").length, readings: allReadings.length },
   };

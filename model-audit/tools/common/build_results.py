@@ -118,26 +118,46 @@ def update_group(path, groups):
     return True
 
 
-def load_gate(run_dir):
+def load_gate(run_dir, current):
     """The reading review saved by the audit window (<run>/gate-confirmation.json), or None when there is none.
-    A file that cannot be read stops the build (exit 2) rather than producing reports without the review state."""
+    `current`: {(group, key): (value, sheet, item)} from the group JSONs being combined.  A reviewed reading whose value
+    or sheet has changed since, or that is gone, does not count as checked; a current reading the review never saw
+    is unreviewed.  A file that cannot be read stops the build (exit 2) rather than producing reports without it."""
     p = os.path.join(run_dir, "gate-confirmation.json")
     if not os.path.exists(p):
         return None
     try:
         with open(p, encoding="utf-8") as f:
             g = json.load(f)
-        rows = g["readings"]
         mode = g["mode"]
-    except (OSError, ValueError, KeyError, TypeError) as e:
+        rows = [{k: str(r.get(k) or "") for k in ("group", "key", "sheet", "item", "value", "note", "mark")}
+                for r in g["readings"]]
+    except (OSError, ValueError, KeyError, TypeError, AttributeError) as e:
         print("ERROR: %s: %s" % (p, e))
         sys.exit(2)
     keep = ("group", "key", "sheet", "item", "value", "note")
-    pick = lambda r: {k: str(r.get(k) or "") for k in keep}
-    return {"mode": mode, "saved": str(g.get("saved") or ""),
-            "checked": sum(1 for r in rows if r.get("mark") == "ok"),
-            "unreviewed": [pick(r) for r in rows if r.get("mark") not in ("ok", "wrong")],
-            "disputed": [pick(r) for r in rows if r.get("mark") == "wrong"]}
+    out = {"mode": mode, "saved": str(g.get("saved") or ""), "checked": 0, "unreviewed": [], "disputed": [], "stale": 0}
+    seen = set()
+    for r in rows:
+        k = (r["group"], r["key"])
+        now = current.get(k)
+        if now is None:
+            continue
+        seen.add(k)
+        if (r["value"], r["sheet"]) != now[:2]:
+            out["stale"] += 1
+            r.update(value=now[0], sheet=now[1], note="")
+            out["unreviewed"].append({x: r[x] for x in keep})
+        elif r["mark"] == "ok":
+            out["checked"] += 1
+        elif r["mark"] == "wrong":
+            out["disputed"].append({x: r[x] for x in keep})
+        else:
+            out["unreviewed"].append({x: r[x] for x in keep})
+    for (grp, key), (value, sheet, item) in current.items():
+        if (grp, key) not in seen:
+            out["unreviewed"].append({"group": grp, "key": key, "sheet": sheet, "item": item, "value": value, "note": ""})
+    return out
 
 
 def main():
@@ -174,10 +194,14 @@ def main():
         unclear += S14["unclear"]
     version = "not read"
     group_ev = {}
+    current = {}
     for gjson, gdir in a.group:
         with open(gjson, encoding="utf-8") as f:
             G = json.load(f)
         gname = G["project_info"]["group"].split()[0]
+        for r in G.get("readings") or []:
+            current[(gname, str(r.get("key") or ""))] = (str(r.get("value") or ""), str(r.get("sheet") or ""),
+                                                        str(r.get("item") or ""))
         v = next((c for c in G["checks"] if c["id"] == "A03-L3"), None)
         if v and str(v.get("status")) == "PASS":
             version = str(v["actual"])
@@ -300,7 +324,7 @@ def main():
         "unclear": unclear,
         "evidence": evidence,
     }
-    gate = load_gate(os.path.dirname(os.path.abspath(a.out)))
+    gate = load_gate(os.path.dirname(os.path.abspath(a.out)), current)
     if gate:
         results["gate"] = gate
     with open(a.out, "w", encoding="utf-8") as f:

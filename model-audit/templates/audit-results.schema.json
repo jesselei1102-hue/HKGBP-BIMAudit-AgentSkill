@@ -222,6 +222,7 @@
         "mode": {"type": "string", "enum": ["confirmed", "unreviewed"]},
         "saved": {"type": "string"},
         "checked": {"type": "integer"},
+        "stale": {"type": "integer", "description": "Reviewed readings whose value or sheet changed afterwards; listed as unreviewed."},
         "unreviewed": {"type": "array", "items": {"$ref": "#/$defs/gate_reading"}},
         "disputed": {"type": "array", "items": {"$ref": "#/$defs/gate_reading"}}
       },

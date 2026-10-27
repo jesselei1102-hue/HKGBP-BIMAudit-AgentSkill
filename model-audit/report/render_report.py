@@ -215,8 +215,10 @@ def gate_note(c):
                 f' checked by the operator ({html.escape(g["saved"])}).</p>')
     out = ['<h3>Sheet readings</h3><div class="verdict">']
     if unrev:
+        stale = g.get("stale", 0)
         out.append(f"<p><b>{len(unrev)} sheet {plural(len(unrev))} not checked by a person.</b> "
-                   "Check these values on the sheets before relying on the results that use them.</p>"
+                   + (f"{stale} {'reading' if stale == 1 else 'readings'} changed after the review. " if stale else "")
+                   + "Check these values on the sheets before relying on the results that use them.</p>"
                    + table(["Item", "Sheet", "Value", "Key"], [row(x) for x in unrev]))
     if disp:
         out.append("<p><b>Marked wrong by the operator</b></p>"

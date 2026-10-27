@@ -31,7 +31,8 @@ export function runPrompt(r: RunRequest): string {
     "Follow model-audit/RUN.md §6c: extract only what each group table lists, run each group's analyser with --tasks. Read-only. " +
     `Run folder: ${r.runDir}. ` +
     (r.mode === "merge"
-      ? "Merge the results into the existing audit in that folder with build_results.py --update (RUN.md §6c step 4). "
+      ? "Merge the results into the existing audit in that folder with build_results.py --update (RUN.md §6c step 4) " +
+        "before calling show_overview, so the overview shows the new readings. "
       : "") +
     thenOverview(r.run)
   );

@@ -17,14 +17,16 @@ const MARKS: Mark[] = ["ok", "wrong", "none"];
 
 /**
  * Write <run>/gate-confirmation.json. The readings are the ones on disk now (the agent may have re-run the analysis
- * since the window opened); marks for readings that no longer exist are ignored, missing marks count as "none".
+ * since the window opened); marks for readings that no longer exist are ignored, missing marks count as "none",
+ * and a mark sent with a value or sheet that differs from the reading on disk counts as "none" (the operator did not
+ * see the current value).
  * "confirmed" needs every reading marked ok.
  */
 export async function saveGate(
   runsRoot: string,
   run: string,
   catalogue: Catalogue,
-  marks: Record<string, { mark: Mark; note?: string }>,
+  marks: Record<string, { mark: Mark; note?: string; value?: string; sheet?: string }>,
   mode: GateMode,
   now: () => Date = () => new Date()
 ): Promise<{ path: string; record: GateRecord }> {
@@ -35,7 +37,8 @@ export async function saveGate(
     saved: now().toISOString(),
     readings: readings.map((r) => {
       const m = marks[r.id];
-      const mark = m && MARKS.includes(m.mark) ? m.mark : "none";
+      const seen = m && (m.value === undefined || m.value === r.value) && (m.sheet === undefined || m.sheet === r.sheet);
+      const mark = m && seen && MARKS.includes(m.mark) ? m.mark : "none";
       return { id: r.id, group: r.group, key: r.key, sheet: r.sheet, item: r.item, value: r.value, mark,
                note: mark === "wrong" ? String(m?.note ?? "") : "" };
     }),

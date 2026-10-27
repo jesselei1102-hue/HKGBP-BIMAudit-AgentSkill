@@ -125,7 +125,14 @@ export async function registerApp(
       description: "Saves the reading review of one audit run to gate-confirmation.json (window only).",
       inputSchema: {
         run: z.string(),
-        marks: z.record(z.object({ mark: z.enum(["ok", "wrong", "none"]), note: z.string().optional() })),
+        marks: z.record(
+          z.object({
+            mark: z.enum(["ok", "wrong", "none"]),
+            note: z.string().optional(),
+            value: z.string().optional().describe("The value the operator saw; a mismatch with the run counts as unmarked."),
+            sheet: z.string().optional(),
+          })
+        ),
         mode: z.enum(["confirmed", "unreviewed"]),
       },
       _meta: { ui: { visibility: ["app"] } },

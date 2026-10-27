@@ -2,6 +2,7 @@
 import type { App } from "@modelcontextprotocol/ext-apps";
 import type { Check, Mark, Overview, Reading, Status } from "../src/types";
 import { sendToChat } from "./chat";
+import { markPayload, preloadMarks } from "./logic/marks";
 import { confirmPrompt, joinPath, rereadPrompt, unreviewedPrompt } from "./logic/prompts";
 import { escapeHtml, pad3 } from "./ui/html";
 import { initTabs } from "./ui/tabs";
@@ -27,9 +28,10 @@ export function renderOverview(
 ) {
   const ov = data.overview;
   const runDir = joinPath(data.runsRoot, ov.run);
-  const hasReports = !!(ov.reports.bim || ov.reports.ap);
-  const marks = new Map<string, { mark: Mark; note: string }>();
-  for (const r of ov.gate?.readings ?? []) if (r.mark !== "none") marks.set(r.id, { mark: r.mark, note: r.note });
+  // Window 3 only when the reports show these results; older reports (e.g. before a merge) leave the gate open.
+  const hasReports = ov.reportsCurrent;
+  const anyReports = !!(ov.reports.bim || ov.reports.ap);
+  const marks = preloadMarks(ov.readings, ov.gate?.readings ?? []);
   const expanded = new Set(ov.tasks.filter((t) => t.counts.FAIL || t.counts.UNCLEAR).map((t) => t.task));
   let tab = "tasks";
   let ready = false;
@@ -55,12 +57,12 @@ export function renderOverview(
       <button class="tab" type="button" role="tab" data-tab="tasks"><span class="n">01</span>Tasks <span class="tab-count">${ov.tasks.length}</span></button>
       <button class="tab" type="button" role="tab" data-tab="readings"><span class="n">02</span>Readings <span class="tab-count" data-k="rcount"></span></button>
       <button class="tab" type="button" role="tab" data-tab="issues"><span class="n">03</span>Data issues <span class="tab-count">${ov.inputs.length + ov.warnings.length || ""}</span></button>
-      ${hasReports ? `<button class="tab" type="button" role="tab" data-tab="reports"><span class="n">04</span>Reports</button>` : ""}
+      ${anyReports ? `<button class="tab" type="button" role="tab" data-tab="reports"><span class="n">04</span>Reports${hasReports ? "" : " (earlier)"}</button>` : ""}
     </nav>
     <section class="panel" id="panel-tasks" role="tabpanel"><div class="table-wrap" data-k="tasks"></div></section>
     <section class="panel" id="panel-readings" role="tabpanel" hidden><div data-k="readings"></div></section>
     <section class="panel" id="panel-issues" role="tabpanel" hidden>${issues()}</section>
-    ${hasReports ? `<section class="panel" id="panel-reports" role="tabpanel" hidden>${reports()}</section>` : ""}
+    ${anyReports ? `<section class="panel" id="panel-reports" role="tabpanel" hidden>${reports()}</section>` : ""}
     <p class="message" data-k="message" hidden></p>
     <footer class="dock" data-k="dock"></footer>`;
 
@@ -199,7 +201,7 @@ export function renderOverview(
   }
 
   async function saveGate(mode: "confirmed" | "unreviewed"): Promise<boolean> {
-    const payload = Object.fromEntries([...marks].map(([id, m]) => [id, { mark: m.mark, note: m.note }]));
+    const payload = markPayload(marks, ov.readings);
     try {
       const r = (await app.callServerTool({ name: "save_gate", arguments: { run: ov.run, marks: payload, mode } })) as ToolResult;
       if (r.isError) throw new Error(errText(r));
