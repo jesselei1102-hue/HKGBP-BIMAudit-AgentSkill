@@ -21,6 +21,7 @@
 | 读数核对 | 默认每条读数都标过「对 / 错」才能确认；也可以不核对直接出报告，但要一直保留提醒 |
 | 待定（UNCLEAR） | 提示用户自己检查 |
 | 运行环境 | 接受多一个 Node.js 要求 |
+| 语言 | 整个 app 和窗口都用英文（界面文字、发给对话的指令、错误信息）；本文件里的中文按钮名只是说明 |
 
 ### 1.2 不做什么
 
@@ -116,7 +117,8 @@ agent 出报告 → 调 show_overview(run) → 窗口 ③（总览 + 报告位�
 {
   "mode": "confirmed | unreviewed",
   "saved": "<ISO 时间>",
-  "readings": [{"key": "...", "sheet": "...", "mark": "ok | wrong | none", "note": "..."}]
+  "readings": [{"id": "<组>:<key>", "group": "G3", "key": "...", "sheet": "...", "item": "...", "value": "...",
+                "mark": "ok | wrong | none", "note": "..."}]
 }
 ```
 
