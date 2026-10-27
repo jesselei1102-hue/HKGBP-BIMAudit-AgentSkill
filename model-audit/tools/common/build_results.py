@@ -118,6 +118,28 @@ def update_group(path, groups):
     return True
 
 
+def load_gate(run_dir):
+    """The reading review saved by the audit window (<run>/gate-confirmation.json), or None when there is none.
+    A file that cannot be read stops the build (exit 2) rather than producing reports without the review state."""
+    p = os.path.join(run_dir, "gate-confirmation.json")
+    if not os.path.exists(p):
+        return None
+    try:
+        with open(p, encoding="utf-8") as f:
+            g = json.load(f)
+        rows = g["readings"]
+        mode = g["mode"]
+    except (OSError, ValueError, KeyError, TypeError) as e:
+        print("ERROR: %s: %s" % (p, e))
+        sys.exit(2)
+    keep = ("group", "key", "sheet", "item", "value", "note")
+    pick = lambda r: {k: str(r.get(k) or "") for k in keep}
+    return {"mode": mode, "saved": str(g.get("saved") or ""),
+            "checked": sum(1 for r in rows if r.get("mark") == "ok"),
+            "unreviewed": [pick(r) for r in rows if r.get("mark") not in ("ok", "wrong")],
+            "disputed": [pick(r) for r in rows if r.get("mark") == "wrong"]}
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", required=True)
@@ -278,6 +300,9 @@ def main():
         "unclear": unclear,
         "evidence": evidence,
     }
+    gate = load_gate(os.path.dirname(os.path.abspath(a.out)))
+    if gate:
+        results["gate"] = gate
     with open(a.out, "w", encoding="utf-8") as f:
         json.dump(results, f, ensure_ascii=False, indent=1)
     print("wrote %s: %d tasks, %d findings (%d Blocker, %d Major), %d unclear, %d A1 items, %d evidence"

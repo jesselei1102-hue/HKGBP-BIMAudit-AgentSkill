@@ -197,7 +197,32 @@ def s_overview(c):
         out.append("<h3>Blockers</h3><ul>" + "".join(
             f'<li><b>{f["id"]}</b> {c.text(f.get("title", ""))} <span class="muted">({", ".join([f["task"]] + f.get("tasks", []))})</span></li>'
             for f in blockers) + "</ul>")
+    out.append(gate_note(c))
     return "".join(out) + "</section>"
+
+
+def gate_note(c):
+    """Reading review state from the audit window; nothing when the audit ran without it."""
+    g = c.r.get("gate")
+    if not g:
+        return ""
+    unrev, disp = g["unreviewed"], g["disputed"]
+    plural = lambda n: "reading was" if n == 1 else "readings were"
+    row = lambda x: (html.escape(x["item"] or x["key"]), html.escape(x["sheet"]), html.escape(x["value"]),
+                     html.escape(x["key"]))
+    if not unrev and not disp:
+        return (f'<h3>Sheet readings</h3><p>All {g["checked"]} sheet {"reading was" if g["checked"] == 1 else "readings were"}'
+                f' checked by the operator ({html.escape(g["saved"])}).</p>')
+    out = ['<h3>Sheet readings</h3><div class="verdict">']
+    if unrev:
+        out.append(f"<p><b>{len(unrev)} sheet {plural(len(unrev))} not checked by a person.</b> "
+                   "Check these values on the sheets before relying on the results that use them.</p>"
+                   + table(["Item", "Sheet", "Value", "Key"], [row(x) for x in unrev]))
+    if disp:
+        out.append("<p><b>Marked wrong by the operator</b></p>"
+                   + table(["Item", "Sheet", "Value", "Key", "Operator note"],
+                           [row(x) + (html.escape(x["note"]) or "—",) for x in disp]))
+    return "".join(out) + "</div>"
 
 
 def s_decisions(c):

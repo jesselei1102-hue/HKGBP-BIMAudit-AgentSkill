@@ -9,7 +9,14 @@
     "status": {"type": "string", "enum": ["Pass", "Partial", "Fail", "Missing", "N/A（附条件）", "N/A 待声明", "Unclear", "Not judged"]},
     "audience": {"type": "string", "enum": ["bim", "both"]},
     "task_id": {"type": "string", "pattern": "^(A1|AUD-[VSA][0-9]{2})$"},
-    "ids": {"type": "array", "items": {"type": "string"}}
+    "ids": {"type": "array", "items": {"type": "string"}},
+    "gate_reading": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {"group": {"type": "string"}, "key": {"type": "string"}, "sheet": {"type": "string"},
+                     "item": {"type": "string"}, "value": {"type": "string"}, "note": {"type": "string"}},
+      "required": ["group", "key", "sheet", "item", "value", "note"]
+    }
   },
   "properties": {
     "meta": {
@@ -206,6 +213,19 @@
         }
       },
       "required": ["previous_round", "items"]
+    },
+    "gate": {
+      "description": "Reading review saved by the audit window (gate-confirmation.json). Absent when the audit ran without the window.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mode": {"type": "string", "enum": ["confirmed", "unreviewed"]},
+        "saved": {"type": "string"},
+        "checked": {"type": "integer"},
+        "unreviewed": {"type": "array", "items": {"$ref": "#/$defs/gate_reading"}},
+        "disputed": {"type": "array", "items": {"$ref": "#/$defs/gate_reading"}}
+      },
+      "required": ["mode", "saved", "checked", "unreviewed", "disputed"]
     },
     "evidence": {
       "type": "array",
