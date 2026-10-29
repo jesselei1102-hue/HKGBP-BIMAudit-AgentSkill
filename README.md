@@ -20,6 +20,40 @@ https://github.com/user-attachments/assets/f34f77bf-a4f4-4862-89c0-07189c292e10
 | [model-audit/](model-audit/) | The package: four layers (L1 domain, L2 task logic, L3 Revit SOP, L4 MCP capabilities), executable tools, report templates, Agent Skills and an optional chat window (`model-audit/app/`, an MCP App). Start with [model-audit/README.md](model-audit/README.md) and [model-audit/RUN.md](model-audit/RUN.md). |
 | [model-audit-design/](model-audit-design/) | Design and plan documents. |
 
+## Quick start
+
+**1. Folder layout.** Clone this repository and open its root folder as the agent's workspace (Claude Code, Cursor,
+Codex, Hermes, …). The package looks for the source texts and writes its runs next to `model-audit/`:
+
+```
+<repo root>/              ← open this folder in the agent
+  model-audit/            the package (RUN.md is here)
+  model-audit-runs/       one folder per audit (the chat window looks here)
+  Legislation/            you add: cap123, cap123f, cap123h, cap123i
+  source/                 you add: BIMGBPS corpus, PNAPs
+```
+
+Without `Legislation/` and `source/` the audit still runs, but every compliance (L2) check is reported UNCLEAR.
+
+**2. Revit and the MCP server.**
+
+- Open a **copy** of the model in Revit, not the central file you will submit. The audit only reads.
+- Start a Revit MCP server and connect it to your agent. Two have capability bindings:
+  Autodesk revit-mcp and mcp-servers-for-revit (see [model-audit/L4-Capabilities/](model-audit/L4-Capabilities/)).
+  With any other MCP the agent stops and tells you; a binding is made first with
+  [CAP-onboarding](model-audit/L4-Capabilities/CAP-onboarding.md).
+- Check that the agent can see the Revit tools, and that it can run Python 3.
+
+**3. First instruction.** In the agent, say:
+
+> Run a full Model Audit on the open model. Follow `model-audit/RUN.md`. Read-only. Write the run to
+> `model-audit-runs/audit-<date>/`.
+
+On the first run the agent copies the six Agent Skills into the workspace's skill folder (RUN.md §1 step 0); they
+take effect in a new conversation. Prompts for one group, one task or a regression are in
+[model-audit/RUN.md](model-audit/RUN.md) §7. The package docs write the package folder as `Model Audit/`: read it as
+`model-audit/`.
+
 ## Chat window (optional)
 
 `model-audit/app/` is a small MCP server (`gbp-audit`, an MCP App) that opens windows inside the chat and walks the
