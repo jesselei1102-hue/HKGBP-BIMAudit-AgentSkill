@@ -1,10 +1,8 @@
-// GBP Model Audit window: one page, two views chosen by the tool result (choose_checks / show_overview).
+// GBP Model Audit window: choose the checks and the outputs (choose_checks). The reports carry the results.
 import { App } from "@modelcontextprotocol/ext-apps";
 import { renderChoose, type ChooseData } from "./choose";
-import { renderOverview, type OverviewData } from "./overview";
 import { applyInitialHostTheme, initTheme } from "./theme/theme";
 import { createModelContext } from "./ui/context";
-import { escapeHtml } from "./ui/html";
 
 type ToolResult = { content?: { type: string; text?: string }[]; structuredContent?: unknown; isError?: boolean };
 
@@ -39,15 +37,6 @@ function show(result: ToolResult) {
     subtitle.textContent = "Choose checks";
     status.textContent = `Runs folder: ${String(data.runsRoot ?? "")}`;
     renderChoose(app, data as unknown as ChooseData, view, setState);
-  } else if (data.view === "overview") {
-    if (data.error) {
-      subtitle.textContent = "Review";
-      status.textContent = "";
-      view.innerHTML = `<div class="empty"><b>Could not read this run</b><span>${escapeHtml(String(data.error))}</span></div>`;
-      setState(`GBP Model Audit window: could not read the run - ${String(data.error)}`);
-      return;
-    }
-    renderOverview(app, data as unknown as OverviewData, view, { status, subtitle }, setState);
   }
 }
 

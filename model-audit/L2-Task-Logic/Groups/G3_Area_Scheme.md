@@ -38,7 +38,7 @@
 - 表值没读的检查记 UNCLEAR（不是 Fail）。
 - **由代码强制**（`tools/common/readings.py`）：备注写明来自模型或假设的行一律拒用（UNCLEAR，并在屏幕摘要列出）；与模型不一致的读数要有该格的裁切图（`box` → `crop_readings.py` → `crop`）才判 Fail，否则 UNCLEAR；一致的读数无裁切图也可 Pass（medium）。
 - 看图下的判断（附录 A / G / H 表、BEAM Plus 目标评级、地盘分类依据）各写一行带 `finding`（Pass / Fail）；没有这一行 → UNCLEAR，不推定。Pass 要有裁切图，Fail 要写明看过的图纸，否则 UNCLEAR。
-- 全部读数连同裁切图列在屏幕摘要与报告「Sheet readings to check」，供操作者在确认关口逐条核对。
+- 全部读数连同裁切图列在屏幕摘要与报告「To check by eye › Sheet readings」，标明未经人工核对（not checked by a person），由操作者自行对图核对。
 
 ## 4. 分析 JSON 与报告
 

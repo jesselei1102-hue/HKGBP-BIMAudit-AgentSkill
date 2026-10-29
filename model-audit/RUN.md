@@ -66,14 +66,21 @@
    - exit 2：数据不合格，按 `INVALID` 行改 JSON 再生成。
    - exit 3：缺截图，补上或删去该证据。
    - 不能执行 Python：按 [report-template.html](templates/report-template.html) 手填两份，`meta.filled_by = "template"`。
-4. 回复操作者：结论（能否原样提交）、Blocker 清单、要 AP 决定的事、要提供的资料、两份报告的路径。
+4. Excel 问题清单（一行一个对象：Revit ID、所在图纸 / 视图、修改方向、给 agent 的一句话）：
+
+   ```
+   python "Model Audit/report/issue_list.py" --results audit-<date>/audit-results.json --out audit-<date>/issues.xlsx
+   ```
+
+5. 只出操作者选的输出（窗口指令里写明；没说就三份都出）。
+6. 回复操作者：结论（能否原样提交）、Blocker 清单、要 AP 决定的事、要提供的资料、各份输出的路径。
 
 ## 6b. 逐组执行（两段式）
 
 1. 按 L3 配方 R-S14、R-G2、R-G3、R-G4、R-G5 提取，存进各组 `_raw/`；MCP 回传太大时原样存档再解析，不手抄。
-2. 依次跑 G1 → G2 → G3 → G4 → G5（后组读前组的 JSON），每组看屏幕摘要；规则有疑问就在这里停下问操作者。摘要末尾的「Readings to check」要请操作者对着报告里的裁切图逐条核对（读图判断是全流程最弱的一环）。
+2. 依次跑 G1 → G2 → G3 → G4 → G5（后组读前组的 JSON），每组看屏幕摘要；规则有疑问就在这里停下问操作者。摘要末尾的「Readings to check」不用停下核对：报告把每条读数列为未经人工核对（not checked by a person），附裁切图（读图判断是全流程最弱的一环，所以一定要列）。
 3. 每组出报告：`tools/s14_lv/report.py`（G1）或 `tools/common/task_report.py`（G2–G5）。
-4. 汇总：`python tools/common/build_results.py --out <run>/audit-results.json … --s14 … --group <JSON> <目录> …`，再用 `report/render_report.py` 出 bim / ap 两份总报告；总报告的证据链接各组 Excel / HTML。
+4. 汇总：`python tools/common/build_results.py --out <run>/audit-results.json … --s14 … --group <JSON> <目录> …`。它按各组 `_raw/` 的提取表补上每个对象的 Revit ID（`tools/common/resolve_ids.py`），写出问题清单（`issues`，每个对象一行）与图纸读数（`readings`）。再按 §6 出所选输出：`report/render_report.py` 的 bim / ap 两份报告、`report/issue_list.py` 的 Excel 问题清单；总报告的证据链接各组 Excel / HTML。
 5. 范例：`work/model-audit-runs/audit-2026-10-13-full/`（36 个 Task + A1）。
 
 ## 6c. 按 Task 单独跑
@@ -81,23 +88,19 @@
 规则见 [AUD-000 §10.4](L2-Task-Logic/AUD-000_Audit_Flow.md)。步骤（以 S10 为例）：
 
 1. 查 S10 属哪组、最少提取哪几步：任务卡 §9 末行 → G2「按 Task 单独跑」表。只做那几步提取。
-2. 分析：`python "Model Audit/tools/room_use/analyze.py" --raw <run>/_raw … --out <run>/G2_S10.json --tasks S10`。看屏幕摘要；有 `S10-INPUT` 就照它补提取，或告诉操作者哪项没判。停下等确认。
+2. 分析：`python "Model Audit/tools/room_use/analyze.py" --raw <run>/_raw … --out <run>/G2_S10.json --tasks S10`。看屏幕摘要；有 `S10-INPUT` 就照它补提取，或告诉操作者哪项没判，然后接着做。
 3. 报告：`python "Model Audit/tools/common/task_report.py" --analysis <run>/G2_S10.json --outdir <run>`（文件名 `GBP_G2_S10_…`）。
-4. 已有整次审核时并回去：`build_results.py` 用上次的全部参数，再加 `--update <run>/G2_S10.json`（`--group` 里要有 G2 的完整 JSON）；然后重出 bim / ap 两份总报告。只有 S10 的结果会变。
+4. 已有整次审核时并回去：`build_results.py` 用上次的全部参数，再加 `--update <run>/G2_S10.json`（`--group` 里要有 G2 的完整 JSON）；然后重出所选输出（§6）。只有 S10 的结果会变。
 5. S14 本身就是一组（G1），单独跑即 R-S14 + `tools/s14_lv/`，并回时给 `--s14` 新的 audit-results.json。
 
 ## 6d. 用对话窗口（有 `gbp-audit` 工具时）
 
-`app/` 是一个可选的 MCP server（见 [app/README.md](app/README.md)），在对话里弹出窗口。有 `choose_checks` 工具时：
+`app/` 是一个可选的 MCP server（见 [app/README.md](app/README.md)），在对话里弹出一个窗口，只用来选：检查哪些 Task、要哪些输出、结果放哪个审核文件夹。有 `choose_checks` 工具时：
 
-1. 操作者要做 GBP 审核 → 先调 `choose_checks`，等窗口发来的指令，照指令执行（§6b 整套 / §6c 部分 Task）。
-2. 所有组的分析 JSON 放在指令写的同一个审核文件夹。并入已有审核时，先用 `build_results.py --update` 并回（§6c 第 4 步），再调 `show_overview`，总览才显示新读数；报告比分析结果旧时，窗口照常给确认关口。
-3. 分析完调 `show_overview(run)`，然后停下，等窗口发来的下一句：
-   - 「Gate confirmed …」：出报告（§6b 第 3–4 步），再调 `show_overview(run)`。
-   - 「These readings … were marked wrong」：按列出的读数重读、重跑相关组的分析，再调 `show_overview(run)`。
-   - 「Build the reports … without a full reading review」：照样出报告；`build_results.py` 会读 `gate-confirmation.json`，报告列出没人核对的读数。再调 `show_overview(run)`。
-   - 「Open this report in my default browser: <路径>」：宿主不让窗口打开本机文件，由 agent 打开（Windows：`start "" "<路径>"`；macOS：`open "<路径>"`）。只开审核文件夹里的报告。
-4. 没有窗口时照 §6b / §6c / §7。
+1. 操作者要做 GBP 审核 → 先调 `choose_checks`，等窗口发来的指令，照指令执行（§6b 整套 / §6c 部分 Task；并入已有审核时用 `build_results.py --update`）。
+2. 所有组的分析 JSON 放在指令写的审核文件夹。分析完直接汇总、出指令里列的输出（§6 第 3–5 步），不再回窗口确认：没有确认关口，读数在报告里列为未经人工核对。
+3. 回复操作者结论和各份输出的路径。操作者要打开报告时由 agent 打开（Windows：`start "" "<路径>"`；macOS：`open "<路径>"`），只开审核文件夹里的文件。
+4. 没有窗口时照 §6b / §6c / §7，输出默认三份都出。
 
 ## 7. 短 Prompt
 

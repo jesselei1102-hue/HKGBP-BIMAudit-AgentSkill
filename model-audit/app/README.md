@@ -1,29 +1,23 @@
 # gbp-audit · chat window for the GBP Model Audit
 
-A small MCP server that shows two windows inside the chat (an MCP App).
+A small MCP server that shows one window inside the chat (an MCP App). The window only chooses; the reports carry the
+results.
 
-Both windows show the four steps at the top (1 Choose › 2 Analyse › 3 Review › 4 Reports), a list on the left and
-the selected list on the right (on narrow windows the left list becomes a row of tabs).
+- **Run sheet** (top): what this run will do: the checks (n of 37 and their sections), the outputs, and where the
+  results go (a new audit folder, or *Add to an earlier audit instead*). It holds the one *Run n checks* button;
+  when nothing can run yet it says why.
+- **Checks**: the BIMGBPS sections (Views, Schedules, Assembly and export, Model health) with selected / total,
+  plus *Full audit* and *Clear*; the section's tasks (name, `TL-xx · §clause`) with search and *Select all*. On
+  narrow windows the section list becomes a row of tabs.
+- **Outputs**: BIM team report (`report-bim.html`), AP / client report (`report-ap.html`), Excel issue list
+  (`issues.xlsx`). All three are ticked by default; at least one is needed.
 
-1. **Choose checks** – the left list holds the BIMGBPS sections (Views, Schedules, Assembly and export, Model
-   health) with selected / total, plus *Full audit* and *Clear*. The right side lists the section's tasks
-   (name, `TL-xx · §clause`) with search and *Select all*; the line underneath names the new audit, or picks an
-   earlier one with *Add to an earlier audit instead*. *Run n checks* sends the matching instruction to the chat
-   and the window then says what happens next (the agent runs the audit as `../RUN.md` says, using the Revit MCP
-   tools it finds; a review window follows; then the reports). If the host refuses the message, the window shows
-   the instruction to paste.
-2. **Overview** – after the analysis the agent opens this window. It is the confirmation gate, laid out as a
-   to-do list: *Failures*, *Check yourself* (UNCLEAR), *Missing inputs* (`-INPUT` checks and data warnings),
-   *Sheet readings*, and *All checks* (the per-task table). Checks with the same task and item show as one card
-   (first 4 objects, `+n more`, then `Fix:` or `Look at:`; click for the details). The first three lists are
-   ticked with *I've seen these* / *I've checked these*; the readings are done when each one is marked
-   *Correct* (marked ones fold away). *Build reports* opens once all four are done; *Send back for re-reading*
-   replaces it while a reading is marked *Wrong*; *Build without full review* is always there. The review is
-   saved as `gate-confirmation.json` (with `reviewed`: which lists were looked at) and the reports name any
-   reading nobody checked and any list not looked at. After the reports are built the same window opens on
-   *Reports* (step 4).
+*Run* sends the instruction to the chat (the agent follows `../RUN.md` with the Revit MCP tools it finds, builds the
+chosen outputs straight away, and says where they are), and the window then shows what happens next. If the host
+refuses the message, the window shows the instruction to paste. There is no review window and no confirmation gate:
+values read off sheet images are listed in the reports as not checked by a person, with their crops.
 
-The server does not talk to Revit and does not use the network. It reads and writes only the package and the runs
+The server does not talk to Revit and does not use the network. It only reads the package and lists the runs
 folder. Without it the audit still runs from the text prompts in `../RUN.md` §7.
 
 ## Build
@@ -68,14 +62,11 @@ when they connect.
 
 | Tool | Called by | Does |
 | --- | --- | --- |
-| `choose_checks` | agent | Opens the Choose checks window (task list from `../tasks.json`, earlier audits in the runs folder) |
-| `show_overview(run)` | agent | Opens the Overview window for one run folder |
-| `get_crop(run, file)` | window only | One crop image as base64 (png / jpg, at most 5 MB, inside the run folder) |
-| `save_gate(run, marks, mode, reviewed?, reviewed_counts?)` | window only | Writes `<run>/gate-confirmation.json` (`confirmed` needs every reading marked correct; `reviewed` records which lists were looked at, `reviewed_counts` how long each was, so a tick only carries over while its list is unchanged) |
+| `choose_checks` | agent | Opens the window (task list from `../tasks.json`, earlier audits in the runs folder) |
 
 ## Develop
 
-The tests (`test/`, `npm test`) and the browser harness (`dev/`, `npm run fixture:overview`) are kept locally by the
+The tests (`test/`, `npm test`) and the browser harness (`dev/harness.html`) are kept locally by the
 maintainer and are not published in this repository.
 
 `../tasks.json` is generated: after changing an analyser's `GROUP` list or an L2 card title, run

@@ -37,10 +37,13 @@ A good score at one level never cancels a fail at the other. A correct calculati
 
 ## What you receive
 
-Each audit produces one folder with two reports from the same results:
+Each audit produces one folder. Before it runs, you choose which of these it writes, all from the same results:
 
-- **AP / client report** (`report-ap.html`): this is your copy. Internal model references and tool details are removed, and a **"Decisions required"** section comes straight after the overview.
-- **BIM team report** (`report-bim.html`): the same findings with the technical detail the modelling team needs to fix them.
+- **AP / client report** (`report-ap.html`): this is your copy. Internal model references and tool details are removed, and the **"Decisions required"** and **"Information required"** sections come straight after the verdict.
+- **BIM team report** (`report-bim.html`): opens on the fix list. Every object to fix shows where it is (sheet, view, level or element) and its Revit ID, which the team can copy into Revit's Select by ID, or copy as one line to ask the agent to find it.
+- **Excel issue list** (`issues.xlsx`): one row per object, to filter and hand out the fixes.
+
+Values the audit read off drawing images are listed as **not checked by a person**, each with a crop of the sheet, so you can check them yourself.
 
 Every finding comes with evidence, such as an exported view, a zoomed-in crop or a colour sample, so you can see the problem rather than take it on trust.
 

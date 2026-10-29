@@ -2,18 +2,69 @@
 
 .brand h1 .sub { color: var(--tx3); font-weight: 400; margin-left: 6px; }
 
-/* ---------- Choose checks ---------- */
-td.tl, td.num { font-family: var(--mono); font-size: 12px; }
-td.wrap { white-space: normal; }
-tr.task-row { cursor: pointer; }
-.group-bar { display: flex; align-items: center; justify-content: space-between; padding: 8px 20px; }
-.group-bar .meta { margin: 0; }
-.run-mode { display: grid; gap: 8px; padding: 14px 20px 4px; border-top: 0.5px solid var(--line); }
-.run-mode label { display: flex; align-items: center; gap: 8px; }
-.run-mode input[type="radio"] { accent-color: var(--accent); }
-.run-mode .mono { color: var(--tx2); font-size: 12px; }
-.run-mode select { font: inherit; font-size: 12px; color: var(--tx); background: var(--s1); border: 0.5px solid var(--line2);
-                   border-radius: 6px; padding: 3px 6px; }
+/* ---------- The run sheet: what this run will do, and the one Run button (the dock, opened up) ---------- */
+.runsheet { margin: 4px 16px 14px; padding: 14px 16px 12px; border-radius: 18px; background: var(--dock-bg);
+            border: 0.5px solid var(--dock-line); color: var(--dock-tx); }
+.runsheet dl { margin: 0; display: grid; grid-template-columns: max-content 1fr auto; gap: 9px 16px; align-items: baseline; }
+.runsheet dt { font-family: var(--mono); font-size: 11px; color: var(--dock-tx2); }
+.runsheet dd { margin: 0; font-size: 13px; min-width: 0; overflow-wrap: anywhere; }
+.runsheet dd .dim { color: var(--dock-tx2); }
+.runsheet dd .mono { font-size: 12px; }
+.runsheet .change { font-size: 12px; color: var(--dock-tx2); text-decoration: underline; text-underline-offset: 3px;
+                    white-space: nowrap; justify-self: end; }
+.runsheet .change:hover { color: var(--dock-tx); }
+.runsheet select { font: inherit; font-size: 12px; color: var(--dock-tx); background: var(--dock-hover);
+                   border: 0.5px solid var(--dock-tx2); border-radius: 6px; padding: 2px 6px; max-width: 100%; }
+.runsheet .go { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+                margin-top: 12px; padding-top: 10px; border-top: 0.5px solid var(--dock-hover); }
+.runsheet .why { font-size: 12px; color: var(--dock-tx2); }
+.runsheet .db.pri { padding: 8px 18px; font-size: 13px; }
+
+/* ---------- Section headings below the sheet ---------- */
+.part-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 16px 20px 6px;
+             border-top: 0.5px solid var(--line); }
+.part-head h2 { margin: 0; font-size: 15px; font-weight: 500; }
+.part-head .meta { margin: 0; }
+
+/* ---------- Choose checks: sections on the left, tasks on the right ---------- */
+.layout { display: grid; grid-template-columns: minmax(170px, 34%) 1fr; }
+.side { display: flex; flex-direction: column; gap: 2px; padding: 6px 8px 10px; border-right: 0.5px solid var(--line); }
+.side-item { display: flex; align-items: center; gap: 8px; text-align: left; padding: 7px 8px; border-radius: 6px; color: var(--tx2); font-size: 13px; }
+.side-item:hover { background: var(--s1); }
+.side-item.sel { background: var(--accent-soft); color: var(--tx); font-weight: 500; }
+.side-item .side-label { flex: 1; }
+.side .side-extra { margin-top: 8px; padding-top: 8px; border-top: 0.5px solid var(--line); display: flex; flex-direction: column; gap: 2px; }
+.side-item .count { font-family: var(--mono); font-size: 11px; min-width: 22px; text-align: center; padding: 1px 6px; border-radius: 10px; background: var(--s1); color: var(--tx2); }
+.side-item .count.unclear { color: var(--accent-tx); }
+.side-item .count.muted { color: var(--tx3); }
+.pane { padding: 6px 16px 14px; min-width: 0; }
+.pane-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.pane-head h3 { margin: 0; font-size: 14px; font-weight: 500; }
+.pane-why { margin: 4px 0 10px; color: var(--tx2); font-size: 12px; }
+.task-line { display: flex; gap: 10px; align-items: flex-start; padding: 7px 4px; border-bottom: 0.5px solid var(--line); cursor: pointer; }
+.task-line.sel { background: var(--accent-soft); }
+.task-line input { accent-color: var(--accent); margin-top: 3px; }
+.task-line .sub { font-family: var(--mono); font-size: 11px; color: var(--tx3); }
+
+/* ---------- Outputs ---------- */
+.outputs { padding: 4px 20px 16px; display: grid; gap: 0; }
+.output-line { display: grid; grid-template-columns: auto 1fr auto; gap: 4px 10px; align-items: baseline; padding: 9px 4px;
+               border-bottom: 0.5px solid var(--line); cursor: pointer; }
+.output-line:last-child { border-bottom: 0; }
+.output-line.sel { background: var(--accent-soft); }
+.output-line input { accent-color: var(--accent); margin: 0; align-self: center; }
+.output-line b { font-weight: 500; }
+.output-line .file { font-family: var(--mono); font-size: 11px; color: var(--tx3); }
+.output-line .note { grid-column: 2 / -1; font-size: 12px; color: var(--tx2); }
+
+/* ---------- After Run ---------- */
+.next { padding: 4px 16px 16px; }
+.next-step { border: 0.5px solid var(--line2); border-radius: 8px; padding: 9px 11px; margin-bottom: 8px; }
+.next-step.now { border-color: var(--accent); background: var(--accent-soft); }
+.next-step b { font-weight: 500; }
+.next-step p { margin: 3px 0 0; font-size: 12px; color: var(--tx2); }
+.next-step ul { margin: 6px 0 0; padding-left: 18px; font-size: 12px; color: var(--tx2); }
+.next-step .mono { font-size: 11px; }
 
 /* ---------- Prompt fallback (host cannot send messages) ---------- */
 .prompt-box { margin: 12px 16px 0; padding: 12px 14px; border: 0.5px solid var(--line2); border-radius: 10px; background: var(--s1); }
@@ -21,78 +72,12 @@ tr.task-row { cursor: pointer; }
 .prompt-box textarea { width: 100%; min-height: 96px; resize: vertical; font-family: var(--mono); font-size: 12px; color: var(--tx);
                        background: var(--bg); border: 0.5px solid var(--line); border-radius: 6px; padding: 8px; box-sizing: border-box; }
 
-/* ---------- Overview ---------- */
-.st { font-family: var(--mono); font-size: 11px; color: var(--tx2); display: inline-flex; align-items: center; gap: 6px; }
-.st .sig { margin: 0; }
-tr.section-row > td { font-family: var(--mono); font-size: 11px; color: var(--tx3); background: var(--bg); padding: 14px 12px 6px; }
-tr.detail-row > td { padding: 0 0 8px 20px; background: var(--s1); white-space: normal; }
-tr.detail-row table td, tr.detail-row table th { background: var(--s1); font-size: 12px; white-space: normal; vertical-align: top; }
-.yourself { display: block; color: var(--accent-tx); font-size: 12px; margin-top: 2px; }
-.cards-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; padding: 14px 16px; }
-.reading { border: 0.5px solid var(--line2); border-radius: 10px; padding: 12px; display: grid; gap: 8px; background: var(--bg); }
-.reading.marked-ok { border-color: var(--accent); }
-.reading .crop { min-height: 48px; display: grid; place-items: center; background: var(--s1); border-radius: 6px; overflow: hidden; }
-.reading .crop img { max-width: 100%; display: block; }
-.reading .crop .meta { margin: 0; padding: 12px; }
-.reading h3 { margin: 0; font-size: 13px; font-weight: 500; }
-.reading .detail { padding: 0; gap: 4px 12px; }
-.seg { display: inline-flex; border: 0.5px solid var(--line2); border-radius: 99px; overflow: hidden; width: max-content; }
-.seg button { padding: 5px 14px; font-size: 12px; color: var(--tx2); }
-.seg button + button { border-left: 0.5px solid var(--line2); }
-.seg button.on { background: var(--accent); color: var(--on-accent); }
-.reading input.note { font: inherit; font-size: 12px; color: var(--tx); background: var(--s1); border: 0.5px solid var(--line);
-                      border-radius: 6px; padding: 6px 8px; }
-.issues { padding: 8px 20px 14px; display: grid; gap: 10px; }
-.issues h3 { margin: 8px 0 0; font-size: 12px; font-family: var(--mono); font-weight: 400; color: var(--tx3); }
-.issues p { margin: 0; overflow-wrap: anywhere; }
-.issues .fix { color: var(--tx2); font-size: 12px; }
-.report-path { font-family: var(--mono); font-size: 12px; overflow-wrap: anywhere; white-space: normal; }
-.dock .note-label { font-size: 12px; color: var(--dock-tx2); margin-right: 6px; }
-.message { margin: 10px 20px 0; font-size: 12px; color: var(--tx2); display: flex; align-items: center; gap: 6px; }
-
-/* ---------- Guided frame: steps bar, side list, pane (both windows) ---------- */
-.steps { list-style: none; display: flex; gap: 6px; margin: 4px 20px 12px; padding: 0; font-family: var(--mono); font-size: 11px; }
-.steps li { flex: 1; text-align: center; padding: 6px 4px; border-radius: 6px; background: var(--s1); color: var(--tx3); }
-.steps li.done { color: var(--accent-tx); background: var(--accent-soft); }
-.steps li.now { color: var(--on-accent); background: var(--accent); }
-.layout { display: grid; grid-template-columns: minmax(170px, 34%) 1fr; border-top: 0.5px solid var(--line); }
-.side { display: flex; flex-direction: column; gap: 2px; padding: 10px 8px; border-right: 0.5px solid var(--line); }
-.side-item { display: flex; align-items: center; gap: 8px; text-align: left; padding: 7px 8px; border-radius: 6px; color: var(--tx2); font-size: 13px; }
-.side-item:hover { background: var(--s1); }
-.side-item.sel { background: var(--accent-soft); color: var(--tx); font-weight: 500; }
-.side-item .side-label { flex: 1; }
-.side-item .tick { color: var(--accent-tx); font-weight: 700; }
-.side .side-extra { margin-top: 8px; padding-top: 8px; border-top: 0.5px solid var(--line); display: flex; flex-direction: column; gap: 2px; }
-.side-item .count, .group-head .count { font-family: var(--mono); font-size: 11px; min-width: 22px; text-align: center; padding: 1px 6px; border-radius: 10px; background: var(--s1); color: var(--tx2); }
-.side-item .count.fail, .group-head .count.fail { color: var(--danger); }
-.side-item .count.unclear, .group-head .count.unclear { color: var(--accent-tx); }
-.side-item .count.muted, .group-head .count.muted { color: var(--tx3); }
-.pane { padding: 12px 16px 14px; min-width: 0; }
-.pane-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
-.pane-head h2 { margin: 0; font-size: 15px; font-weight: 500; }
-.pane-why { margin: 4px 0 10px; color: var(--tx2); font-size: 12px; }
-.group { border: 0.5px solid var(--line2); border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; }
-.group-head { display: flex; align-items: center; gap: 8px; cursor: pointer; }
-.group-head .tl { font-family: var(--mono); font-size: 11px; color: var(--tx3); white-space: nowrap; }
-.group-head .gi { font-weight: 500; }
-.group .objs, .group .fix { font-size: 12px; margin-top: 4px; overflow-wrap: anywhere; }
-.group .objs { color: var(--tx2); }
-.group .fix { color: var(--accent-tx); }
-.group .group-detail table td, .group .group-detail table th { font-size: 12px; white-space: normal; vertical-align: top; }
-.task-line { display: flex; gap: 10px; align-items: flex-start; padding: 7px 4px; border-bottom: 0.5px solid var(--line); cursor: pointer; }
-.task-line.sel { background: var(--accent-soft); }
-.task-line input { accent-color: var(--accent); margin-top: 3px; }
-.task-line .sub { font-family: var(--mono); font-size: 11px; color: var(--tx3); }
-.save-line { margin-top: 10px; padding: 8px 10px; border-radius: 6px; background: var(--s1); font-size: 12px; color: var(--tx2); }
-.next-step { border: 0.5px solid var(--line2); border-radius: 8px; padding: 9px 11px; margin-bottom: 8px; }
-.next-step.now { border-color: var(--accent); background: var(--accent-soft); }
-.next-step b { font-weight: 500; }
-.next-step p { margin: 3px 0 0; font-size: 12px; color: var(--tx2); }
 @media (max-width: 560px) {
   .layout { grid-template-columns: 1fr; }
   .side { flex-direction: row; flex-wrap: wrap; border-right: 0; border-bottom: 0.5px solid var(--line); }
   .side-item { flex: 0 0 auto; padding: 5px 9px; border-radius: 14px; background: var(--s1); font-size: 12px; }
   .side-item .side-label { flex: 0 0 auto; }
   .side .side-extra { flex-direction: row; margin: 0; padding: 0; border: 0; }
-  .steps { margin: 4px 12px 10px; }
+  .runsheet dl { grid-template-columns: 1fr auto; }
+  .runsheet dt { grid-column: 1 / -1; margin-bottom: -6px; }
 }

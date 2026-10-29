@@ -6,16 +6,67 @@
   "type": "object",
   "additionalProperties": false,
   "$defs": {
-    "status": {"type": "string", "enum": ["Pass", "Partial", "Fail", "Missing", "N/A（附条件）", "N/A 待声明", "Unclear", "Not judged"]},
-    "audience": {"type": "string", "enum": ["bim", "both"]},
-    "task_id": {"type": "string", "pattern": "^(A1|AUD-[VSA][0-9]{2})$"},
-    "ids": {"type": "array", "items": {"type": "string"}},
+    "status": {
+      "type": "string",
+      "enum": [
+        "Pass",
+        "Partial",
+        "Fail",
+        "Missing",
+        "N/A（附条件）",
+        "N/A 待声明",
+        "Unclear",
+        "Not judged"
+      ]
+    },
+    "audience": {
+      "type": "string",
+      "enum": [
+        "bim",
+        "both"
+      ]
+    },
+    "task_id": {
+      "type": "string",
+      "pattern": "^(A1|AUD-[VSA][0-9]{2})$"
+    },
+    "ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
     "gate_reading": {
       "type": "object",
       "additionalProperties": false,
-      "properties": {"group": {"type": "string"}, "key": {"type": "string"}, "sheet": {"type": "string"},
-                     "item": {"type": "string"}, "value": {"type": "string"}, "note": {"type": "string"}},
-      "required": ["group", "key", "sheet", "item", "value", "note"]
+      "properties": {
+        "group": {
+          "type": "string"
+        },
+        "key": {
+          "type": "string"
+        },
+        "sheet": {
+          "type": "string"
+        },
+        "item": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "group",
+        "key",
+        "sheet",
+        "item",
+        "value",
+        "note"
+      ]
     }
   },
   "properties": {
@@ -23,35 +74,81 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "project": {"type": "string"},
-        "model": {"type": "string", "description": "Model file path or name."},
-        "revit_version": {"type": "string"},
-        "mcp": {"type": "string"},
-        "harness": {"type": "string"},
-        "date": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
-        "round": {"type": "string", "description": "e.g. 'Round 1' or 'Regression 1'."},
-        "package_version": {"type": "string"},
-        "filled_by": {"type": "string", "enum": ["script", "template"]}
+        "project": {
+          "type": "string"
+        },
+        "model": {
+          "type": "string",
+          "description": "Model file path or name."
+        },
+        "revit_version": {
+          "type": "string"
+        },
+        "mcp": {
+          "type": "string"
+        },
+        "harness": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "round": {
+          "type": "string",
+          "description": "e.g. 'Round 1' or 'Regression 1'."
+        },
+        "package_version": {
+          "type": "string"
+        },
+        "filled_by": {
+          "type": "string",
+          "enum": [
+            "script",
+            "template"
+          ]
+        }
       },
-      "required": ["project", "model", "date", "round"]
+      "required": [
+        "project",
+        "model",
+        "date",
+        "round"
+      ]
     },
     "verdict": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "submittable": {"type": "boolean"},
-        "summary": {"type": "string"},
+        "submittable": {
+          "type": "boolean"
+        },
+        "summary": {
+          "type": "string"
+        },
         "reasons": {
           "type": "array",
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "properties": {"text": {"type": "string"}, "finding_ids": {"$ref": "#/$defs/ids"}},
-            "required": ["text"]
+            "properties": {
+              "text": {
+                "type": "string"
+              },
+              "finding_ids": {
+                "$ref": "#/$defs/ids"
+              }
+            },
+            "required": [
+              "text"
+            ]
           }
         }
       },
-      "required": ["submittable", "reasons"]
+      "required": [
+        "submittable",
+        "reasons"
+      ]
     },
     "a1": {
       "type": "array",
@@ -59,16 +156,40 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "id": {"type": "string", "pattern": "^MA-[1-7]\\.[0-9]+$"},
-          "title": {"type": "string"},
-          "result": {"$ref": "#/$defs/status"},
-          "evidence": {"type": "string"},
-          "element_ids": {"$ref": "#/$defs/ids"},
-          "clause": {"type": "string"},
-          "gap": {"type": ["string", "null"]},
-          "audience": {"$ref": "#/$defs/audience"}
+          "id": {
+            "type": "string",
+            "pattern": "^MA-[1-7]\\.[0-9]+$"
+          },
+          "title": {
+            "type": "string"
+          },
+          "result": {
+            "$ref": "#/$defs/status"
+          },
+          "evidence": {
+            "type": "string"
+          },
+          "element_ids": {
+            "$ref": "#/$defs/ids"
+          },
+          "clause": {
+            "type": "string"
+          },
+          "gap": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "audience": {
+            "$ref": "#/$defs/audience"
+          }
         },
-        "required": ["id", "title", "result"]
+        "required": [
+          "id",
+          "title",
+          "result"
+        ]
       }
     },
     "tasks": {
@@ -77,38 +198,95 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "id": {"type": "string", "pattern": "^AUD-[VSA][0-9]{2}$"},
-          "name": {"type": "string"},
-          "clause": {"type": "string"},
-          "category": {"type": "string", "enum": ["View", "Schedule", "Assembly"]},
+          "id": {
+            "type": "string",
+            "pattern": "^AUD-[VSA][0-9]{2}$"
+          },
+          "name": {
+            "type": "string"
+          },
+          "clause": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "View",
+              "Schedule",
+              "Assembly"
+            ]
+          },
           "applicability": {
             "type": "object",
             "additionalProperties": false,
             "properties": {
-              "applicable": {"type": "boolean"},
-              "reason": {"type": ["string", "null"], "description": "N/A reason sentence (DK-AUD-003 template)."},
-              "conditions": {"type": ["string", "null"]},
-              "ap_confirmed": {"type": ["string", "null"], "description": "Date the AP confirmed the N/A, or null."}
+              "applicable": {
+                "type": "boolean"
+              },
+              "reason": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "N/A reason sentence (DK-AUD-003 template)."
+              },
+              "conditions": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "ap_confirmed": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Date the AP confirmed the N/A, or null."
+              }
             },
-            "required": ["applicable"]
+            "required": [
+              "applicable"
+            ]
           },
-          "l1_status": {"$ref": "#/$defs/status"},
-          "l2_status": {"$ref": "#/$defs/status"},
-          "summary": {"type": "string"},
+          "l1_status": {
+            "$ref": "#/$defs/status"
+          },
+          "l2_status": {
+            "$ref": "#/$defs/status"
+          },
+          "summary": {
+            "type": "string"
+          },
           "checks": {
             "type": "array",
             "items": {
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "id": {"type": "string"},
-                "item": {"type": "string"},
-                "result": {"$ref": "#/$defs/status"},
-                "evidence": {"type": "string"},
-                "element_ids": {"$ref": "#/$defs/ids"},
-                "audience": {"$ref": "#/$defs/audience"}
+                "id": {
+                  "type": "string"
+                },
+                "item": {
+                  "type": "string"
+                },
+                "result": {
+                  "$ref": "#/$defs/status"
+                },
+                "evidence": {
+                  "type": "string"
+                },
+                "element_ids": {
+                  "$ref": "#/$defs/ids"
+                },
+                "audience": {
+                  "$ref": "#/$defs/audience"
+                }
               },
-              "required": ["id", "item", "result"]
+              "required": [
+                "id",
+                "item",
+                "result"
+              ]
             }
           },
           "calcs": {
@@ -117,51 +295,135 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "id": {"type": "string"},
-                "formula": {"type": "string"},
-                "values": {"type": "string"},
-                "limit": {"type": "string"},
-                "clause": {"type": "string"},
-                "result": {"$ref": "#/$defs/status"},
-                "basis": {"type": ["string", "null"], "description": "Which basis, when two are computed for the AP to choose."},
-                "audience": {"$ref": "#/$defs/audience"}
+                "id": {
+                  "type": "string"
+                },
+                "formula": {
+                  "type": "string"
+                },
+                "values": {
+                  "type": "string"
+                },
+                "limit": {
+                  "type": "string"
+                },
+                "clause": {
+                  "type": "string"
+                },
+                "result": {
+                  "$ref": "#/$defs/status"
+                },
+                "basis": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "Which basis, when two are computed for the AP to choose."
+                },
+                "audience": {
+                  "$ref": "#/$defs/audience"
+                }
               },
-              "required": ["id", "formula", "result"]
+              "required": [
+                "id",
+                "formula",
+                "result"
+              ]
             }
           },
-          "evidence_ids": {"$ref": "#/$defs/ids"},
-          "finding_ids": {"$ref": "#/$defs/ids"},
+          "evidence_ids": {
+            "$ref": "#/$defs/ids"
+          },
+          "finding_ids": {
+            "$ref": "#/$defs/ids"
+          },
           "fix": {
             "type": "array",
             "items": {
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "text": {"type": "string"},
-                "method": {"type": "string", "enum": ["manual", "function-b", "AP", "external"]},
-                "audience": {"$ref": "#/$defs/audience"}
+                "text": {
+                  "type": "string"
+                },
+                "method": {
+                  "type": "string",
+                  "enum": [
+                    "manual",
+                    "function-b",
+                    "AP",
+                    "external"
+                  ]
+                },
+                "audience": {
+                  "$ref": "#/$defs/audience"
+                }
               },
-              "required": ["text", "method"]
+              "required": [
+                "text",
+                "method"
+              ]
             }
           },
-          "overturn_if": {"type": ["string", "null"]}
+          "overturn_if": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
         },
-        "required": ["id", "name", "clause", "category", "applicability", "l1_status", "l2_status", "checks", "evidence_ids", "finding_ids", "fix"]
+        "required": [
+          "id",
+          "name",
+          "clause",
+          "category",
+          "applicability",
+          "l1_status",
+          "l2_status",
+          "checks",
+          "evidence_ids",
+          "finding_ids",
+          "fix"
+        ]
       }
     },
-    "findings": {"type": "array", "items": {"$ref": "finding.schema.json"}},
+    "findings": {
+      "type": "array",
+      "items": {
+        "$ref": "finding.schema.json"
+      }
+    },
     "decisions": {
       "type": "array",
       "items": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "id": {"type": "string", "pattern": "^INP-[0-9]{2}$"},
-          "question": {"type": "string"},
-          "options": {"type": "array", "items": {"type": "string"}},
-          "tasks": {"type": "array", "items": {"$ref": "#/$defs/task_id"}}
+          "id": {
+            "type": "string",
+            "pattern": "^INP-[0-9]{2}$"
+          },
+          "question": {
+            "type": "string"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "tasks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/task_id"
+            }
+          }
         },
-        "required": ["id", "question", "tasks"]
+        "required": [
+          "id",
+          "question",
+          "tasks"
+        ]
       }
     },
     "inputs": {
@@ -170,11 +432,25 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "id": {"type": "string", "pattern": "^INP-[0-9]{2}$"},
-          "item": {"type": "string"},
-          "tasks": {"type": "array", "items": {"$ref": "#/$defs/task_id"}}
+          "id": {
+            "type": "string",
+            "pattern": "^INP-[0-9]{2}$"
+          },
+          "item": {
+            "type": "string"
+          },
+          "tasks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/task_id"
+            }
+          }
         },
-        "required": ["id", "item", "tasks"]
+        "required": [
+          "id",
+          "item",
+          "tasks"
+        ]
       }
     },
     "unclear": {
@@ -183,52 +459,311 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "task": {"$ref": "#/$defs/task_id"},
-          "reason_kind": {"type": "string", "enum": ["source", "data", "tool"]},
-          "detail": {"type": "string"},
-          "need": {"type": "string"},
-          "gap": {"type": ["string", "null"]}
+          "task": {
+            "$ref": "#/$defs/task_id"
+          },
+          "reason_kind": {
+            "type": "string",
+            "enum": [
+              "source",
+              "data",
+              "tool"
+            ]
+          },
+          "detail": {
+            "type": "string"
+          },
+          "need": {
+            "type": "string"
+          },
+          "gap": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
         },
-        "required": ["task", "reason_kind", "detail", "need"]
+        "required": [
+          "task",
+          "reason_kind",
+          "detail",
+          "need"
+        ]
+      }
+    },
+    "issues": {
+      "description": "Fix list: one row per failing (action fix) or undecided (action check) object, every object of every finding. element_id is the Revit ID (looked up from the extracts when the analyser left it out; id_from says which).",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "task",
+          "tl",
+          "rule",
+          "action",
+          "status",
+          "severity",
+          "object",
+          "element_id",
+          "fix",
+          "clause"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "finding_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "task": {
+            "type": "string"
+          },
+          "tl": {
+            "type": "string"
+          },
+          "rule": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "fix",
+              "check"
+            ]
+          },
+          "status": {
+            "type": "string"
+          },
+          "severity": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "Blocker",
+              "Major",
+              "Minor",
+              null
+            ]
+          },
+          "object": {
+            "type": "string"
+          },
+          "kind": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "sheet",
+              "view",
+              "level",
+              "scheme",
+              "schedule",
+              "room",
+              "element",
+              null
+            ]
+          },
+          "element_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "sheet": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id_from": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "analysis",
+              "lookup",
+              null
+            ]
+          },
+          "expected": {
+            "type": "string"
+          },
+          "actual": {
+            "type": "string"
+          },
+          "fix": {
+            "type": "string"
+          },
+          "clause": {
+            "type": "string"
+          },
+          "audience": {
+            "type": "string",
+            "enum": [
+              "both",
+              "bim"
+            ]
+          }
+        }
+      }
+    },
+    "readings": {
+      "description": "Values read off sheet images. Nobody has checked them; the reports list them as not checked by a person. crop is a file in assets/ or null.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "group",
+          "key",
+          "sheet",
+          "item",
+          "value",
+          "crop"
+        ],
+        "properties": {
+          "group": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "sheet": {
+            "type": "string"
+          },
+          "item": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          },
+          "confidence": {
+            "type": "string"
+          },
+          "finding": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "crop": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
       }
     },
     "regression": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "previous_round": {"type": "string"},
+        "previous_round": {
+          "type": "string"
+        },
         "items": {
           "type": "array",
           "items": {
             "type": "object",
             "additionalProperties": false,
             "properties": {
-              "finding_id": {"type": "string", "pattern": "^F[0-9]+$"},
-              "before": {"type": "string"},
-              "after": {"type": "string", "enum": ["closed", "partly closed", "open", "new", "not applicable"]},
-              "note": {"type": "string"}
+              "finding_id": {
+                "type": "string",
+                "pattern": "^F[0-9]+$"
+              },
+              "before": {
+                "type": "string"
+              },
+              "after": {
+                "type": "string",
+                "enum": [
+                  "closed",
+                  "partly closed",
+                  "open",
+                  "new",
+                  "not applicable"
+                ]
+              },
+              "note": {
+                "type": "string"
+              }
             },
-            "required": ["finding_id", "before", "after"]
+            "required": [
+              "finding_id",
+              "before",
+              "after"
+            ]
           }
         }
       },
-      "required": ["previous_round", "items"]
+      "required": [
+        "previous_round",
+        "items"
+      ]
     },
     "gate": {
-      "description": "Reading review saved by the audit window (gate-confirmation.json). Absent when the audit ran without the window.",
+      "description": "Deprecated: the reading review of the old audit window (gate-confirmation.json). No longer written; accepted so older results still render.",
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "mode": {"type": "string", "enum": ["confirmed", "unreviewed"]},
-        "saved": {"type": "string"},
-        "checked": {"type": "integer"},
-        "not_reviewed": {"type": "array", "description": "Review lists not looked at before the reports (audit window).",
-                         "items": {"type": "string", "enum": ["failures", "check_yourself", "inputs"]}},
-        "stale": {"type": "integer", "description": "Reviewed readings whose value or sheet changed afterwards; listed as unreviewed."},
-        "unreviewed": {"type": "array", "items": {"$ref": "#/$defs/gate_reading"}},
-        "disputed": {"type": "array", "items": {"$ref": "#/$defs/gate_reading"}}
+        "mode": {
+          "type": "string",
+          "enum": [
+            "confirmed",
+            "unreviewed"
+          ]
+        },
+        "saved": {
+          "type": "string"
+        },
+        "checked": {
+          "type": "integer"
+        },
+        "not_reviewed": {
+          "type": "array",
+          "description": "Review lists not looked at before the reports (audit window).",
+          "items": {
+            "type": "string",
+            "enum": [
+              "failures",
+              "check_yourself",
+              "inputs"
+            ]
+          }
+        },
+        "stale": {
+          "type": "integer",
+          "description": "Reviewed readings whose value or sheet changed afterwards; listed as unreviewed."
+        },
+        "unreviewed": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/gate_reading"
+          }
+        },
+        "disputed": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/gate_reading"
+          }
+        }
       },
-      "required": ["mode", "saved", "checked", "unreviewed", "disputed"]
+      "required": [
+        "mode",
+        "saved",
+        "checked",
+        "unreviewed",
+        "disputed"
+      ]
     },
     "evidence": {
       "type": "array",
@@ -236,16 +771,55 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "id": {"type": "string"},
-          "file": {"type": "string", "description": "Path relative to assets/."},
-          "kind": {"type": "string", "enum": ["view", "sheet", "crop", "swatch", "csv", "table", "report"]},
-          "caption": {"type": "string", "description": "Must not contain element IDs."},
-          "task": {"$ref": "#/$defs/task_id"},
-          "audience": {"$ref": "#/$defs/audience"}
+          "id": {
+            "type": "string"
+          },
+          "file": {
+            "type": "string",
+            "description": "Path relative to assets/."
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "view",
+              "sheet",
+              "crop",
+              "swatch",
+              "csv",
+              "table",
+              "report"
+            ]
+          },
+          "caption": {
+            "type": "string",
+            "description": "Must not contain element IDs."
+          },
+          "task": {
+            "$ref": "#/$defs/task_id"
+          },
+          "audience": {
+            "$ref": "#/$defs/audience"
+          }
         },
-        "required": ["id", "file", "kind", "caption", "task"]
+        "required": [
+          "id",
+          "file",
+          "kind",
+          "caption",
+          "task"
+        ]
       }
     }
   },
-  "required": ["meta", "verdict", "a1", "tasks", "findings", "decisions", "inputs", "unclear", "evidence"]
+  "required": [
+    "meta",
+    "verdict",
+    "a1",
+    "tasks",
+    "findings",
+    "decisions",
+    "inputs",
+    "unclear",
+    "evidence"
+  ]
 }

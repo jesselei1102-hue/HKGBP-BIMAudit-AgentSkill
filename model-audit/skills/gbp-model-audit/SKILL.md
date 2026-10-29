@@ -17,7 +17,7 @@ description: Use when asked to audit a Revit model for a Hong Kong GBP (general 
 
 ## 1b. 有对话窗口时
 
-当前会话有 `choose_checks` 工具（对话窗口 server，见 `<PKG>/app/README.md`）：先调它，让操作者在窗口里选检查，照窗口发来的指令执行；分析完调 `show_overview(run)` 等确认。完整步骤见 `<PKG>/RUN.md` §6d。没有这个工具就照下文。
+当前会话有 `choose_checks` 工具（对话窗口 server，见 `<PKG>/app/README.md`）：先调它，让操作者在窗口里选检查和输出（BIM 报告、AP 报告、Excel 问题清单），照窗口发来的指令执行；分析完直接出所选输出，不再回窗口确认。完整步骤见 `<PKG>/RUN.md` §6d。没有这个工具就照下文，三份输出都出。
 
 ## 2. 选组
 

@@ -9,7 +9,7 @@ Roadmap **功能 A（Model Audit）** 按四层架构的实现：只读审核一
 - A3 合规计算（L2）
 - 回归
 
-产出一份结构化结果 `audit-results.json` 和两份英文可视化报告：BIM 团队版、AP / 客户版。
+产出一份结构化结果 `audit-results.json`，以及审核前选定的输出：两份英文 HTML 报告（BIM 团队版、AP / 客户版）和一份 Excel 问题清单。BIM 团队版以「Fix list」开头：每个要改的对象都有所在图纸 / 视图、Revit ID（可复制到 Revit 的 Select by ID）、修改方向和一句可贴给 agent 的指令。
 
 本包可在任何能连 BIM MCP 的 harness 里运行（Cursor、Hermes、Claude Code 等），不依赖任何 harness 专有功能。
 
@@ -26,7 +26,7 @@ Roadmap **功能 A（Model Audit）** 按四层架构的实现：只读审核一
 | 模板与报告 | [templates/](templates/)、[report/](report/) | 结果 schema、finding schema、N/A 表、HTML 模板、报告生成脚本 | 报告格式改变 |
 | Skills | [skills/](skills/) | 6 个 `SKILL.md`：给支持 Skill 的 harness 自动触发；只指向本包，不含规则 | 加组、改命令 |
 | 提取转换 | [tools/extract/](tools/extract/) | 把 MCP 原样回传转成提取文件（`g1_extract.py`、`g2_extract.py`、`g3_extract.py`、`g4_extract.py`、`g5_extract.py`，共用 `mcp_formats.py`；认 revit-mcp 与 mcp-servers-for-revit 两种格式） | 换 MCP 时加适配器 |
-| 对话窗口（可选） | [app/](app/) | `gbp-audit` MCP server：在对话里弹出「选检查」和「总览 / 确认关口」两个窗口；要 Node.js ≥ 20。见 [app/README.md](app/README.md)、RUN.md §6d | 改窗口或任务清单 |
+| 对话窗口（可选） | [app/](app/) | `gbp-audit` MCP server：在对话里弹出一个窗口，选检查和输出，然后交给 agent；结果都在报告里，没有确认关口。要 Node.js ≥ 20。见 [app/README.md](app/README.md)、RUN.md §6d | 改窗口或任务清单 |
 | 执行工具 | [tools/](tools/) | 每组的分析脚本（只读提取文件 → 分析 JSON + 屏幕摘要）、通用 Excel / HTML 报告、汇总成 audit-results.json；只用 Python 标准库（取色要 Pillow） | 规则或提取格式改变 |
 
 ### 合并同类项后的六组
@@ -39,7 +39,7 @@ Roadmap **功能 A（Model Audit）** 按四层架构的实现：只读审核一
 | G4 | V01–V05、V13、A01–A03（及 V08 / V10 / V11 图面项） | [G4](L2-Task-Logic/Groups/G4_Drawings.md) | R-G4 | `tools/drawings/` |
 | G5 / G6 | S01、S03、S04、S09、S17、S18、A04；A1 | [G5 / G6](L2-Task-Logic/Groups/G5_Lists_G6_Model_Health.md) | R-G5 | `tools/lists_health/` |
 
-每组都是两段：先分析（提取文件 → 分析 JSON + 屏幕摘要，操作者确认），再出报告（Excel + HTML，只读分析 JSON）。规则见 [AUD-000 §10](L2-Task-Logic/AUD-000_Audit_Flow.md)。
+每组都是两段：先分析（提取文件 → 分析 JSON + 屏幕摘要），再出报告（Excel + HTML，只读分析 JSON）。不等确认：有疑问的规则才停下问操作者。规则见 [AUD-000 §10](L2-Task-Logic/AUD-000_Audit_Flow.md)。
 
 ## 36 个 Task 与法例对照
 
@@ -112,7 +112,7 @@ Roadmap **功能 A（Model Audit）** 按四层架构的实现：只读审核一
 | 跑法 | 什么时候用 | 规则 |
 | --- | --- | --- |
 | 整套审核 | 第一次审一个模型：A1 + 36 个 Task，出两份总报告 | [RUN.md](RUN.md) §2–§6 |
-| 逐组（两段式） | 平时的做法：G1 → G5 依次提取、分析、操作者确认、出组报告，最后汇总 | RUN.md §6b |
+| 逐组（两段式） | 平时的做法：G1 → G5 依次提取、分析、出组报告，最后汇总并出所选输出 | RUN.md §6b |
 | 单个 Task | 只改了一处、只想复查一项（例：S10）；用 `--tasks` 只跑这一项，再用 `--update` 并回总结果，只有这一项会变 | RUN.md §6c、[AUD-000 §10.4](L2-Task-Logic/AUD-000_Audit_Flow.md) |
 | 回归 | 模型修改后，与上一次的 `audit-results.json` 比 | [AUD-REG](L2-Task-Logic/AUD-REG_Regression.md) |
 
@@ -169,8 +169,10 @@ audit-<date>/
   audit-results.json    审核结果（按 templates/audit-results.schema.json）
   decisions.json        AP 决定清单（可选；build_results.py --decisions）
   assets/               截图、裁切图、取色对比图、CSV
-  report-bim.html       BIM 团队版
-  report-ap.html        AP / 客户版
+  report-bim.html       BIM 团队版：Fix list（每个对象的位置牌：名称、类别、图纸、Revit ID；Copy ID、Copy for agent、
+                        Fixed 勾选只存在本机浏览器）、To check（未经人工核对的读数与裁切图）、Tasks、Information、N/A
+  report-ap.html        AP / 客户版：结论、要 AP 决定的事、要提供的资料、按 Task 的问题；不含 ID 与工具细节
+  issues.xlsx           Excel 问题清单：Fix list、To check、Sheet readings 三张表；Revit ID 存为文本
 ```
 
 逐组或单个 Task 跑时，每组另有：
@@ -191,7 +193,10 @@ audit-<date>-<组>/
 ```
 python "Model Audit/report/render_report.py" --results audit-<date>/audit-results.json --audience bim --out audit-<date>/report-bim.html
 python "Model Audit/report/render_report.py" --results audit-<date>/audit-results.json --audience ap  --out audit-<date>/report-ap.html
+python "Model Audit/report/issue_list.py"    --results audit-<date>/audit-results.json --out audit-<date>/issues.xlsx
 ```
+
+`build_results.py` 汇总时按各组 `_raw/` 的提取表补上 Revit ID（`tools/common/resolve_ids.py`：图纸号、视图名、楼层、面积方案、明细表、房间、图片）；对不上或对上多个的留空，不猜。
 
 - 脚本只用标准库；先校验数据，不合格不生成（exit 2），缺截图不生成（exit 3）。
 - AP 版自动去掉元素 ID、工具名、GAP 编号和标为 `bim` 的内容；把「Decisions required」放在总览之后。
@@ -208,7 +213,7 @@ python "Model Audit/report/render_report.py" --results audit-<date>/audit-result
 | 无 LOD 判据 | MA-3.3 只能人工抽查 | GAP-05 |
 | 明细表不能导出图像 | 截图用整张图纸代替 | GAP-06 |
 | MCP 不回传开口所属房间 | 已由 `tools/s14_lv/analyze.py` 按几何补上（每条带匹配方式与置信度）；仍缺 reg 31「面向室外」检查和百叶净通风面积，要人工核对 V13 图、向 AP 取百叶资料（INP-17） | GAP-07 |
-| 图纸上的读数（表值、坐标、街道、附录等）靠读图 | 脚本判不了裁切图是否满足条文：组报告的「Readings to check」要操作者对着裁切图逐条核对；无裁切图的 PASS 一律改记 Unclear | RUN.md §6b |
+| 图纸上的读数（表值、坐标、街道、附录等）靠读图 | 脚本判不了裁切图是否满足条文：总报告「To check by eye」把每条读数列为未经人工核对，附裁切图，操作者自行对图核对；无裁切图的 PASS 一律改记 Unclear | RUN.md §6b |
 | FS Code 2011 Part B / C / D | V02、V06、V08、S10–S12 的 L2 = Unclear | [DK-AUD-006](L1-Domain/DK-AUD-006_Missing_Sources.md) M-01 至 M-03 |
 | Cap. 172、APP-2、APP-130、APP-151 附录 A 准则、APP-152 后退、ADM-9 色表 | S13、S18、V13、S07 (g)、V14、V02–V05 的部分判定 | DK-AUD-006 M-04 至 M-09 |
 | BIMGBPS 新版 / ESH 介质；附表 1 电子版 | G9、A03、S05 | DK-AUD-006 M-10、M-11 |

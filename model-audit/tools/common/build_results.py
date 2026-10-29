@@ -10,7 +10,11 @@ Usage:
 old file is kept as <name>.prev.json), the group report is rebuilt, then everything is combined as usual - so the
 other tasks keep their results.  --decisions: {"decisions": [...], "inputs": [...]} for the AP questions.
 Each group's Excel and HTML report are copied to <run>/assets and linked as evidence; every FAIL / Partial / Missing
-check becomes part of a finding (one finding per task and rule); UNCLEAR checks go to 'unclear'.  Stdlib only.
+check becomes part of a finding (one finding per task and rule); UNCLEAR checks go to 'unclear'.
+'issues' lists every failing or undecided object one row each (all objects, not the first six a finding quotes), with
+its Revit ID filled in by resolve_ids.py where the analyser left it out, so the reports can say where to fix it.
+'readings' lists every value read off a sheet image, with its crop copied to assets/: nobody has checked them, and
+the reports say so.  Stdlib only.
 """
 import argparse
 import glob
@@ -22,10 +26,12 @@ import subprocess
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import resolve_ids as RI  # noqa: E402
 import tasks as T  # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 L2 = os.path.normpath(os.path.join(HERE, "..", "..", "L2-Task-Logic"))
+CATALOGUE = os.path.normpath(os.path.join(HERE, "..", "..", "tasks.json"))
 L2_RE = r"-C\d|-C-|^S13-C|^V\d\d-C|-LIM$|-ROUTE$|-DV-"
 STATUS = {"PASS": "Pass", "FAIL": "Fail", "UNCLEAR": "Unclear", "N/A": "N/A（附条件）", "APPLICABLE": "Unclear"}
 ORDER = ["Fail", "Missing", "Partial", "Unclear", "N/A 待声明", "N/A（附条件）", "Pass", "Not judged"]
@@ -121,48 +127,28 @@ def update_group(path, groups):
     return True
 
 
-def load_gate(run_dir, current):
-    """The reading review saved by the audit window (<run>/gate-confirmation.json), or None when there is none.
-    `current`: {(group, key): (value, sheet, item)} from the group JSONs being combined.  A reviewed reading whose value
-    or sheet has changed since, or that is gone, does not count as checked; a current reading the review never saw
-    is unreviewed.  A file that cannot be read stops the build (exit 2) rather than producing reports without it."""
-    p = os.path.join(run_dir, "gate-confirmation.json")
-    if not os.path.exists(p):
-        return None
+
+
+def tl_codes():
+    """AUD-V01 -> TL-V01 from tasks.json (the task numbers the operator knows)."""
     try:
-        with open(p, encoding="utf-8") as f:
-            g = json.load(f)
-        mode = g["mode"]
-        rows = [{k: str(r.get(k) or "") for k in ("group", "key", "sheet", "item", "value", "note", "mark")}
-                for r in g["readings"]]
-    except (OSError, ValueError, KeyError, TypeError, AttributeError) as e:
-        print("ERROR: %s: %s" % (p, e))
-        sys.exit(2)
-    keep = ("group", "key", "sheet", "item", "value", "note")
-    rv = g.get("reviewed") if isinstance(g.get("reviewed"), dict) else {}
-    out = {"mode": mode, "saved": str(g.get("saved") or ""), "checked": 0, "unreviewed": [], "disputed": [], "stale": 0,
-           "not_reviewed": [k for k in ("failures", "check_yourself", "inputs") if k in rv and not rv[k]]}
-    seen = set()
-    for r in rows:
-        k = (r["group"], r["key"])
-        now = current.get(k)
-        if now is None:
-            continue
-        seen.add(k)
-        if (r["value"], r["sheet"]) != now[:2]:
-            out["stale"] += 1
-            r.update(value=now[0], sheet=now[1], note="")
-            out["unreviewed"].append({x: r[x] for x in keep})
-        elif r["mark"] == "ok":
-            out["checked"] += 1
-        elif r["mark"] == "wrong":
-            out["disputed"].append({x: r[x] for x in keep})
-        else:
-            out["unreviewed"].append({x: r[x] for x in keep})
-    for (grp, key), (value, sheet, item) in current.items():
-        if (grp, key) not in seen:
-            out["unreviewed"].append({"group": grp, "key": key, "sheet": sheet, "item": item, "value": value, "note": ""})
-    return out
+        with open(CATALOGUE, encoding="utf-8") as f:
+            return {t["task"]: t["tl"] for t in json.load(f)["tasks"]}
+    except (OSError, ValueError, KeyError):
+        return {}
+
+
+def issue_row(c, tl, finding_id=None):
+    """One failing or undecided object for the fix list."""
+    fail = c["status"] == "FAIL"
+    oid = c.get("object_id")
+    return {"id": c["id"], "finding_id": finding_id, "task": c["task"], "tl": tl, "rule": c["item"],
+            "action": "fix" if fail else "check", "status": status_of(c), "severity": severity(c) if fail else None,
+            "object": str(c.get("object") or ""), "kind": c.get("object_kind"),
+            "element_id": str(oid) if oid not in (None, "") else None, "sheet": c.get("sheet"),
+            "id_from": c.get("id_from") if oid not in (None, "") else None,
+            "expected": str(c.get("expected", "")), "actual": str(c.get("actual", "")),
+            "fix": c.get("fix") or "", "clause": c.get("cite") or "", "audience": "both"}
 
 
 def main():
@@ -184,7 +170,8 @@ def main():
     run = os.path.dirname(os.path.abspath(a.out))
     assets = os.path.join(run, "assets")
     os.makedirs(assets, exist_ok=True)
-    evidence, tasks, findings, unclear, a1 = [], {}, [], [], []
+    evidence, tasks, findings, unclear, a1, issues, readings = [], {}, [], [], [], [], []
+    tls = tl_codes()
     if a.s14:
         with open(a.s14, encoding="utf-8") as f:
             S14 = json.load(f)
@@ -199,7 +186,6 @@ def main():
         unclear += S14["unclear"]
     version = "not read"
     group_ev = {}
-    current = {}
     partial_tasks = []
     for gjson, gdir in a.group:
         with open(gjson, encoding="utf-8") as f:
@@ -207,9 +193,23 @@ def main():
         gname = G["project_info"]["group"].split()[0]
         if G["project_info"].get("partial"):
             partial_tasks += G["project_info"]["tasks"]
+        raws = []
+        for d in (gdir, os.path.dirname(os.path.abspath(gjson))):
+            raw = os.path.join(d, "_raw")
+            if raw not in raws:
+                raws.append(raw)
+        RI.fill(G["checks"], RI.build_index(raws))
         for r in G.get("readings") or []:
-            current[(gname, str(r.get("key") or ""))] = (str(r.get("value") or ""), str(r.get("sheet") or ""),
-                                                        str(r.get("item") or ""))
+            crop = None
+            src = next((os.path.join(d, r["crop"]) for d in (gdir, os.path.dirname(os.path.abspath(gjson)))
+                        if r.get("crop") and os.path.isfile(os.path.join(d, r["crop"]))), None)
+            if src:
+                crop = "reading-%s-%s" % (gname.lower(), os.path.basename(src))
+                shutil.copyfile(src, os.path.join(assets, crop))
+            readings.append({"group": gname, "key": str(r.get("key") or ""), "sheet": str(r.get("sheet") or ""),
+                             "item": str(r.get("item") or ""), "value": str(r.get("value") or ""),
+                             "confidence": str(r.get("confidence") or ""), "finding": str(r.get("finding") or ""),
+                             "note": str(r.get("note") or ""), "crop": crop})
         v = next((c for c in G["checks"] if c["id"] == "A03-L3"), None)
         if v and str(v.get("status")) == "PASS":
             version = str(v["actual"])
@@ -241,6 +241,10 @@ def main():
                                                      for c in mc[:8]),
                                "element_ids": [str(c["object_id"]) for c in mc if c.get("object_id")],
                                "clause": mc[0].get("cite", ""), "gap": None, "audience": "both"})
+                for c in cs:                   # the fix list keeps every object, MA id or not
+                    if c["status"] in ("FAIL", "UNCLEAR") and not c["id"].endswith("-INPUT"):
+                        m = re.match(r"^(MA-[1-7]\.\d+)", c["id"])
+                        issues.append(issue_row(c, m.group(1) if m else "MA"))
                 continue
             group_ev.setdefault(t, set()).update(evs)
             name, clause, cat = card(t)
@@ -292,8 +296,13 @@ def main():
                     "fix": gc[0].get("fix") or "", "fix_method": method_of(gc[0].get("fix")),
                     "overturn_if": "A reading or association marked medium / low is shown wrong on the drawings.", "gap": None})
                 T["finding_ids"].append(fid)
+                for c in gc:
+                    c["_finding"] = fid
                 if gc[0].get("fix") and not any(x["text"] == gc[0]["fix"] for x in T["fix"]):
                     T["fix"].append({"text": gc[0]["fix"], "method": method_of(gc[0]["fix"]), "audience": "both"})
+            for c in cs:
+                if c["status"] in ("FAIL", "UNCLEAR") and not c["id"].endswith("-INPUT"):
+                    issues.append(issue_row(c, tls.get(t, t), c.pop("_finding", None)))
     for t, evs in group_ev.items():
         tasks[t]["evidence_ids"] = sorted(set(tasks[t]["evidence_ids"]) | evs)
     for png, task, cap in a.crop:
@@ -333,15 +342,16 @@ def main():
         "decisions": dec["decisions"],
         "inputs": dec["inputs"],
         "unclear": unclear,
+        "issues": issues,
+        "readings": readings,
         "evidence": evidence,
     }
-    gate = load_gate(os.path.dirname(os.path.abspath(a.out)), current)
-    if gate:
-        results["gate"] = gate
     with open(a.out, "w", encoding="utf-8") as f:
         json.dump(results, f, ensure_ascii=False, indent=1)
-    print("wrote %s: %d tasks, %d findings (%d Blocker, %d Major), %d unclear, %d A1 items, %d evidence"
-          % (a.out, len(tasks), len(findings), len(blockers), len(majors), len(unclear), len(a1), len(evidence)))
+    print("wrote %s: %d tasks, %d findings (%d Blocker, %d Major), %d unclear, %d A1 items, %d evidence, "
+          "%d issue rows (%d with a Revit ID), %d sheet readings"
+          % (a.out, len(tasks), len(findings), len(blockers), len(majors), len(unclear), len(a1), len(evidence),
+             len(issues), sum(1 for i in issues if i["element_id"]), len(readings)))
 
 
 if __name__ == "__main__":

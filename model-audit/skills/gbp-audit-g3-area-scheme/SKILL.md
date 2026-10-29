@@ -18,7 +18,7 @@ description: Use when checking area schemes and area calculation tables in a Rev
 - 脚本会拒用备注写着来自模型 / 假设的行；与模型不符的值要有裁切图才判 FAIL：填 `box`，跑 `python "<PKG>/tools/common/crop_readings.py" --raw <run>/_raw`。
 - 看图下的判断（`appendices`、`beam_target_rating`、`site_class_info`）写一行并填 `finding`。
 
-**读图判断**：PASS 要有那一处的裁切图，FAIL 要在 `sheet` 写明看过的图纸，否则 UNCLEAR。确认关口请操作者对照报告「Sheet readings to check」的裁切图逐条核对。
+**读图判断**：PASS 要有那一处的裁切图，FAIL 要在 `sheet` 写明看过的图纸，否则 UNCLEAR。报告把每条读数列在「To check by eye › Sheet readings」，标明未经人工核对，附裁切图；不等操作者确认，直接出报告。
 
 **只跑某个 Task**：分析命令加 `--tasks <Task>`，只做规格「按 Task 单独跑」表列的提取；并回总结果用 `build_results.py --update`（`<PKG>/RUN.md` §6c）。
 
