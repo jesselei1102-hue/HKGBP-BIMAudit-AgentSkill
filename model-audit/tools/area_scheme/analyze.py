@@ -38,6 +38,8 @@ SCHED1_NONDOM = [(15, 100, 5), (18, 97.5, 5.8), (21, 95, 6.7), (24, 92, 7.4), (2
 # APP-151 Appendix A item flags in the model -> (item, subject to the 10 % cap?) ; mapping confirmed against the C003 table columns
 CONCESSION = {"d22": ("2.2", False), "d21": ("21", False), "d23": ("2.3", True), "d25": ("25", True), "d27": ("27", None)}
 TOL = 0.0005
+SHEET_NO = re.compile(r"\b([A-Z]\d{3})\b")
+SHEET_FILE = re.compile(r" - Sheet - ([A-Z]\d{3}) - ")
 
 
 def f(x):
@@ -122,6 +124,13 @@ def main():
     # ------------------------------------------------------------ GEN-01: tables are raster images
     def imgs(*keys):
         return sorted({r["name"] for r in rasters for k in keys if k in r["name"]})
+
+    # sheets known to exist: values were read off them, G4 listed them, or their export is in sheets/
+    read_off = {m for r in TV.values() for m in SHEET_NO.findall(r.get("sheet") or "")}
+    vos = os.path.join(a.raw, "views_on_sheets.tsv")
+    seen = read_off | {(r.get("sheet") or "").strip() for r in (read_tsv(vos) if os.path.exists(vos) else [])}
+    if os.path.isdir(os.path.join(a.raw, "sheets")):
+        seen |= {m.group(1) for n in os.listdir(os.path.join(a.raw, "sheets")) for m in [SHEET_FILE.search(n)] if m}
     for task, obj, keys in (("AUD-S02", "C003 site area calculation", ("C003 - SC DIAGRAM",)),
                             ("AUD-V09", "C003 SC calculation", ("C003 - SC DIAGRAM",)),
                             ("AUD-S05", "C001 SC / PR calculation and Development Schedule", ("C001 -", "Development Schedule")),
@@ -134,29 +143,52 @@ def main():
                             ("AUD-V14", "C008 greenery calculation", ("C008 -",))):
         if not have["rasters.tsv"]:
             continue
-        found = imgs(*keys)
+        found, sheet_no = imgs(*keys), obj.split()[0]
+        if found:
+            st, act = "FAIL", "raster image: " + "; ".join(found)
+        elif sheet_no in seen:
+            st, act = "PASS", "no raster named after %s" % sheet_no
+        else:                                       # no picture of a sheet nobody has seen proves nothing
+            st, act = "UNCLEAR", "%s not found or not read: no table to judge" % sheet_no
         O.add("%s-GEN01" % task.split("-")[1], task, "Calculation table is generated from the model (GEN-01)", obj,
-              "schedule / model-generated text", "raster image: " + "; ".join(found) if found else "no raster found",
-              "FAIL" if found else "PASS", cite="BIMGBPS §4.2(b), §5.1.2 (GEN-01)",
+              "schedule / model-generated text", act, st, cite="BIMGBPS §4.2(b), §5.1.2 (GEN-01)",
               method="Raster Images in the model, named after the sheet",
-              fix="Rebuild the table as a schedule or calculated text from the area scheme (Function B)")
+              fix={"FAIL": "Rebuild the table as a schedule or calculated text from the area scheme (Function B)",
+                   "PASS": "", "UNCLEAR": "Check that %s exists and holds this table; read it into the run" % sheet_no}[st])
 
     # ------------------------------------------------------------ S02 site area
-    site_rows = [r for r in A if r["scheme"] in ("(property line)", "ARC_gbp_site area", "Block plan", "Location Plan")]
-    site = area(next(r for r in A if r["scheme"] == "(property line)"))
+    site_rows = [r for r in A if r["scheme"] in ("ARC_gbp_site area", "Block plan", "Location Plan")]
+    pline = next(r for r in A if r["scheme"] == "(property line)")
+    site, pl_id = area(pline), int(pline["id"])
     for r in site_rows:
         O.eq("S02-L2-%s" % r["id"], "AUD-S02", "Site area equals the property line", r["scheme"], area(r), site,
              "BIMGBPS §5.3.2 (GEN-06)", fix="Re-draw the area to the property line", object_id=int(r["id"]))
+    if not site_rows:
+        O.add("S02-L2", "AUD-S02", "Site area equals the property line", "site area schemes",
+              "a site Area in ARC_gbp_site area / Block plan / Location Plan", "no site Area in any scheme", "UNCLEAR",
+              cite="BIMGBPS §5.3.2 (GEN-06)", method="Areas by scheme",
+              fix="Model the site area in the site-area scheme, or name the scheme that holds it")
     for k in ("site_area", "site_area_c003"):
-        O.eq("S02-T-%s" % k, "AUD-S02", "Table site area equals the model", TV.get(k, {}).get("sheet", k), site, tv(k),
+        O.eq("S02-T-%s" % k, "AUD-S02", "Table site area equals the model", TV.get(k, {}).get("sheet", {"site_area": "C001", "site_area_c003": "C003"}[k]), site, tv(k),
              "BIMGBPS §5.3.2 (GEN-06)", tv=TV.get(k), fix="Correct the table")
+    # ADM-21 rounds the site area as stated on the drawings; the property line's own Area is never rounded
     rounded = round(site) if site >= 2000 else round(site, 1)
-    O.add("S02-L3", "AUD-S02", "Site area rounded per ADM-21 (≥ 2,000 m² to 1 m²)", "site area", rounded, site,
-          "PASS" if abs(rounded - site) < TOL else "FAIL", cite="PNAP ADM-21; BIMGBPS §5.1.1 (LIM-02)",
-          method="property line Area")
+    stated = [k for k in ("site_area", "site_area_c003") if k in TV and tv(k) is not None]
+    for k in stated:
+        st = readings.status(abs(tv(k) - rounded) < TOL, TV[k])
+        O.add("S02-L3" if k == stated[0] else "S02-L3-c003", "AUD-S02", "Site area rounded per ADM-21 (≥ 2,000 m² to 1 m²)",
+              TV[k].get("sheet") or "site area table", rounded, tv(k), st, cite="PNAP ADM-21; BIMGBPS §5.1.1 (LIM-02)",
+              method="stated site area vs the property line Area rounded", confidence=readings.confidence(TV[k]),
+              fix={"PASS": "", "FAIL": "State the site area as %s m² (ADM-21)" % rounded,
+                   "UNCLEAR": readings.CROP_FIX}[st])
+    if not stated:
+        O.add("S02-L3", "AUD-S02", "Site area rounded per ADM-21 (≥ 2,000 m² to 1 m²)", "site area table", rounded,
+              "not read", "UNCLEAR", cite="PNAP ADM-21; BIMGBPS §5.1.1 (LIM-02)",
+              method="stated site area vs the property line Area rounded",
+              fix="Read the stated site area off C001 / C003 (key site_area)")
     O.add("S02-C1", "AUD-S02", "Site area agrees with the lease plan / land survey", "site area", "lease plan figure",
           site, "UNCLEAR", cite="Cap. 123F reg 23(2) (LIM-14)", method="needs INP-01", basis="external input",
-          fix="Provide the lease plan / LSP site area (INP-01)")
+          fix="Provide the lease plan / LSP site area (INP-01)", object_id=pl_id)
 
     # ------------------------------------------------------------ V10 / S08 / S07 GFA
     gross = {}
@@ -477,13 +509,18 @@ def main():
     for c in O.checks:
         p = per.setdefault(c["task"], {})
         p[c["status"]] = p.get(c["status"], 0) + 1
-    O.warnings += [
-        "Every G3 calculation table is a raster image: table values were read from the exported sheets (1920 px); "
-        "each reading carries a confidence in table_values.tsv. A medium reading is cross-checked by the table's own totals.",
-        "APP-151 item mapping (2.2 / 21 no cap; 2.3 / 25 subject to cap) is the model's GFA DEDUCT flags matched to the C003 columns.",
-        "First Schedule values come from the reconstructed table in Knowledge (DK-AUD-006 M-11): confirm against e-Legislation.",
-        "FS Code 2011 Parts C and D are not in Knowledge: compartment and EVA limits are UNCLEAR.",
-    ]
+    ran = lambda *ts: any(t in wanted for t in ts)
+    O.warnings += [w for w, on in (
+        ("%d table value(s) were read from the exported sheets (%s); each reading carries a confidence. A medium reading "
+         "is cross-checked by the table's own totals." % (len(TV), ", ".join(sorted(read_off)) or "sheet not named")
+         if TV else "No table values were read off the calculation sheets: every check against a table is UNCLEAR.", True),
+        ("APP-151 item mapping (2.2 / 21 no cap; 2.3 / 25 subject to cap) is the model's GFA DEDUCT flags matched to the "
+         "C003 columns.", ran("AUD-S08", "AUD-S07", "AUD-V10")),
+        ("First Schedule values come from the reconstructed table in Knowledge (DK-AUD-006 M-11): confirm against "
+         "e-Legislation.", ran("AUD-S05")),
+        ("FS Code 2011 Parts C and D are not in Knowledge: compartment and EVA limits are UNCLEAR.",
+         ran("AUD-V08", "AUD-S12", "AUD-V06")),
+    ) if on]
     if rejected:
         O.warnings.insert(0, readings.warning(rejected))
     unver = sorted(k for k, r in TV.items() if not r["verified"])

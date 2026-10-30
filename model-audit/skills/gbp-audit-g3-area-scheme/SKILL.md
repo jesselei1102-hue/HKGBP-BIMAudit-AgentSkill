@@ -33,7 +33,7 @@ description: Use when checking area schemes and area calculation tables in a Rev
    python "<PKG>/tools/area_scheme/analyze.py" --raw <run>/_raw --project <名> --model <路径> --out <run>/G3_analysis_<名>.json [--g2 <G2 JSON>]
    ```
 
-3. 给操作者看屏幕摘要（GFA 两种算法、受 cap %、SC、PR、各 Task 计数）。**在这里停下**，等确认。
+3. 给操作者看屏幕摘要（GFA 两种算法、受 cap %、SC、PR、各 Task 计数）。不等确认，直接进第二段；分类规则或限值有疑问时才停下问操作者，改规则重跑。
 
 ## 第二段：报告
 

@@ -468,8 +468,19 @@ def inputs_html(c):
     return table(["Information", "Needed for"], rows) if rows else "<p>None.</p>"
 
 
+TOOLISH = re.compile(r"\.tsv|\.json|\bSOP\b|\bR-G\d|\bkey\b|\b[a-z]+(?:_[a-z0-9]+)+\b")
+AP_NEED = "BIM team to complete; the BIM team edition says how"
+
+
 def unclear_html(c):
-    rows = [[html.escape(u["task"]), html.escape(REASON_EN[u["reason_kind"]]), c.text(u["detail"]), c.text(u["need"])]
+    def detail(s):                      # AP: "<item> - <object>", the object dropped when it is a tool key
+        item, sep, obj = str(s or "").rpartition(" - ")
+        return c.text(item if sep and c.ap and TOOLISH.search(obj) else s)
+
+    def need(s):                        # AP: a need that names files, keys or SOP steps is the BIM team's work
+        return html.escape(AP_NEED) if c.ap and TOOLISH.search(str(s or "")) else c.text(s)
+
+    rows = [[html.escape(u["task"]), html.escape(REASON_EN[u["reason_kind"]]), detail(u["detail"]), need(u["need"])]
             + ([] if c.ap else [html.escape(u.get("gap") or "")]) for u in c.r["unclear"]]
     head = ["Task", "Why", "Detail", "Needed"] + ([] if c.ap else ["Gap"])
     return table(head, rows) if rows else "<p>None.</p>"

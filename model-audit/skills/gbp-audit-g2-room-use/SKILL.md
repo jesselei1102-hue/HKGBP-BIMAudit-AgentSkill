@@ -27,7 +27,7 @@ description: Use when checking room-use schedules in a Revit model for a Hong Ko
    python "<PKG>/tools/room_use/analyze.py" --raw <run>/_raw --project <名> --model <路径> --out <run>/G2_analysis_<名>.json [--use <用途>]
    ```
 
-3. 给操作者看屏幕摘要（§5）。**在这里停下**，等确认。
+3. 给操作者看屏幕摘要（§5）。不等确认，直接进第二段；分类规则或限值有疑问时才停下问操作者，改规则重跑。
 
 ## 第二段：报告
 

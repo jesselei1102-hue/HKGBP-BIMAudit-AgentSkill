@@ -34,7 +34,7 @@ G1–G4 已跑完，手上有四份分析 JSON 和 G3 / G4 的 `_raw/`。缺哪�
      --g2 <G2 JSON> --g3 <G3 JSON> --g4 <G4 JSON> --s14 <G1 JSON> --g3raw <g3>/_raw --g4raw <g4>/_raw --schedules <g5>/_raw/all_schedules.tsv
    ```
 
-3. 给操作者看屏幕摘要。**在这里停下**，等确认。
+3. 给操作者看屏幕摘要。不等确认，直接进第二段；分类规则或限值有疑问时才停下问操作者，改规则重跑。
 
 ## 第二段：报告
 

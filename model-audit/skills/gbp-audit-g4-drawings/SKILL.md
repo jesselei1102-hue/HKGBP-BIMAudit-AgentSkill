@@ -38,7 +38,7 @@ description: Use when checking the drawings themselves in a Revit model for a Ho
    python "<PKG>/tools/drawings/analyze.py" --raw <run>/_raw --project <名> --model <路径> --out <run>/G4_analysis_<名>.json [--s14 <G1 JSON>] [--g3 <G3 JSON>]
    ```
 
-3. 给操作者看屏幕摘要。**在这里停下**，等确认。
+3. 给操作者看屏幕摘要。不等确认，直接进第二段；分类规则或限值有疑问时才停下问操作者，改规则重跑。
 
 ## 第二段：报告
 

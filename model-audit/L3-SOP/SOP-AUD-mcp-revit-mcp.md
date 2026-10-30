@@ -210,7 +210,7 @@ python "Model Audit/tools/common/task_report.py" --analysis <run>/G3_analysis_<�
 - 和模型对不上的读数，要有格子的裁切图才判 FAIL：填 `box` 后跑 `python "Model Audit/tools/common/crop_readings.py" --raw <run>/_raw`，它写 `crops/<key>.png` 并填 `crop`；没有裁切图 → UNCLEAR。对得上的读数没有裁切图也可 PASS（medium）。
 - 看图下的判断（例：附录 G 表有没有、BEAM Plus 目标评级有没有、地盘分类依据是否齐）写成一行，`finding` 填 PASS 或 FAIL；没有这一行 → UNCLEAR，不推定。
 - **证据**：PASS 是说「图上有」——要有那一处的裁切图（`box` → `crop_readings.py`）；FAIL 是说「图上没有」——`sheet` 栏写明看过的图纸。缺证据 → UNCLEAR。
-- **核对表**：每组的屏幕摘要列出全部读数（有没有裁切图），报告的「Sheet readings to check」把每条读数和它的裁切图并排。操作者确认前逐条对一下：数对不对、判断是否真的满足规则（例：只有「CLASS OF SITE: C」不等于地盘分类依据齐全）。G3 用的 key：`appendices`、`beam_target_rating`、`site_class_info`。
+- **核对表**：每组的屏幕摘要列出全部读数（有没有裁切图），报告的「Sheet readings to check」把每条读数和它的裁切图并排。报告把它们列为未经人工核对；看报告的人逐条对一下：数对不对、判断是否真的满足规则（例：只有「CLASS OF SITE: C」不等于地盘分类依据齐全）。G3 用的 key：`appendices`、`beam_target_rating`、`site_class_info`。
 
 **原样保存 MCP 回传（不手抄）**：回传过大时，Claude Code 会把结果原样存成文件并给出路径；把该文件复制到 `mcp/` 再用脚本解析。其他 harness 若直接显示结果，把 JSON 原文整段存成 `mcp/*.json`，不要逐值重打。AllParameters 每次最多 20 个元素。
 

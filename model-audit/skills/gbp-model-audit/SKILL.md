@@ -37,7 +37,7 @@ description: Use when asked to audit a Revit model for a Hong Kong GBP (general 
 
 ## 3. 整套审核
 
-1. 依次跑 G1 → G2 → G3 → G4 → G5；后组要读前组的分析 JSON。每组都按该组 Skill 的两段式：先分析、给操作者看屏幕摘要、确认后再出报告。
+1. 依次跑 G1 → G2 → G3 → G4 → G5；后组要读前组的分析 JSON。每组都按该组 Skill 的两段式：先分析、给操作者看屏幕摘要，再直接出报告（没有确认关口；规则有疑问才停下问）。
 2. 汇总（`<run>` 为本次审核文件夹）：
 
    ```

@@ -26,7 +26,7 @@ description: Use when checking natural lighting and ventilation of rooms in a Re
      [--schedule <S14 明细表 CSV>] [--fixtures <G2 的 fixtures.tsv>] [--previous <上次 JSON>]
    ```
 
-3. 把屏幕摘要给操作者看（房间分类数、通过 / 不通过、pending、数据质量警告）。**在这里停下**，等操作者确认或修正规则后再往下。
+3. 把屏幕摘要给操作者看（房间分类数、通过 / 不通过、pending、数据质量警告）。不等确认，直接进第二段；分类规则或限值有疑问时才停下问操作者，改规则重跑。
 
 ## 第二段：报告（只读分析 JSON）
 
