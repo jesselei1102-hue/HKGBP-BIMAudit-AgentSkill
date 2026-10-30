@@ -228,10 +228,13 @@ def main():
     O.eq("S08-L4-cap", "AUD-S08", "Total capped concessions equal the model", "subject to cap", capd, tv("cap_total"),
          "BIMGBPS §5.3.8 (GEN-06)", tv=TV.get("cap_total"))
     pct = capd / tot_a * 100 if tot_a else None
+    shown = ("%.3f %% (%.3f / %.3f)" % (pct, capd, tot_a) if pct is not None
+             else "no accountable GFA (GFA SUMMARY total 0)")
     O.add("S08-C1", "AUD-S08", "Capped concessions ≤ 10 % of total GFA (non-domestic)", "development", "≤ 10 %",
-          "%.3f %% (%.3f / %.3f)" % (pct, capd, tot_a), "PASS" if pct is not None and pct <= 10 else "FAIL",
+          shown, "PASS" if pct is not None and pct <= 10 else "FAIL",
           cite="PNAP APP-151 ¶4 (LIM-23)", method="model sums", basis="arithmetic only; item eligibility in S07")
-    O.eq("S08-T-pct", "AUD-S08", "Table concession % equals the model", "% of GFA concession", round(pct, 3), tv("cap_pct"),
+    O.eq("S08-T-pct", "AUD-S08", "Table concession % equals the model", "% of GFA concession",
+         round(pct, 3) if pct is not None else None, tv("cap_pct"),
          "BIMGBPS §5.3.8 (GEN-06)", tv=TV.get("cap_pct"), tol=0.0006)
     st, txt, cf = readings.observation(TV, "appendices", a.raw)
     O.add("S08-L2", "AUD-S08", "Tables (a): APP-151 Appendix A list, ADM-2 Appendix G and H present", "C003",

@@ -370,7 +370,8 @@ def readings_block(c):
         return "<h3>Sheet readings</h3><p>No values were read off sheet images in this audit.</p>"
     cards = []
     for x in rs:
-        img = (f'<img src="assets/{attr(x["crop"])}" loading="lazy" alt="Crop of sheet {attr(x["sheet"])}: {attr(x["item"])}">'
+        img = (f'<a class="crop" href="assets/{attr(x["crop"])}" title="Open the crop full size">'
+               f'<img src="assets/{attr(x["crop"])}" loading="lazy" alt="Crop of sheet {attr(x["sheet"])}: {attr(x["item"])}"></a>'
                if x.get("crop") else '<div class="nocrop">No crop</div>')
         conf = f' · confidence {html.escape(x["confidence"])}' if x.get("confidence") else ""
         key = "" if c.ap else f' · {html.escape(x["key"])}'
