@@ -110,12 +110,13 @@ def main():
             j = (i + 1) % len(coords)
             area += xs[i] * ys[j] - xs[j] * ys[i]
         area = abs(area) / 2
-        site = None
+        site, site_txt = None, "property line area (needs --g3)"
         if a.g3 and os.path.exists(a.g3):
-            g3 = load_json(a.g3, {})
-            site = next((c["expected"] for c in g3.get("checks", []) if c["id"].startswith("S02-L2-")), None)
+            g3s = load_json(a.g3, {}).get("summary", {})
+            site = g3s.get("site_area")                                        # null: the model has no property line
+            site_txt = "no property line in the model (G3)" if "site_area" in g3s else "property line area (rerun G3)"
         O.add("V01-L6-num", "AUD-V01", "Boundary coordinates enclose the site area", "A001 coordinates table",
-              "%.3f m² (property line, G3)" % site if site is not None else "property line area (needs --g3)",
+              "%.3f m² (property line, G3)" % site if site is not None else site_txt,
               "%.3f m²" % area, "UNCLEAR" if site is None else ("PASS" if abs(area - site) < 0.5 else "FAIL"),
               cite="%s §5.2.1(e)" % BIMGBPS, method="shoelace area of the tabulated points", evidence="points " +
               "; ".join("%s %s, %s" % (c["point"], c["E_m"], c["N_m"]) for c in coords))

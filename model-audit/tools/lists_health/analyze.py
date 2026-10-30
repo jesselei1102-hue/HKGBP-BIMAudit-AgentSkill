@@ -322,14 +322,15 @@ def main():
         if nl:
             O.add("MA-5.3", "AUD-A1", "Every model element has a level", "plumbing fixtures", "level set",
                   "%d unlevelled counters" % len(nl), "FAIL", basis="Minor", fix=nl[0]["fix"])
-        site_m = next((c["expected"] for c in G3["checks"] if c["id"].startswith("S02-L2-")), None)
+        site_m = G3.get("summary", {}).get("site_area")             # G3's property line; null: none in the model
         poly = None
         if len(coords) >= 3:
             xy = [(float(r["E_m"]), float(r["N_m"])) for r in coords]
             poly = abs(sum(x1 * y2 - x2 * y1 for (x1, y1), (x2, y2) in zip(xy, xy[1:] + xy[:1]))) / 2
         st = "UNCLEAR" if site_m is None or poly is None else ("PASS" if abs(site_m - poly) < 0.5 else "FAIL")
         O.add("MA-6.1", "AUD-A1", "Property line closed and equal to the site area", "Property Line",
-              "%.3f m² (property line)" % site_m if site_m is not None else "property line area",
+              "%.3f m² (property line)" % site_m if site_m is not None else ("no property line in the model (G3)"
+                  if "site_area" in G3.get("summary", {}) else "property line area (rerun G3)"),
               "%.3f m² enclosed by the boundary coordinates" % poly if poly is not None else "coordinates not read", st,
               method="G3 property-line Area vs shoelace area of the coordinates (coords.tsv)",
               fix={"PASS": "", "FAIL": "Make the property line and the boundary coordinates agree",

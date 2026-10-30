@@ -158,9 +158,19 @@ def main():
 
     # ------------------------------------------------------------ S02 site area
     site_rows = [r for r in A if r["scheme"] in ("ARC_gbp_site area", "Block plan", "Location Plan")]
-    pline = next(r for r in A if r["scheme"] == "(property line)")
-    site, pl_id = area(pline), int(pline["id"])
+    pline = next((r for r in A if r["scheme"] == "(property line)"), None)
+    site, pl_id = (area(pline), int(pline["id"])) if pline else (None, None)
+
+    def no_site(cid, task, item, obj, **kw):
+        """A check that needs the site area, when the model has no property line: reported, not judged, no stand-in."""
+        O.add(cid, task, item, obj, "site area from the property line", "not judged: no property line in the model",
+              "UNCLEAR", basis="input", method="property line Area",
+              fix="Draw the property line in the model (Massing & Site > Property Line); the site area is taken from it", **kw)
+
     for r in site_rows:
+        if site is None:
+            no_site("S02-L2-%s" % r["id"], "AUD-S02", "Site area equals the property line", r["scheme"], object_id=int(r["id"]))
+            continue
         O.eq("S02-L2-%s" % r["id"], "AUD-S02", "Site area equals the property line", r["scheme"], area(r), site,
              "BIMGBPS §5.3.2 (GEN-06)", fix="Re-draw the area to the property line", object_id=int(r["id"]))
     if not site_rows:
@@ -169,11 +179,18 @@ def main():
               cite="BIMGBPS §5.3.2 (GEN-06)", method="Areas by scheme",
               fix="Model the site area in the site-area scheme, or name the scheme that holds it")
     for k in ("site_area", "site_area_c003"):
+        if site is None:
+            no_site("S02-T-%s" % k, "AUD-S02", "Table site area equals the model", {"site_area": "C001", "site_area_c003": "C003"}[k])
+            continue
         O.eq("S02-T-%s" % k, "AUD-S02", "Table site area equals the model", TV.get(k, {}).get("sheet", {"site_area": "C001", "site_area_c003": "C003"}[k]), site, tv(k),
              "BIMGBPS §5.3.2 (GEN-06)", tv=TV.get(k), fix="Correct the table")
     # ADM-21 rounds the site area as stated on the drawings; the property line's own Area is never rounded
-    rounded = round(site) if site >= 2000 else round(site, 1)
-    stated = [k for k in ("site_area", "site_area_c003") if k in TV and tv(k) is not None]
+    if site is None:
+        rounded, stated = None, []
+        no_site("S02-L3", "AUD-S02", "Site area rounded per ADM-21 (≥ 2,000 m² to 1 m²)", "site area table")
+    else:
+        rounded = round(site) if site >= 2000 else round(site, 1)
+        stated = [k for k in ("site_area", "site_area_c003") if k in TV and tv(k) is not None]
     for k in stated:
         st = readings.status(abs(tv(k) - rounded) < TOL, TV[k])
         O.add("S02-L3" if k == stated[0] else "S02-L3-c003", "AUD-S02", "Site area rounded per ADM-21 (≥ 2,000 m² to 1 m²)",
@@ -181,12 +198,15 @@ def main():
               method="stated site area vs the property line Area rounded", confidence=readings.confidence(TV[k]),
               fix={"PASS": "", "FAIL": "State the site area as %s m² (ADM-21)" % rounded,
                    "UNCLEAR": readings.CROP_FIX}[st])
-    if not stated:
+    if site is not None and not stated:
         O.add("S02-L3", "AUD-S02", "Site area rounded per ADM-21 (≥ 2,000 m² to 1 m²)", "site area table", rounded,
               "not read", "UNCLEAR", cite="PNAP ADM-21; BIMGBPS §5.1.1 (LIM-02)",
               method="stated site area vs the property line Area rounded",
               fix="Read the stated site area off C001 / C003 (key site_area)")
-    O.add("S02-C1", "AUD-S02", "Site area agrees with the lease plan / land survey", "site area", "lease plan figure",
+    if site is None:
+        no_site("S02-C1", "AUD-S02", "Site area agrees with the lease plan / land survey", "site area")
+    else:
+        O.add("S02-C1", "AUD-S02", "Site area agrees with the lease plan / land survey", "site area", "lease plan figure",
           site, "UNCLEAR", cite="Cap. 123F reg 23(2) (LIM-14)", method="needs INP-01", basis="external input",
           fix="Provide the lease plan / LSP site area (INP-01)", object_id=pl_id)
 
@@ -287,8 +307,11 @@ def main():
     h_c = tv("height_c001")
     band = next((b for b in SCHED1_NONDOM if h_c is not None and h_c <= b[0]), None)
     ppr_c = (band[2] if not isinstance(band[2], dict) else band[2]["C"]) if band else None
-    pr_up = (tot_a + capd) / site
-    O.add("S07-C6", "AUD-S07", "Sensitivity: PR still within the limit if capped concessions are refused", "development",
+    pr_up = (tot_a + capd) / site if site else None
+    if site is None:
+        no_site("S07-C6", "AUD-S07", "Sensitivity: PR still within the limit if capped concessions are refused", "development")
+    else:
+        O.add("S07-C6", "AUD-S07", "Sensitivity: PR still within the limit if capped concessions are refused", "development",
           "PR ≤ %s" % ppr_c if ppr_c else "PR ≤ permitted (height not read)",
           "%.3f / %.3f = %.3f" % (tot_a + capd, site, pr_up),
           "UNCLEAR" if ppr_c is None else ("PASS" if pr_up <= ppr_c else "FAIL"),
@@ -299,12 +322,16 @@ def main():
     sc_area = sum(area(r) for r in sch("ARC_gbp_sc"))
     O.eq("V09-T-area", "AUD-V09", "Table covered area equals the SC Area", "C001", sc_area, tv("sc_area"),
          "BIMGBPS §5.2.9 (GEN-06)", tv=TV.get("sc_area"))
-    sc_pct = sc_area / site * 100
-    O.eq("S05-T-sc", "AUD-S05", "Table SC % equals covered area ÷ site area", "C001", round(sc_pct, 3), tv("sc_pct"),
-         "BIMGBPS §5.3.5 (GEN-06)", tv=TV.get("sc_pct"), tol=0.0006)
-    pr = tot_a / site
-    O.eq("S05-T-pr", "AUD-S05", "Table PR equals GFA ÷ site area", "C001", round(pr, 3), tv("pr"),
-         "BIMGBPS §5.3.5 (GEN-06)", tv=TV.get("pr"), tol=0.0006)
+    sc_pct = sc_area / site * 100 if site else None
+    pr = tot_a / site if site else None
+    if site is None:
+        no_site("S05-T-sc", "AUD-S05", "Table SC % equals covered area ÷ site area", "C001")
+        no_site("S05-T-pr", "AUD-S05", "Table PR equals GFA ÷ site area", "C001")
+    else:
+        O.eq("S05-T-sc", "AUD-S05", "Table SC % equals covered area ÷ site area", "C001", round(sc_pct, 3), tv("sc_pct"),
+             "BIMGBPS §5.3.5 (GEN-06)", tv=TV.get("sc_pct"), tol=0.0006)
+        O.eq("S05-T-pr", "AUD-S05", "Table PR equals GFA ÷ site area", "C001", round(pr, 3), tv("pr"),
+             "BIMGBPS §5.3.5 (GEN-06)", tv=TV.get("pr"), tol=0.0006)
     O.eq("S05-T-gfa", "AUD-S05", "Table GFA equals the model", "C001", tot_a, tv("gfa"), "BIMGBPS §5.3.5 (GEN-06)", tv=TV.get("gfa"))
     gf_gross = gross.get("G/F", 0)
     if gross:
@@ -330,11 +357,15 @@ def main():
             continue
         psc = band[1] if not isinstance(band[1], dict) else band[1]["C"]
         ppr = band[2] if not isinstance(band[2], dict) else band[2]["C"]
-        O.add("S05-C7-%s" % hkey, "AUD-S05", "SC within the First Schedule (non-domestic, class C)", "%s %.2f m" % (basis, h),
+        if site is None:
+            no_site("S05-C7-%s" % hkey, "AUD-S05", "SC within the First Schedule (non-domestic, class C)", "%s %.2f m" % (basis, h))
+            no_site("S05-C8-%s" % hkey, "AUD-S05", "PR within the First Schedule (non-domestic, class C)", "%s %.2f m" % (basis, h))
+        else:
+            O.add("S05-C7-%s" % hkey, "AUD-S05", "SC within the First Schedule (non-domestic, class C)", "%s %.2f m" % (basis, h),
               "≤ %s %%" % psc, "%.3f %%" % sc_pct, "PASS" if sc_pct <= psc else "FAIL",
               cite="Cap. 123F reg 20, First Schedule col 10 (LIM-16; reconstructed table, check e-Legislation)",
               confidence="medium", basis="conditional: class C (INP-02), non-domestic use")
-        O.add("S05-C8-%s" % hkey, "AUD-S05", "PR within the First Schedule (non-domestic, class C)", "%s %.2f m" % (basis, h),
+            O.add("S05-C8-%s" % hkey, "AUD-S05", "PR within the First Schedule (non-domestic, class C)", "%s %.2f m" % (basis, h),
               "≤ %s" % ppr, "%.3f" % pr, "PASS" if pr <= ppr else "FAIL",
               cite="Cap. 123F reg 21, First Schedule col 13 (LIM-16; reconstructed table)", confidence="medium",
               basis="conditional: class C (INP-02), non-domestic use")
@@ -393,15 +424,19 @@ def main():
     # ------------------------------------------------------------ V14 greenery
     grn = sch("ARC_gbp_greenery")
     gt = sum(area(r) for r in grn)
-    gpct = gt / site * 100
+    gpct = gt / site * 100 if site else None
     O.eq("V14-T-gf", "AUD-V14", "Table G/F greenery equals the model", "C008",
          sum(area(r) for r in grn if short(r["level"]) == "G/F"), tv("grn_gf"), "BIMGBPS §5.2.14 (GEN-06)", tv=TV.get("grn_gf"))
     O.eq("V14-T-rf", "AUD-V14", "Table R/F greenery equals the model", "C008",
          sum(area(r) for r in grn if short(r["level"]) == "R/F"), tv("grn_rf"), "BIMGBPS §5.2.14 (GEN-06)", tv=TV.get("grn_rf"))
-    O.eq("V14-T-pct", "AUD-V14", "Table greenery % equals the model", "C008", round(gpct, 3), tv("grn_pct"),
-         "BIMGBPS §5.2.14 (GEN-06)", tv=TV.get("grn_pct"), tol=0.0006)
-    O.add("V14-C1", "AUD-V14", "Overall greenery ≥ 20 % (site 1,000–20,000 m²)", "site", "≥ 20 %", "%.3f %%" % gpct,
-          "PASS" if gpct >= 20 else "FAIL", cite="PNAP APP-152 Table 2 (LIM-29)", method="greenery Areas ÷ site area")
+    if site is None:
+        no_site("V14-T-pct", "AUD-V14", "Table greenery % equals the model", "C008")
+        no_site("V14-C1", "AUD-V14", "Overall greenery ≥ 20 % (site 1,000–20,000 m²)", "site")
+    else:
+        O.eq("V14-T-pct", "AUD-V14", "Table greenery % equals the model", "C008", round(gpct, 3), tv("grn_pct"),
+             "BIMGBPS §5.2.14 (GEN-06)", tv=TV.get("grn_pct"), tol=0.0006)
+        O.add("V14-C1", "AUD-V14", "Overall greenery ≥ 20 % (site 1,000–20,000 m²)", "site", "≥ 20 %", "%.3f %%" % gpct,
+              "PASS" if gpct >= 20 else "FAIL", cite="PNAP APP-152 Table 2 (LIM-29)", method="greenery Areas ÷ site area")
     O.add("V14-C2", "AUD-V14", "Primary-zone greenery ≥ 10 %", "primary zone", "≥ 10 % of site in the primary zone",
           "C008 claims %s %% using all G/F greenery; no primary zone defined in the model" % tvs("grn_primary_pct"),
           "UNCLEAR", cite="PNAP APP-152 Table 2 (LIM-29)", basis="needs zone",
@@ -523,6 +558,10 @@ def main():
     ) if on]
     if rejected:
         O.warnings.insert(0, readings.warning(rejected))
+    if site is None:
+        O.warnings.insert(0, "No property line in the model: %d check(s) that need the site area were not judged "
+                             "(S02, S05, S07, V14 - each is listed in the report)."
+                          % sum(1 for c in O.checks if c["actual"] == "not judged: no property line in the model"))
     unver = sorted(k for k, r in TV.items() if not r["verified"])
     if unver:
         O.warnings.insert(0, "Readings without a crop of the cell (%d): %s. They can PASS (medium confidence) but a "
@@ -539,6 +578,7 @@ def main():
            "summary": {"per_task": per, "checks": len(O.checks),
                        "fail": sum(1 for c in O.checks if c["status"] == "FAIL"),
                        "unclear": sum(1 for c in O.checks if c["status"] == "UNCLEAR"),
+                       "site_area": round(site, 3) if site is not None else None,   # property line; null: none in the model
                        "gfa": {"gross": round(tot_g, 3), "deductions": round(tot_d, 3), "accountable": round(tot_a, 3),
                                "no_cap": round(nocap, 3), "capped": round(capd, 3),
                                "capped_pct": round(pct, 3) if pct is not None else None},
@@ -549,8 +589,9 @@ def main():
     with open(a.out, "w", encoding="utf-8") as fh:
         json.dump(out, fh, indent=1, ensure_ascii=False)
     T.print_summary(out, "G3 area-scheme")
-    print("GFA gross %.3f - deductions %.3f = accountable %.3f m² | no cap %.3f, capped %.3f (%s) | site %.3f m²"
-          % (tot_g, tot_d, tot_a, nocap, capd, ("%.3f %%" % pct) if pct is not None else "n/a", site))
+    print("GFA gross %.3f - deductions %.3f = accountable %.3f m² | no cap %.3f, capped %.3f (%s) | site %s"
+          % (tot_g, tot_d, tot_a, nocap, capd, ("%.3f %%" % pct) if pct is not None else "n/a",
+             "%.3f m²" % site if site is not None else "not known (no property line)"))
     return 0
 
 
