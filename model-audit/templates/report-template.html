@@ -9,6 +9,7 @@
   Preferred: generate with  python report/render_report.py --results audit-results.json --audience bim|ap --out report-<audience>.html
   Use this template only when the harness cannot run code. Fill each FILL block from audit-results.json
   (templates/audit-results.schema.json), apply the audience rules in each block, and keep meta.filled_by = "template".
+  The report keeps one ground, the white sheet of its road-sign world, in every colour scheme and in print.
   The <style id="report-css"> and <script id="report-js"> blocks are also read by render_report.py: edit them here only.
 
   Audience rules:
@@ -30,17 +31,6 @@
   --check:#8a4b00;--check-tint:#fdf1de;--pass:#1e6b34;--pass-tint:#e5f2e8;--na:#56616c;--na-tint:#eceff2;
   --focus:#2a6fd6;--select:#cfe0fb;
 }
-@media (prefers-color-scheme:dark){
-  :root{
-    color-scheme:dark;
-    --sign:#1c4b8f;--sign-deep:#12345f;--sign-ink:#ffffff;--sign-soft:#b9cbe6;--sign-text:#9dbdf2;
-    --ground:#0f141a;--paper:#161d25;--ink:#e8ecf0;--ink-2:#c3cad2;--muted:#9aa4ae;--line:#2a333d;--line-2:#3b4652;
-    --plate:#ffffff;--plate-ink:#121519;
-    --fail:#f2867c;--fail-tint:#3a1d1a;--major:#f2867c;--minor:#c3cad2;--minor-tint:#212a33;
-    --check:#f0b35c;--check-tint:#33270f;--pass:#7fd08f;--pass-tint:#17301f;--na:#a8b2bc;--na-tint:#212a33;
-    --focus:#7fb0ff;--select:#24406b;
-  }
-}
 *{box-sizing:border-box}
 html{scroll-padding-top:116px}
 body{margin:0;background:var(--ground);color:var(--ink);
@@ -56,7 +46,7 @@ a{color:inherit;text-underline-offset:3px;text-decoration-thickness:1px}
 .band{background:var(--sign);color:var(--sign-ink);position:sticky;top:0;z-index:10;
   box-shadow:0 2px 10px rgba(10,25,50,.18)}
 .band-in{max-width:1240px;margin:0 auto;padding:14px 24px 0;display:grid;grid-template-columns:1fr auto;gap:6px 24px;align-items:end}
-.band h1{margin:0;font-size:21px;line-height:1.2;font-weight:650;letter-spacing:-.01em}
+.band h1{margin:0;font-size:21px;line-height:1.3;font-weight:650;letter-spacing:-.01em}
 .band .sub{margin:2px 0 0;font-size:13px;color:var(--sign-soft)}
 .verdict-sign{justify-self:end;display:flex;align-items:center;gap:10px;background:var(--ground);color:var(--ink);
   border-radius:4px;padding:7px 12px 7px 10px;font-size:14px;font-weight:600;white-space:nowrap}
@@ -74,7 +64,7 @@ a{color:inherit;text-underline-offset:3px;text-decoration-thickness:1px}
 main{max-width:1240px;margin:0 auto;padding:8px 24px 64px}
 section{padding:36px 0 8px;border-bottom:1px solid var(--line)}
 section:last-of-type{border-bottom:0}
-h2{font-size:20px;line-height:1.25;margin:0 0 6px;font-weight:650;letter-spacing:-.01em}
+h2{font-size:20px;line-height:1.3;margin:0 0 6px;font-weight:650;letter-spacing:-.01em}
 h3{font-size:16px;margin:28px 0 8px;font-weight:650}
 .lead{margin:0 0 18px;color:var(--ink-2);max-width:72ch}
 .muted{color:var(--muted)}
@@ -126,7 +116,6 @@ p{max-width:75ch}
 .obj:first-child{border-top:0}
 .obj .tick{width:18px;height:18px;accent-color:var(--pass);cursor:pointer;margin:0}
 .obj .what{font-size:13.5px;color:var(--ink-2);min-width:0}
-.obj .what .arrow-r{color:var(--muted);padding:0 4px}
 .obj .acts{display:flex;gap:6px}
 .obj.fixed .plate,.obj.fixed .what{opacity:.5}
 .obj.fixed .what{text-decoration:line-through;text-decoration-color:var(--pass);text-decoration-thickness:2px}
@@ -139,19 +128,19 @@ p{max-width:75ch}
 /* the street-name plate: where the object is */
 .plate{display:block;background:var(--plate);color:var(--plate-ink);border:1.5px solid var(--plate-ink);border-radius:3px;
   padding:5px 10px 4px;min-width:0;box-shadow:0 1px 0 rgba(0,0,0,.08)}
-.plate-name{display:block;font-size:14px;font-weight:650;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.plate-name{display:block;font-size:14px;font-weight:650;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .plate-line{display:block;font-size:12px;line-height:1.35;color:#3e4650;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .plate-line .plate-id{font-weight:700;color:var(--plate-ink)}
 .plate.no-id{border-style:dashed}
 
 /* ---------- readings to check ---------- */
 .readings{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin-top:10px}
-.reading{border:1px solid var(--line);border-radius:5px;background:var(--paper);overflow:hidden}
+.reading{margin:0;border:1px solid var(--line);border-radius:5px;background:var(--paper);overflow:hidden}
 .reading img{display:block;width:100%;height:150px;object-fit:contain;background:#fff;border-bottom:1px solid var(--line)}
 .reading .nocrop{height:150px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px;
   border-bottom:1px solid var(--line)}
 .reading .body{padding:8px 10px 10px}
-.reading .val{font-size:18px;font-weight:650}
+.reading .val{font-size:18px;line-height:1.3;font-weight:650}
 .reading .meta{font-size:12.5px;color:var(--muted)}
 .notice{border:1px solid var(--check);background:var(--check-tint);color:var(--ink);border-radius:5px;padding:10px 14px;max-width:75ch}
 

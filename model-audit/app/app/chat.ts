@@ -48,7 +48,7 @@ export async function sendToChat(app: App, text: string, view: HTMLElement): Pro
   box.innerHTML =
     `<p>This window cannot post to the chat here. Copy the instruction and paste it into the chat.</p>` +
     `<textarea readonly>${escapeHtml(text)}</textarea>` +
-    `<button class="text-link" type="button" data-copy>Copy</button>`;
+    `<button class="copy-btn" type="button" data-copy>Copy instruction</button>`;
   const area = box.querySelector("textarea")!;
   box.querySelector<HTMLButtonElement>("[data-copy]")!.addEventListener("click", async (e) => {
     const btn = e.currentTarget as HTMLButtonElement;

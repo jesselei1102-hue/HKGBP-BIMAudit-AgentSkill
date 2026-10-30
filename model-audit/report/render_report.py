@@ -35,6 +35,7 @@ METHOD_EN = {"manual": "Manual (Revit)", "function-b": "Function B (model prepar
              "external": "External information"}
 REASON_EN = {"source": "Source text not available", "data": "Project information not available",
              "tool": "Cannot be read by the tool"}
+VIEW_TYPE = re.compile(r"\s*\([A-Z][A-Za-z]+\)$")   # a trailing Revit view-type enum such as "(FloorPlan)"
 KIND_EN = {"sheet": "Sheet", "view": "View", "level": "Level", "scheme": "Area scheme", "schedule": "Schedule",
            "room": "Room", "element": "Element", None: "Object"}
 ICON_COPY = ('<svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5">'
@@ -230,14 +231,15 @@ def plate(i):
     else:
         bits.append("no Revit ID · find by name")
     cls = "plate" + ("" if i.get("element_id") else " no-id")
-    name = html.escape(i["object"] or "—")
+    name = html.escape(VIEW_TYPE.sub("", i["object"] or "") or "—")   # "(FloorPlan)": the line below already says View
     return f'<span class="{cls}" title="{attr(i["object"])}"><span class="plate-name">{name}</span><span class="plate-line">{" · ".join(bits)}</span></span>'
 
 
 def obj_row(c, i, n):
     """One object to fix or check: Fixed mark, plate, expected → actual, copy actions."""
     exp, act = c.text(i.get("expected")), c.text(i.get("actual"))
-    what = (f'{exp}<span class="arrow-r" aria-label="actual">→</span>{act}' if exp and act else act or exp or c.text(i.get("status")))
+    what = (f'<span class="muted">expected</span> {exp} · <span class="muted">found</span> {act}' if exp and act
+            else act or exp or c.text(i.get("status")))
     key = f'{i["id"]}#{n}'
     label = f'Mark {html.escape(i["object"] or "this object")} as fixed'
     copy_id = (f'<button type="button" class="btn" data-copy="{attr(i["element_id"])}" data-copied="Revit ID copied">{ICON_COPY}Copy ID</button>'

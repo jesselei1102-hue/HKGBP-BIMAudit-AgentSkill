@@ -1,7 +1,7 @@
 // The window: a run sheet at the top (what will run, what it will produce, where the results go, and the one Run button),
 // then the checks by BIMGBPS section, then the outputs. After Run it says what happens next; the reports carry the results.
 import type { App } from "@modelcontextprotocol/ext-apps";
-import { sendToChat } from "./chat";
+import { copyText, sendToChat } from "./chat";
 import { singleFlight } from "./logic/once";
 import { joinPath, OUTPUTS, runPrompt, type OutputId } from "./logic/prompts";
 import { groupsFor, sectionState, toggleSection, toggleTask } from "./logic/selection";
@@ -166,8 +166,8 @@ export function renderChoose(app: App, data: ChooseData, view: HTMLElement, onSt
           <dt>Outputs</dt><dd>${escapeHtml(outs.map((o) => o.label).join(" · "))}</dd><span></span>
           <dt>Results</dt><dd><span class="mono">${escapeHtml(dir)}</span></dd><span></span>
         </dl>
-        <div class="go"><span class="why">${sent ? "Sent to the agent." : "Not sent: paste the instruction below into the chat."}</span>
-          <button class="db pri" type="button" disabled>${sent ? "Sent" : "Not sent"}</button></div>
+        <div class="go"><span class="why" data-k="sent-state">${sent ? "Sent to the agent." : "Not sent: this chat does not accept messages from the window. Copy the instruction and paste it into the chat."}</span>
+          ${sent ? "" : '<button class="db pri" type="button" data-k="copy-instr">Copy instruction</button>'}</div>
       </section>
       <div class="next">
         <div class="next-step now"><b>The agent reads the model and runs the checks</b>
@@ -180,6 +180,11 @@ export function renderChoose(app: App, data: ChooseData, view: HTMLElement, onSt
                   <pre class="mono pane-why" data-k="sent-text" hidden>${escapeHtml(text)}</pre>` : ""}
       </div>`;
     if (box) view.append(box);
+    view.querySelector('[data-k="copy-instr"]')?.addEventListener("click", async (e) => {
+      const btn = e.currentTarget as HTMLButtonElement;
+      const ok = await copyText(text, view);
+      btn.textContent = ok ? "Copied: paste it into the chat" : "Press Ctrl+C to copy";
+    });
     view.querySelector('[data-k="show-sent"]')?.addEventListener("click", () => {
       const pre = view.querySelector<HTMLElement>('[data-k="sent-text"]')!;
       pre.hidden = !pre.hidden;

@@ -69,10 +69,14 @@
 /* ---------- Prompt fallback (host cannot send messages) ---------- */
 .prompt-box { margin: 12px 16px 0; padding: 12px 14px; border: 0.5px solid var(--line2); border-radius: 10px; background: var(--s1); }
 .prompt-box p { margin: 0 0 8px; color: var(--tx2); font-size: 12px; }
+.prompt-box .copy-btn { margin-top: 8px; font: inherit; font-size: 12px; font-weight: 500; color: var(--accent-tx);
+                         border: 0.5px solid var(--accent); border-radius: 99px; padding: 6px 14px; background: var(--bg); cursor: pointer; }
+.prompt-box .copy-btn:hover { background: var(--accent-soft); }
 .prompt-box textarea { width: 100%; min-height: 96px; resize: vertical; font-family: var(--mono); font-size: 12px; color: var(--tx);
                        background: var(--bg); border: 0.5px solid var(--line); border-radius: 6px; padding: 8px; box-sizing: border-box; }
 
 @media (max-width: 560px) {
+  .orbit-clip { display: none; }      /* the orbit would sit on the title in a narrow window */
   .layout { grid-template-columns: 1fr; }
   .side { flex-direction: row; flex-wrap: wrap; border-right: 0; border-bottom: 0.5px solid var(--line); }
   .side-item { flex: 0 0 auto; padding: 5px 9px; border-radius: 14px; background: var(--s1); font-size: 12px; }

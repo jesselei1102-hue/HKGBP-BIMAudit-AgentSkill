@@ -334,9 +334,10 @@ def main():
                  "package_version": "Model Audit package 2026-10-14 (executable specs, --tasks)", "filled_by": "script"},
         "verdict": {"submittable": not blockers and not majors and not partial_tasks,
                     "summary": ("Partial audit: only %s checked, so this report cannot say whether the package can be "
-                                "submitted. " % ", ".join(t.replace("AUD-", "") for t in partial_tasks) if partial_tasks else "")
-                               + "%d tasks audited by measurement; %d findings (%d Blocker, %d Major). Group reports hold every check."
-                               % (len(tasks), len(findings), len(blockers), len(majors)),
+                                "submitted. " % ", ".join(tls.get(t, t) for t in partial_tasks) if partial_tasks else "")
+                               + "%d task%s checked; %d finding%s (%d Blocker, %d Major)."
+                               % (len(tasks), "" if len(tasks) == 1 else "s", len(findings), "" if len(findings) == 1 else "s",
+                                  len(blockers), len(majors)),
                     "reasons": reasons},
         "a1": a1, "tasks": sorted(tasks.values(), key=lambda t: t["id"]), "findings": findings,
         "decisions": dec["decisions"],
