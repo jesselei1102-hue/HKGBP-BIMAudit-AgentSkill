@@ -29,7 +29,7 @@ import sys
 from collections import Counter
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from mcp_formats import Out, Stop, check_complete, elements, files_for, length_mm, query_ids  # noqa: E402
+from mcp_formats import Out, Stop, area_m2, check_complete, elements, files_for, length_mm, query_ids  # noqa: E402
 
 PARAMS = {"scheme_id": "Area Scheme Id", "area": "Area", "number": "Number", "name": "Name", "level": "Level",
           "common_area": "Common Area", "gfa_summary": "GFA SUMMARY", "d22": "GFA DEDUCT 2.2", "d23": "GFA DEDUCT 2.3",
@@ -81,6 +81,8 @@ def run(a):
         if not p:
             return ""
         if p["display"] is not None:
+            if key in lengths and re.search(r"['\"]", str(p["display"])):         # feet-inches text -> mm
+                return length_mm(dict(p, value=None), "area %d %s" % (e["id"], P[key]), warn)
             return p["display"]
         v = p.get("value")
         if v in (None, ""):
@@ -90,6 +92,11 @@ def run(a):
         return str(v)
 
     num = lambda s: re.sub(r"[^\d.\-]", "", s or "")
+
+    def m2(e):
+        """Area in m² (an area shown in SF is converted, not read as m²); '' when the Area has none (not placed)."""
+        p = e["params"].get(P["area"])
+        return area_m2(p, "area %d" % e["id"]) if p and (p["display"] or p.get("value") not in (None, "")) else ""
 
     def yes(e, key):
         p = e["params"].get(P[key]) or {}
@@ -102,21 +109,21 @@ def run(a):
             bad.append(e["id"])
             continue
         lo, hi = e["bb"] if e["bb"] else ({}, {})
-        rows.append([e["id"], schemes[int(sid)], disp(e, "level"), disp(e, "name"), num(disp(e, "area")), disp(e, "number"),
+        rows.append([e["id"], schemes[int(sid)], disp(e, "level"), disp(e, "name"), m2(e), disp(e, "number"),
                      disp(e, "common_area"), yes(e, "gfa_summary"), yes(e, "d22"), yes(e, "d23"), yes(e, "d21"),
                      yes(e, "d25"), yes(e, "d27"), num(disp(e, "served_facade")), disp(e, "frr"), disp(e, "compartment"),
                      num(disp(e, "frc_height")), num(disp(e, "perimeter")), disp(e, "area_type"),
                      "%.2f" % lo.get("x", 0), "%.2f" % lo.get("y", 0), "%.2f" % hi.get("x", 0), "%.2f" % hi.get("y", 0)])
     if bad:
         raise Stop("Areas whose scheme is not among the schemes read: %s" % ", ".join(map(str, bad[:20])))
-    placed = [e for e in plines if num(disp(e, "area"))]
+    placed = [e for e in plines if m2(e)]
     if len(placed) < len(plines):
         warn.append("property lines without an area (not placed) left out: %s"
                     % ", ".join(str(e["id"]) for e in plines if e not in placed))
     if not placed:
         warn.append("no property line with an area - S02 site area checks will have nothing to compare with")
     for e in placed:
-        rows.append([e["id"], "(property line)", "", "Property", num(disp(e, "area"))] + [""] * 18)
+        rows.append([e["id"], "(property line)", "", "Property", m2(e)] + [""] * 18)
     rows.sort(key=lambda r: r[0])
     out.files["areas.tsv"] = "\t".join(HEAD) + "\n" + "".join("\t".join(str(x) for x in r) + "\n" for r in rows)
     out.files["area_schemes.tsv"] = "id\tname\tareas\n" + "".join(

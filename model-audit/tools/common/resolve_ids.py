@@ -31,10 +31,11 @@ def _rows(path):
 
 class Index:
     def __init__(self):
-        self.sheets = {}                      # number -> id
+        self.sheets = {}                      # number -> {id} (one number can be on several sheets in Revit 2025+)
         self.views = {}                       # name -> {(id, sheet)}
         self.named = {k: {} for k in ("level", "scheme", "schedule", "room")}   # name -> {id}
         self.rasters = {}                     # file name -> id
+        self.by_id = {}                       # id -> (kind, sheet): what an ID the analyser recorded is
 
     def add(self, kind, name, ident):
         name, ident = (name or "").strip(), str(ident or "").strip()
@@ -47,7 +48,7 @@ def build_index(raw_dirs):
     for raw in raw_dirs:
         for r in _rows(os.path.join(raw, "views_on_sheets.tsv")):
             if r.get("sheet") and r.get("sheet_id"):
-                ix.sheets[r["sheet"].strip()] = r["sheet_id"].strip()
+                ix.sheets.setdefault(r["sheet"].strip(), set()).add(r["sheet_id"].strip())
             if r.get("view_name") and r.get("view_id"):
                 ix.views.setdefault(r["view_name"].strip(), set()).add((r["view_id"].strip(), (r.get("sheet") or "").strip() or None))
         for r in _rows(os.path.join(raw, "view_props.tsv")):
@@ -56,7 +57,7 @@ def build_index(raw_dirs):
         for p in glob.glob(os.path.join(raw, "sheets", "*")):
             m = SHEET_FILE.search(os.path.basename(p))
             if m:
-                ix.sheets.setdefault(m.group(2), m.group(1))
+                ix.sheets.setdefault(m.group(2), set()).add(m.group(1))
         for r in _rows(os.path.join(raw, "levels.tsv")):
             ix.add("level", r.get("name"), r.get("id"))
         for r in _rows(os.path.join(raw, "area_schemes.tsv")):
@@ -73,6 +74,16 @@ def build_index(raw_dirs):
     for name, hits in ix.views.items():
         with_sheet = {i for i, s in hits if s}
         ix.views[name] = {(i, s) for i, s in hits if s or i not in with_sheet}
+    for number, ids in ix.sheets.items():
+        for i in ids:
+            ix.by_id[i] = ("sheet", number)
+    for hits in ix.views.values():
+        for i, s in hits:
+            ix.by_id[i] = ("view", s)
+    for kind, names in ix.named.items():
+        for ids in names.values():
+            for i in ids:
+                ix.by_id.setdefault(i, (kind, None))
     return ix
 
 
@@ -113,8 +124,9 @@ def resolve(text, ix):
             hit = _view(ix, rest, number)
             if hit:
                 return hit
-        if number in ix.sheets:
-            return ix.sheets[number], "sheet", number
+        sheet = _one(ix.sheets.get(number))
+        if sheet:
+            return sheet, "sheet", number
     lv = _level(ix, t)
     if lv:
         return lv, "level", None
@@ -133,14 +145,15 @@ def fill(checks, ix):
     """Add object_id / object_kind / sheet / id_from to the checks in place; returns how many IDs were looked up."""
     n = 0
     for c in checks:
-        ident, kind, sheet = resolve(c.get("object"), ix)
         if c.get("object_id") not in (None, ""):
             c.setdefault("id_from", "analysis")     # a second run keeps "lookup"
+            kind, sheet = ix.by_id.get(str(c["object_id"]).strip(), (None, None))   # what this ID is, not what the text matched
             if kind and not c.get("object_kind"):
                 c["object_kind"] = kind
             if sheet and not c.get("sheet"):
                 c["sheet"] = sheet
             continue
+        ident, kind, sheet = resolve(c.get("object"), ix)
         if ident:
             c.update(object_id=ident, object_kind=kind, id_from="lookup")
             if sheet:

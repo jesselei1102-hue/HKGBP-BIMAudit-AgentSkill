@@ -166,18 +166,31 @@ def area_m2(p, what):
     raise Stop("%s: area '%s' is not in m² and has no internal value" % (what, disp))
 
 
+FEET_INCHES = re.compile(r"""^\s*(?:(-?\d+(?:\.\d+)?)\s*')?\s*-?\s*(?:(\d+(?:\.\d+)?)?(?:\s*(\d+)/(\d+))?\s*")?\s*$""")
+
+
+def feet_inches_mm(text):
+    """Revit feet-inches text (1' - 9 11/16", 0' - 4", 5 1/2") in mm, or None when it is not that."""
+    m = FEET_INCHES.match(str(text or ""))
+    if not m or not any(m.groups()):
+        return None
+    ft, inch, num_, den = m.groups()
+    inches = float(inch or 0) + (float(num_) / float(den) if den and float(den) else 0)
+    return round((abs(float(ft or 0)) * 12 + inches) * 25.4) * (-1 if (ft or "").startswith("-") else 1)
+
+
 def length_mm(p, what, warn):
     """Length in mm as displayed; checked against the internal value (feet) when the MCP gives one."""
     if not p or p["display"] in (None, ""):
         return ""
     disp = str(p["display"])
-    shown = number(disp) if not re.search(r"['\"]|ft|in\b", disp) else None
+    shown = number(disp) if not re.search(r"['\"]|ft|in\b", disp) else feet_inches_mm(disp)
     internal = round(float(p["value"]) * FT_MM) if p.get("value") not in (None, "") and number(p["value"]) is not None else None
     if shown is not None and internal is not None and abs(shown - internal) > 1:
         warn.append("%s: shows %s but the internal value is %d mm - internal value used" % (what, disp, internal))
         return str(internal)
     if shown is not None:
-        return first_token(disp)
+        return first_token(disp) if not re.search(r"['\"]", disp) else str(shown)
     if internal is not None:
         return str(internal)
     raise Stop("%s: '%s' cannot be read in mm" % (what, disp))

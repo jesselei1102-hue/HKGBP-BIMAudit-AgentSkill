@@ -26,7 +26,7 @@ mcp-servers-for-revit has no get_sheets / get_views_on_sheets; save instead:
 Output rules:
   views_on_sheets.tsv  sheet_id, sheet number, view_id, view name, view type, outline min / max y (sheet feet, 3 dp);
                        title-block revision schedules ('<Revision Schedule>') left out unless --keep-revision-schedules
-  view_props.tsv       view_id, name, view type name, sheet, scale (1:n -> n, custom scale -> 'custom'), template,
+  view_props.tsv       view_id, name, view type name, sheet, scale (1:n or 1/8" = 1'-0" -> n, custom -> 'custom'), template,
                        title on sheet.  Type names that Revit stores with leading control characters (system section /
                        elevation types) are cleaned and prefixed with the view type, e.g. 'Section (ARC_gbp)'.
   view_counts.json     {view id: categoryBreakdown} for every view_counts_<id> file
@@ -213,6 +213,10 @@ def run(a):
             scale = e["params"].get("View Scale") or {}
             sv = str(scale.get("value") if scale.get("value") not in (None, "") else (scale.get("display") or "")).strip()
             sv = "custom" if sv in ("-1", "Custom", "custom") else (re.sub(r".*:\s*", "", sv) if ":" in sv else sv)
+            imp = re.match(r"""^\s*(\d+)(?:/(\d+))?\s*"\s*=\s*(\d+)\s*'\s*-?\s*(\d+)?\s*"?\s*$""", sv)
+            if imp:                                                     # 1/8" = 1'-0" (model in feet) -> 96
+                num_, den, ft, inch = imp.groups()
+                sv = "%g" % ((int(ft) * 12 + int(inch or 0)) / (int(num_) / int(den or 1)))
             own = pdisp(e, "Sheet Number")
             sheet = own if own not in (None,) + NO_SHEET else first_sheet.get(e["id"], "")
             rows.append([e["id"], e["name"], clean_type(e["type"], vtype.get(e["id"])), sheet, sv,
