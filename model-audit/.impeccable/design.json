@@ -1,0 +1,757 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-30T02:09:32+00:00",
+  "title": "Design System: GBP Model Audit",
+  "extensions": {
+    "colorMeta": {
+      "sign-blue": {
+        "role": "primary",
+        "displayName": "Direction-Sign Blue",
+        "canonical": "#17407a",
+        "tonalRamp": [
+          "#010a1f",
+          "#0e2545",
+          "#24426e",
+          "#3b619a",
+          "#5b83be",
+          "#84a7d9",
+          "#afcbf5",
+          "#daf0ff"
+        ]
+      },
+      "sign-blue-deep": {
+        "role": "secondary",
+        "displayName": "Night Sign Blue",
+        "canonical": "#0f2f5c",
+        "tonalRamp": [
+          "#020b1c",
+          "#13253f",
+          "#2a4266",
+          "#43628f",
+          "#6384b3",
+          "#8ba7d0",
+          "#b4cbed",
+          "#def0ff"
+        ]
+      },
+      "sign-mist": {
+        "role": "secondary",
+        "displayName": "Sign Mist",
+        "canonical": "#c9d6ea",
+        "tonalRamp": [
+          "#080b11",
+          "#20252e",
+          "#3a424f",
+          "#586272",
+          "#788394",
+          "#9ca6b4",
+          "#c2cad6",
+          "#e9eff8"
+        ]
+      },
+      "sheet-white": {
+        "role": "neutral",
+        "displayName": "Sheet White",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#a5a5a5",
+          "#c9c9c9",
+          "#eeeeee"
+        ]
+      },
+      "sheet-paper": {
+        "role": "neutral",
+        "displayName": "Sheet Paper",
+        "canonical": "#f3f5f8",
+        "tonalRamp": [
+          "#0b0b0c",
+          "#242526",
+          "#414244",
+          "#606164",
+          "#818285",
+          "#a4a5a7",
+          "#c8c9cb",
+          "#edeef0"
+        ]
+      },
+      "plate-ink": {
+        "role": "neutral",
+        "displayName": "Plate Ink",
+        "canonical": "#121519",
+        "tonalRamp": [
+          "#0a0b0d",
+          "#232528",
+          "#3f4246",
+          "#5e6166",
+          "#7f8388",
+          "#a2a5aa",
+          "#c7c9cd",
+          "#edeff1"
+        ]
+      },
+      "ink-secondary": {
+        "role": "neutral",
+        "displayName": "Ink Secondary",
+        "canonical": "#3e4650",
+        "tonalRamp": [
+          "#090b0f",
+          "#21252b",
+          "#3d434a",
+          "#5a626c",
+          "#7b838d",
+          "#9fa6af",
+          "#c4cad1",
+          "#eaeff5"
+        ]
+      },
+      "ink-muted": {
+        "role": "neutral",
+        "displayName": "Ink Muted",
+        "canonical": "#5a636d",
+        "tonalRamp": [
+          "#080b0f",
+          "#21262b",
+          "#3c434a",
+          "#5a626b",
+          "#7b838d",
+          "#9ea6ae",
+          "#c4cad1",
+          "#eaeff4"
+        ]
+      },
+      "rule-line": {
+        "role": "neutral",
+        "displayName": "Rule Line",
+        "canonical": "#d6dbe1",
+        "tonalRamp": [
+          "#0a0b0d",
+          "#232528",
+          "#3f4246",
+          "#5e6266",
+          "#7f8388",
+          "#a2a5aa",
+          "#c6c9cd",
+          "#eceff1"
+        ]
+      },
+      "rule-line-strong": {
+        "role": "neutral",
+        "displayName": "Rule Line Strong",
+        "canonical": "#b9c0c8",
+        "tonalRamp": [
+          "#090b0e",
+          "#222529",
+          "#3e4248",
+          "#5c6268",
+          "#7d838a",
+          "#a0a6ac",
+          "#c5cace",
+          "#ebeff3"
+        ]
+      },
+      "state-fail": {
+        "role": "tertiary",
+        "displayName": "Fail Red",
+        "canonical": "#b3261e",
+        "tonalRamp": [
+          "#240000",
+          "#4d0001",
+          "#7b1510",
+          "#ab2d23",
+          "#d35345",
+          "#ee8173",
+          "#ffaea1",
+          "#ffdbd0"
+        ]
+      },
+      "state-fail-tint": {
+        "role": "tertiary",
+        "displayName": "Fail Tint",
+        "canonical": "#fbe9e7",
+        "tonalRamp": [
+          "#0f0a09",
+          "#2b2322",
+          "#4a3f3e",
+          "#6b5d5c",
+          "#8d7e7d",
+          "#aea2a0",
+          "#d1c6c5",
+          "#f4eceb"
+        ]
+      },
+      "state-major": {
+        "role": "tertiary",
+        "displayName": "Major Red",
+        "canonical": "#9c2a1f",
+        "tonalRamp": [
+          "#210000",
+          "#480a06",
+          "#732219",
+          "#a23a2e",
+          "#c85d4e",
+          "#e5887a",
+          "#ffb3a6",
+          "#ffded4"
+        ]
+      },
+      "state-minor-tint": {
+        "role": "neutral",
+        "displayName": "Minor Tint",
+        "canonical": "#eceff2",
+        "tonalRamp": [
+          "#0a0b0c",
+          "#242526",
+          "#404244",
+          "#5f6164",
+          "#808385",
+          "#a3a5a7",
+          "#c7c9cb",
+          "#edeff0"
+        ]
+      },
+      "state-check": {
+        "role": "tertiary",
+        "displayName": "Unclear Amber",
+        "canonical": "#8a4b00",
+        "tonalRamp": [
+          "#1a0500",
+          "#3c1b00",
+          "#623504",
+          "#8b5118",
+          "#af723d",
+          "#cd986d",
+          "#ebbf9d",
+          "#ffe7cd"
+        ]
+      },
+      "state-check-tint": {
+        "role": "tertiary",
+        "displayName": "Check Tint",
+        "canonical": "#fdf1de",
+        "tonalRamp": [
+          "#0e0b06",
+          "#2a241c",
+          "#484135",
+          "#696051",
+          "#8b8171",
+          "#aca496",
+          "#cfc8bd",
+          "#f3eee5"
+        ]
+      },
+      "state-pass": {
+        "role": "tertiary",
+        "displayName": "Pass Green",
+        "canonical": "#1e6b34",
+        "tonalRamp": [
+          "#001101",
+          "#042e10",
+          "#184e27",
+          "#2e713f",
+          "#51945f",
+          "#7eb587",
+          "#aad6b1",
+          "#d7f9dc"
+        ]
+      },
+      "state-pass-tint": {
+        "role": "tertiary",
+        "displayName": "Pass Tint",
+        "canonical": "#e5f2e8",
+        "tonalRamp": [
+          "#090c09",
+          "#212722",
+          "#3c443e",
+          "#5a645c",
+          "#7b867d",
+          "#9fa8a1",
+          "#c4cbc5",
+          "#eaf0ec"
+        ]
+      },
+      "state-na": {
+        "role": "tertiary",
+        "displayName": "N/A Grey",
+        "canonical": "#56616c",
+        "tonalRamp": [
+          "#080c0f",
+          "#20262c",
+          "#3b434b",
+          "#58636d",
+          "#79848e",
+          "#9da6b0",
+          "#c2cad2",
+          "#e9eff5"
+        ]
+      },
+      "focus-blue": {
+        "role": "secondary",
+        "displayName": "Focus Blue",
+        "canonical": "#2a6fd6",
+        "tonalRamp": [
+          "#00072b",
+          "#002157",
+          "#0b3e86",
+          "#1e5db9",
+          "#4280e0",
+          "#71a6f7",
+          "#9fcbff",
+          "#cff1ff"
+        ]
+      },
+      "selection-blue": {
+        "role": "secondary",
+        "displayName": "Selection Blue",
+        "canonical": "#cfe0fb",
+        "tonalRamp": [
+          "#070b13",
+          "#1e2531",
+          "#384353",
+          "#556277",
+          "#75839a",
+          "#9aa6b9",
+          "#c0cada",
+          "#e7effc"
+        ]
+      },
+      "uv-bg": {
+        "role": "neutral",
+        "displayName": "Ultraviolet Ground",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#a5a5a5",
+          "#c9c9c9",
+          "#eeeeee"
+        ],
+        "darkScheme": "#0e0d14"
+      },
+      "uv-surface-1": {
+        "role": "neutral",
+        "displayName": "Ultraviolet Surface 1",
+        "canonical": "#f5f5f8",
+        "tonalRamp": [
+          "#0b0b0c",
+          "#252526",
+          "#424244",
+          "#616163",
+          "#828284",
+          "#a5a5a7",
+          "#c9c9cb",
+          "#eeeef0"
+        ],
+        "darkScheme": "#16151e"
+      },
+      "uv-surface-2": {
+        "role": "neutral",
+        "displayName": "Ultraviolet Surface 2",
+        "canonical": "#ececf1",
+        "tonalRamp": [
+          "#0b0b0c",
+          "#252527",
+          "#424245",
+          "#616165",
+          "#828286",
+          "#a5a5a8",
+          "#c9c9cc",
+          "#eeeef0"
+        ],
+        "darkScheme": "#1d1c27"
+      },
+      "uv-text": {
+        "role": "neutral",
+        "displayName": "Ultraviolet Text",
+        "canonical": "#121118",
+        "tonalRamp": [
+          "#0b0b0e",
+          "#252429",
+          "#424147",
+          "#616068",
+          "#82818a",
+          "#a5a4ac",
+          "#c9c8ce",
+          "#eeeef3"
+        ],
+        "darkScheme": "#ecebf3"
+      },
+      "uv-text-2": {
+        "role": "neutral",
+        "displayName": "Ultraviolet Text 2",
+        "canonical": "#5d5b6b",
+        "tonalRamp": [
+          "#0b0a10",
+          "#25242c",
+          "#42404c",
+          "#615f6e",
+          "#828090",
+          "#a5a3b1",
+          "#c9c8d3",
+          "#eeedf6"
+        ],
+        "darkScheme": "#9c9aae"
+      },
+      "uv-text-3": {
+        "role": "neutral",
+        "displayName": "Ultraviolet Text 3",
+        "canonical": "#9a98a8",
+        "tonalRamp": [
+          "#0b0a0f",
+          "#25242c",
+          "#42404b",
+          "#615f6d",
+          "#82808f",
+          "#a5a3b0",
+          "#c9c8d2",
+          "#eeedf5"
+        ],
+        "darkScheme": "#5f5d70"
+      },
+      "uv-accent": {
+        "role": "primary",
+        "displayName": "Ultraviolet",
+        "canonical": "#7b61ff",
+        "tonalRamp": [
+          "#0c0033",
+          "#240c63",
+          "#3f2697",
+          "#5d40ce",
+          "#7b66f6",
+          "#9c92ff",
+          "#c0bcff",
+          "#e7e6ff"
+        ],
+        "darkScheme": "#8f7bff"
+      },
+      "uv-accent-text": {
+        "role": "primary",
+        "displayName": "Ultraviolet Text Accent",
+        "canonical": "#5b41e0",
+        "tonalRamp": [
+          "#0b0034",
+          "#210c64",
+          "#3b2799",
+          "#5742d1",
+          "#7568f9",
+          "#9693ff",
+          "#bbbdff",
+          "#e3e7ff"
+        ],
+        "darkScheme": "#b3a6ff"
+      },
+      "uv-on-accent": {
+        "role": "neutral",
+        "displayName": "On Ultraviolet",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#a5a5a5",
+          "#c9c9c9",
+          "#eeeeee"
+        ],
+        "darkScheme": "#0e0d14"
+      },
+      "uv-danger": {
+        "role": "tertiary",
+        "displayName": "Ultraviolet Danger",
+        "canonical": "#e5484d",
+        "tonalRamp": [
+          "#260000",
+          "#500005",
+          "#7e0618",
+          "#b0202c",
+          "#d84a4d",
+          "#f47c78",
+          "#ffaaa5",
+          "#ffd8d3"
+        ],
+        "darkScheme": "#f0605f"
+      },
+      "uv-dock": {
+        "role": "neutral",
+        "displayName": "Dock",
+        "canonical": "#121118",
+        "tonalRamp": [
+          "#0b0b0e",
+          "#252429",
+          "#424147",
+          "#616068",
+          "#82818a",
+          "#a5a4ac",
+          "#c9c8ce",
+          "#eeeef3"
+        ],
+        "darkScheme": "#1d1c27"
+      },
+      "uv-dock-text": {
+        "role": "neutral",
+        "displayName": "Dock Text",
+        "canonical": "#f2f1f7",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#252527",
+          "#424145",
+          "#616065",
+          "#828186",
+          "#a5a4a9",
+          "#c9c8cc",
+          "#eeeef1"
+        ],
+        "darkScheme": "#ecebf3"
+      }
+    },
+    "typographyMeta": {
+      "report-display": {
+        "displayName": "Report Display",
+        "purpose": "Project name in the band."
+      },
+      "report-headline": {
+        "displayName": "Report Headline",
+        "purpose": "Section headings."
+      },
+      "report-title": {
+        "displayName": "Report Title",
+        "purpose": "Finding titles and sub-headings."
+      },
+      "report-body": {
+        "displayName": "Report Body",
+        "purpose": "Running text; leads 72ch, paragraphs 75ch."
+      },
+      "report-label": {
+        "displayName": "Report Label",
+        "purpose": "Section signs, buttons, segments, tags."
+      },
+      "plate-name": {
+        "displayName": "Plate Name",
+        "purpose": "Object name on a location plate."
+      },
+      "plate-line": {
+        "displayName": "Plate Line",
+        "purpose": "Kind, sheet and Revit ID under the plate name; ID at 700."
+      },
+      "window-title": {
+        "displayName": "Window Title",
+        "purpose": "App name in the header."
+      },
+      "window-headline": {
+        "displayName": "Window Headline",
+        "purpose": "Section heads below the run sheet."
+      },
+      "window-body": {
+        "displayName": "Window Body",
+        "purpose": "Default window text."
+      },
+      "window-mono-label": {
+        "displayName": "Window Mono Label",
+        "purpose": "Run-sheet terms, counts, file names, task codes, meta."
+      }
+    },
+    "shadows": [
+      {
+        "name": "band-separation",
+        "value": "0 2px 10px rgba(10,25,50,.18)",
+        "purpose": "Under the sticky report band only; removed in print."
+      },
+      {
+        "name": "plate-lip",
+        "value": "0 1px 0 rgba(0,0,0,.08)",
+        "purpose": "The mounted edge of a location plate."
+      },
+      {
+        "name": "uv-pop",
+        "value": "0 12px 32px rgba(18,17,24,0.14), 0 2px 6px rgba(18,17,24,0.06)",
+        "purpose": "Window popovers, light scheme (dark: 0 16px 40px rgba(0,0,0,0.55))."
+      },
+      {
+        "name": "uv-glow",
+        "value": "0 0 10px var(--accent)",
+        "purpose": "Dark scheme only: Run pill, signal dot, active tab rule."
+      }
+    ],
+    "motion": [
+      {
+        "name": "strike",
+        "value": "0.35s cubic-bezier(.16,1,.3,1)",
+        "purpose": "Fixed-row strike drawing across the plate; off under reduced motion."
+      },
+      {
+        "name": "toast",
+        "value": "opacity .18s ease-out, transform .25s cubic-bezier(.16,1,.3,1)",
+        "purpose": "Copy confirmation toast, shown 1.8s."
+      },
+      {
+        "name": "copied",
+        "value": "1.4s",
+        "purpose": "Button stays in Pass Green after a copy."
+      },
+      {
+        "name": "uv-spin",
+        "value": "0.9s linear infinite",
+        "purpose": "Window refresh icon while loading."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "report-stack-rows",
+        "value": "820px"
+      },
+      {
+        "name": "report-single-column",
+        "value": "640px"
+      },
+      {
+        "name": "window-narrow",
+        "value": "560px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Section Signs",
+      "kind": "nav",
+      "refersTo": "section-sign",
+      "description": "White-on-blue section links in the report band, each led by an arrow and followed by its count.",
+      "html": "<nav class=\"ds-signs\"><a href=\"#\"><svg class=\"ds-arrow\" viewBox=\"0 0 14 10\" aria-hidden=\"true\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\"><path d=\"M1 5h11M8.5 1.5L12 5 8.5 8.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>Fix list<span class=\"ds-n\">6</span></a><a href=\"#\"><svg class=\"ds-arrow\" viewBox=\"0 0 14 10\" aria-hidden=\"true\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\"><path d=\"M1 5h11M8.5 1.5L12 5 8.5 8.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>To check<span class=\"ds-n\">15</span></a><a href=\"#\"><svg class=\"ds-arrow\" viewBox=\"0 0 14 10\" aria-hidden=\"true\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\"><path d=\"M1 5h11M8.5 1.5L12 5 8.5 8.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>Tasks<span class=\"ds-n\">3</span></a></nav>",
+      "css": ".ds-signs{display:flex;gap:2px;background:#17407a;padding:0 10px;font-family:\"Segoe UI\",system-ui,-apple-system,\"Helvetica Neue\",Arial,sans-serif} .ds-signs a{color:#fff;text-decoration:none;font-size:13.5px;font-weight:600;padding:8px 10px 10px;border-bottom:3px solid transparent;white-space:nowrap} .ds-signs a:hover{border-bottom-color:#c9d6ea} .ds-signs a:focus-visible{outline:2px solid #2a6fd6;outline-offset:2px} .ds-n{font-weight:500;color:#c9d6ea;margin-left:5px;font-variant-numeric:tabular-nums} .ds-arrow{display:inline-block;width:14px;height:10px;margin-right:6px;vertical-align:-1px}"
+    },
+    {
+      "name": "Verdict Sign",
+      "kind": "custom",
+      "refersTo": "verdict-sign",
+      "description": "White verdict plate on the band: state mark, verdict words, severity counts.",
+      "html": "<div class=\"ds-band\"><div class=\"ds-verdict\"><span class=\"ds-mark\"></span>Not ready to submit<span class=\"ds-count\">14 Major · 10 Minor</span></div></div>",
+      "css": ".ds-band{background:#17407a;padding:14px 24px} .ds-verdict{display:inline-flex;align-items:center;gap:10px;background:#fff;color:#121519;border-radius:4px;padding:7px 12px 7px 10px;font:600 14px/1.3 \"Segoe UI\",system-ui,sans-serif;white-space:nowrap} .ds-mark{width:10px;height:10px;border-radius:2px;background:#b3261e} .ds-count{font-weight:500;color:#5a636d}"
+    },
+    {
+      "name": "Location Plate",
+      "kind": "custom",
+      "refersTo": "location-plate",
+      "description": "The street-name plate for an object: name above, kind, sheet and Revit ID below; dashed when there is no ID.",
+      "html": "<span class=\"ds-plate\"><span class=\"ds-pn\">A002 FFL 0.30 G/F</span><span class=\"ds-pl\">View · sheet A002 · ID <b>1071929</b></span></span> <span class=\"ds-plate ds-noid\"><span class=\"ds-pn\">Site area</span><span class=\"ds-pl\">Sheet · C001</span></span>",
+      "css": ".ds-plate{display:inline-block;min-width:220px;background:#fff;color:#121519;border:1.5px solid #121519;border-radius:3px;padding:5px 10px 4px;box-shadow:0 1px 0 rgba(0,0,0,.08);font-family:\"Segoe UI\",system-ui,sans-serif} .ds-noid{border-style:dashed} .ds-pn{display:block;font-size:14px;font-weight:650;line-height:1.3} .ds-pl{display:block;font-size:12px;line-height:1.35;color:#3e4650;margin-top:1px;font-variant-numeric:tabular-nums} .ds-pl b{font-weight:700;color:#121519}"
+    },
+    {
+      "name": "Report Button",
+      "kind": "button",
+      "refersTo": "report-button",
+      "description": "Quiet copy action with a stroked icon; turns green after a copy.",
+      "html": "<button class=\"ds-btn\"><svg viewBox=\"0 0 16 16\" aria-hidden=\"true\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><rect x=\"5.5\" y=\"5.5\" width=\"8\" height=\"8\" rx=\"1.2\"/><path d=\"M10.5 3.5v-.8a1.2 1.2 0 0 0-1.2-1.2H3.7a1.2 1.2 0 0 0-1.2 1.2v5.6a1.2 1.2 0 0 0 1.2 1.2h.8\"/></svg>Copy ID</button> <button class=\"ds-btn ds-done\"><svg viewBox=\"0 0 16 16\" aria-hidden=\"true\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><path d=\"M2.5 3.5h11v7h-6l-3 2.5v-2.5h-2z\" stroke-linejoin=\"round\"/></svg>Copy for agent</button>",
+      "css": ".ds-btn{font:600 13px/1.5 \"Segoe UI\",system-ui,sans-serif;display:inline-flex;align-items:center;gap:6px;cursor:pointer;border:1px solid #b9c0c8;background:#fff;color:#121519;border-radius:5px;padding:5px 10px} .ds-btn:hover{border-color:#3e4650} .ds-btn:focus-visible{outline:2px solid #2a6fd6;outline-offset:2px} .ds-btn svg{width:14px;height:14px} .ds-done{border-color:#1e6b34;color:#1e6b34}"
+    },
+    {
+      "name": "Report Primary Button",
+      "kind": "button",
+      "refersTo": "report-button-primary",
+      "description": "The one blue action per toolbar: Copy IDs in view.",
+      "html": "<button class=\"ds-btn-pri\"><svg viewBox=\"0 0 16 16\" aria-hidden=\"true\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><rect x=\"5.5\" y=\"5.5\" width=\"8\" height=\"8\" rx=\"1.2\"/><path d=\"M10.5 3.5v-.8a1.2 1.2 0 0 0-1.2-1.2H3.7a1.2 1.2 0 0 0-1.2 1.2v5.6a1.2 1.2 0 0 0 1.2 1.2h.8\"/></svg>Copy IDs in view</button>",
+      "css": ".ds-btn-pri{font:600 13px/1.5 \"Segoe UI\",system-ui,sans-serif;display:inline-flex;align-items:center;gap:6px;cursor:pointer;border:1px solid #17407a;background:#17407a;color:#fff;border-radius:5px;padding:5px 10px} .ds-btn-pri:hover{background:#0f2f5c} .ds-btn-pri:focus-visible{outline:2px solid #2a6fd6;outline-offset:2px} .ds-btn-pri svg{width:14px;height:14px}"
+    },
+    {
+      "name": "Filter Segments",
+      "kind": "chip",
+      "refersTo": "filter-segment-on",
+      "description": "Severity filter strip; the pressed segment fills signage blue.",
+      "html": "<span class=\"ds-seg\"><button aria-pressed=\"true\">All<span>6</span></button><button aria-pressed=\"false\">Major<span>4</span></button><button aria-pressed=\"false\">Minor<span>2</span></button></span>",
+      "css": ".ds-seg{display:inline-flex;border:1px solid #b9c0c8;border-radius:5px;overflow:hidden} .ds-seg button{font:13px/1.5 \"Segoe UI\",system-ui,sans-serif;border:0;border-right:1px solid #d6dbe1;background:#fff;color:#3e4650;padding:6px 11px;cursor:pointer} .ds-seg button:last-child{border-right:0} .ds-seg button[aria-pressed=true]{background:#17407a;color:#fff} .ds-seg button:focus-visible{outline:2px solid #2a6fd6;outline-offset:-2px} .ds-seg span{margin-left:5px;opacity:.8;font-variant-numeric:tabular-nums}"
+    },
+    {
+      "name": "Severity and Status Tags",
+      "kind": "chip",
+      "refersTo": "severity-major",
+      "description": "State words on tints; colour only reinforces the word.",
+      "html": "<span class=\"ds-t ds-blk\">Blocker</span> <span class=\"ds-t ds-maj\">Major</span> <span class=\"ds-t ds-min\">Minor</span> <span class=\"ds-t ds-unc\">Unclear</span> <span class=\"ds-t ds-pass\">Pass</span> <span class=\"ds-t ds-na\">N/A</span>",
+      "css": ".ds-t{display:inline-block;font:700 12px/1.5 \"Segoe UI\",system-ui,sans-serif;letter-spacing:.02em;border-radius:3px;padding:2px 7px} .ds-blk{background:#b3261e;color:#fff} .ds-maj{background:#fbe9e7;color:#9c2a1f} .ds-min{background:#eceff2;color:#3e4650} .ds-unc{background:#fdf1de;color:#8a4b00;font-weight:600;letter-spacing:0} .ds-pass{background:#e5f2e8;color:#1e6b34;font-weight:600;letter-spacing:0} .ds-na{background:#eceff2;color:#56616c;font-weight:600;letter-spacing:0}"
+    },
+    {
+      "name": "Fixed Row",
+      "kind": "custom",
+      "refersTo": "location-plate",
+      "description": "A ticked object keeps its place: plate dimmed and struck in Pass Green.",
+      "html": "<label class=\"ds-row\"><input type=\"checkbox\" checked><span class=\"ds-fp\"><b>A003 FFL 5.30 1/F</b><small>View · sheet A003 · ID 1068012</small></span><span class=\"ds-what\">expected 26 door tags · found 8 door tags</span></label>",
+      "css": ".ds-row{display:flex;gap:12px;align-items:center;font-family:\"Segoe UI\",system-ui,sans-serif} .ds-row input{width:18px;height:18px;accent-color:#1e6b34} .ds-row input:focus-visible{outline:2px solid #2a6fd6;outline-offset:2px} .ds-fp{position:relative;display:inline-block;border:1.5px solid #121519;border-radius:3px;padding:5px 10px 4px;opacity:.5} .ds-fp b{display:block;font-size:14px;font-weight:650} .ds-fp small{display:block;font-size:12px;color:#3e4650} .ds-fp::after{content:'';position:absolute;left:-4px;right:-4px;top:50%;height:2px;background:#1e6b34;transform-origin:left;animation:ds-strike .35s cubic-bezier(.16,1,.3,1) both} .ds-what{font-size:13.5px;color:#3e4650;opacity:.5;text-decoration:line-through;text-decoration-color:#1e6b34;text-decoration-thickness:2px} @keyframes ds-strike{from{transform:scaleX(0)}to{transform:scaleX(1)}} @media (prefers-reduced-motion:reduce){.ds-fp::after{animation:none}}"
+    },
+    {
+      "name": "Run Sheet",
+      "kind": "card",
+      "refersTo": "window-run-sheet",
+      "description": "The Ultraviolet dock opened up at the top of the window, with the one Run pill.",
+      "html": "<section class=\"ds-rs\"><dl><dt>Checks</dt><dd>Full audit · 37 of 37</dd><a href=\"#\">Change</a><dt>Outputs</dt><dd>BIM team report · AP / client report</dd><a href=\"#\">Change</a></dl><div class=\"ds-go\"><span>Ready to run.</span><button class=\"ds-run\">Run 37 checks</button></div></section>",
+      "css": ".ds-rs{padding:14px 16px 12px;border-radius:18px;background:var(--dock-bg,#121118);color:var(--dock-tx,#f2f1f7);font:13px/1.4 ui-sans-serif,system-ui,sans-serif} .ds-rs dl{margin:0;display:grid;grid-template-columns:max-content 1fr auto;gap:9px 16px;align-items:baseline} .ds-rs dt{font:11px ui-monospace,Menlo,Consolas,monospace;color:var(--dock-tx2,rgba(242,241,247,.62))} .ds-rs dd{margin:0} .ds-rs a{font-size:12px;color:var(--dock-tx2,rgba(242,241,247,.62));text-underline-offset:3px} .ds-rs a:hover{color:var(--dock-tx,#f2f1f7)} .ds-go{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:12px;padding-top:10px;border-top:.5px solid rgba(255,255,255,.1);font-size:12px;color:var(--dock-tx2,rgba(242,241,247,.62))} .ds-run{font:500 13px ui-sans-serif,system-ui,sans-serif;border:0;border-radius:99px;padding:8px 18px;background:var(--accent,#7b61ff);color:var(--on-accent,#fff);cursor:pointer;box-shadow:var(--glow,none)} .ds-run:hover{filter:brightness(1.08)} .ds-run:focus-visible{outline:2px solid var(--accent,#7b61ff);outline-offset:2px}"
+    },
+    {
+      "name": "Window Chip and Output Line",
+      "kind": "chip",
+      "refersTo": "window-chip-on",
+      "description": "Ultraviolet pill chips and the selectable output line with mono file name.",
+      "html": "<div class=\"ds-chips\"><button class=\"ds-chip ds-on\">Views</button><button class=\"ds-chip\">Schedules</button></div><label class=\"ds-out ds-sel\"><input type=\"checkbox\" checked><b>BIM team report</b><span class=\"ds-file\">report-bim.html</span><span class=\"ds-note\">Fix list with Revit IDs</span></label>",
+      "css": ".ds-chips{display:flex;gap:6px;margin-bottom:8px} .ds-chip{font:12px ui-sans-serif,system-ui,sans-serif;padding:5px 11px;border-radius:99px;border:.5px solid var(--line2,rgba(18,17,24,.16));background:none;color:var(--tx2,#5d5b6b);cursor:pointer} .ds-chip:hover{color:var(--tx,#121118);border-color:var(--tx3,#9a98a8)} .ds-chip:focus-visible{outline:2px solid var(--accent,#7b61ff);outline-offset:2px} .ds-on{background:var(--tx,#121118);color:var(--bg,#fff);border-color:transparent} .ds-out{display:grid;grid-template-columns:auto 1fr auto;gap:4px 10px;align-items:baseline;padding:9px 4px;border-bottom:.5px solid var(--line,rgba(18,17,24,.08));font:13px/1.4 ui-sans-serif,system-ui,sans-serif;color:var(--tx,#121118);cursor:pointer} .ds-sel{background:var(--accent-soft,rgba(123,97,255,.07))} .ds-out input{accent-color:var(--accent,#7b61ff);margin:0} .ds-out b{font-weight:500} .ds-file{font:11px ui-monospace,Menlo,Consolas,monospace;color:var(--tx3,#9a98a8)} .ds-note{grid-column:2/-1;font-size:12px;color:var(--tx2,#5d5b6b)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Road Signs to the Object",
+    "overview": "The package has two visual worlds with a hard boundary between them. The audit reports (`report/render_report.py` with the CSS and JS blocks of `templates/report-template.html`) live in Hong Kong road signage: a deep direction-sign blue band across the top carries the project, the verdict sign and the section signs in white, and everything below is a plain white sheet. Each object to fix is set on a street-name plate (black text in a thin black frame, object name above, kind, sheet and Revit ID on a smaller district line), so every finding reads as a destination with an address. The report is a working document kept open beside Revit: dense, flat, legible, with colour spent only on state.\n\nThe chat window (the `gbp-audit` MCP App, `app/app/`) keeps the operator's Ultraviolet theme, the brand commitment for MCP App windows: white or near-black ground, 0.5px hairlines, monospace metadata, one violet signal and a dark rounded dock. This build extended it without changing a token: the run sheet is the dock opened up at the top of the window, and the outputs are chosen as plain selectable lines. The window chooses; the reports carry the results. Neither world borrows from the other.",
+    "keyCharacteristics": [
+      "Report: blue signage band over one white sheet, in every colour scheme and in print.",
+      "Report: location plates for every object, with tabular figures for IDs.",
+      "Report: state colour only where it carries meaning, always beside its text.",
+      "Window: Ultraviolet tokens only, light and dark, hairline structure, mono labels.",
+      "Window: one primary action, the violet Run pill, sitting in the dark run sheet."
+    ],
+    "rules": [
+      {
+        "name": "The One Ground Rule",
+        "body": "The report keeps its white sheet in every colour scheme and in print (`color-scheme: light`, no dark block). A road sign does not invert at night.",
+        "section": "colors"
+      },
+      {
+        "name": "The Meaning-Only Colour Rule",
+        "body": "Red, amber, green and grey appear only on a status, a severity, the verdict mark, the fixed strike or the check notice, and every one of them sits beside its word. Colour alone never carries a status.",
+        "section": "colors"
+      },
+      {
+        "name": "The Variables-Only Rule",
+        "body": "Window components use only the Ultraviolet variables; `gbp.css` adds no colours of its own. Change the signal by editing the five accent variables in both scheme blocks.",
+        "section": "colors"
+      },
+      {
+        "name": "The Tabular Address Rule",
+        "body": "Every Revit ID, count and reading value uses tabular figures, so IDs line up down a column like house numbers.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat Sheet Rule",
+        "body": "Nothing on the report sheet floats. Cards, tables and the verdict sign are separated by hairlines or the paper tint, never by a shadow.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do put every object on a location plate with its Revit ID in tabular figures, and its finding code linked to its task card.",
+      "Do keep the report on the white sheet in dark mode and in print, with the band printed in colour.",
+      "Do show every status and severity as words on a tint; the tint only reinforces the word.",
+      "Do strike a fixed row through in Pass Green and leave it in place.",
+      "Do use stroked inline SVG icons (copy, agent, arrow) at 14px in the report and the Ultraviolet `svg.i` set at 14px in the window.",
+      "Do build window additions only from the Ultraviolet variables, at 0.5px hairlines, with mono for labels and counts."
+    ],
+    "donts": [
+      "Don't use Direction-Sign Blue for a status, or a state colour for wayfinding.",
+      "Don't colour a plate by its state; the plate is the address, the tag beside the finding is the state.",
+      "Don't add a dark scheme to the report.",
+      "Don't add shadows to anything on the report sheet beyond the band and the plate lip.",
+      "Don't bring Ultraviolet violet, pills or the dock into the reports, or the signage blue and plates into the window.",
+      "Don't add a second primary action to the window; Run (or Copy instruction) is the only accent fill.",
+      "Don't treat the system sans in the report as a house face to defend: if an embedded signage face can ship inside the self-contained file, it may replace it."
+    ]
+  }
+}

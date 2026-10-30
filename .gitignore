@@ -13,3 +13,8 @@
 /model-audit/app/vitest.config.ts
 __pycache__/
 *.pyc
+
+# Impeccable working files (local only)
+/model-audit/.impeccable/review/
+/model-audit/.impeccable/questions/
+/model-audit/.impeccable/hook.cache.json
