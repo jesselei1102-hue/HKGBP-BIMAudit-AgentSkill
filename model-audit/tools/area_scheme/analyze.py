@@ -275,11 +275,17 @@ def main():
          "BIMGBPS §5.3.5 (GEN-06)", tv=TV.get("pr"), tol=0.0006)
     O.eq("S05-T-gfa", "AUD-S05", "Table GFA equals the model", "C001", tot_a, tv("gfa"), "BIMGBPS §5.3.5 (GEN-06)", tv=TV.get("gfa"))
     gf_gross = gross.get("G/F", 0)
-    O.add("V09-C0", "AUD-V09", "Covered area is not smaller than the largest floor plate", "SC Area vs G/F gross",
-          "≥ %.3f" % max(gross.values()), round(sc_area, 3), "PASS" if sc_area >= max(gross.values()) - TOL else "UNCLEAR",
-          method="ARC_gbp_sc vs ARC_gbp_gfa", confidence="medium",
-          evidence="G/F gross %.3f m² is %.3f m² larger than the SC area" % (gf_gross, gf_gross - sc_area),
-          fix="Check which outline the SC area follows (external wall vs projection)")
+    if gross:
+        O.add("V09-C0", "AUD-V09", "Covered area is not smaller than the largest floor plate", "SC Area vs G/F gross",
+              "≥ %.3f" % max(gross.values()), round(sc_area, 3), "PASS" if sc_area >= max(gross.values()) - TOL else "UNCLEAR",
+              method="ARC_gbp_sc vs ARC_gbp_gfa", confidence="medium",
+              evidence="G/F gross %.3f m² is %.3f m² larger than the SC area" % (gf_gross, gf_gross - sc_area),
+              fix="Check which outline the SC area follows (external wall vs projection)")
+    else:
+        O.add("V09-C0", "AUD-V09", "Covered area is not smaller than the largest floor plate", "SC Area vs GFA",
+              "ARC_gbp_gfa floors", "no ARC_gbp_gfa areas in the model", "UNCLEAR",
+              method="ARC_gbp_sc vs ARC_gbp_gfa",
+              fix="This model has no ARC_gbp_gfa scheme, so the floor-plate comparison was not made")
     for basis, hkey in (("C001 height", "height_c001"), ("Development Schedule height", "height_devsched")):
         h = tv(hkey)
         if h is None:
@@ -497,7 +503,8 @@ def main():
                        "fail": sum(1 for c in O.checks if c["status"] == "FAIL"),
                        "unclear": sum(1 for c in O.checks if c["status"] == "UNCLEAR"),
                        "gfa": {"gross": round(tot_g, 3), "deductions": round(tot_d, 3), "accountable": round(tot_a, 3),
-                               "no_cap": round(nocap, 3), "capped": round(capd, 3), "capped_pct": round(pct, 3)},
+                               "no_cap": round(nocap, 3), "capped": round(capd, 3),
+                               "capped_pct": round(pct, 3) if pct is not None else None},
                        "data_quality_warnings": O.warnings}}
     out["readings"] = readings.listing(TV, a.raw, rejected=rejected)
     T.finish(out, wanted, GROUP, gp, TABLE_TASKS)
@@ -505,8 +512,8 @@ def main():
     with open(a.out, "w", encoding="utf-8") as fh:
         json.dump(out, fh, indent=1, ensure_ascii=False)
     T.print_summary(out, "G3 area-scheme")
-    print("GFA gross %.3f - deductions %.3f = accountable %.3f m² | no cap %.3f, capped %.3f (%.3f %%) | site %.3f m²"
-          % (tot_g, tot_d, tot_a, nocap, capd, pct, site))
+    print("GFA gross %.3f - deductions %.3f = accountable %.3f m² | no cap %.3f, capped %.3f (%s) | site %.3f m²"
+          % (tot_g, tot_d, tot_a, nocap, capd, ("%.3f %%" % pct) if pct is not None else "n/a", site))
     return 0
 
 
