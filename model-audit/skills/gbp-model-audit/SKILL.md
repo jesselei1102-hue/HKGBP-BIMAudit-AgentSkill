@@ -47,7 +47,7 @@ description: Use when asked to audit a Revit model for a Hong Kong GBP (general 
    python "<PKG>/report/render_report.py" --results <run>/audit-results.json --audience ap  --out <run>/report-ap.html
    ```
 
-   exit 2 = JSON 不合格，按 `INVALID` 行改；exit 3 = 缺截图。
+   出报告前先截不合格对象的图：`tools/common/shots.py plan`，逐行截图，再 `attach`（`<PKG>/RUN.md` §6e）。exit 2 = JSON 不合格，按 `INVALID` 行改；exit 3 = 缺截图。
 3. 回复操作者：能否原样提交、Blocker 清单、要 AP 决定的事、要提供的资料、两份报告路径。
 
 ## 4. 回归

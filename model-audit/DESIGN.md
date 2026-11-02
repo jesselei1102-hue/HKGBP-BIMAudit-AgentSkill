@@ -323,6 +323,9 @@ The street-name plate is the report's unit of address: white fill, 1.5px Plate I
 ### Fixed Row (signature)
 Ticking an object marks it fixed in this browser: the plate and description drop to 50% opacity, a 2px Pass Green line draws across the plate (0.35s, cubic-bezier(.16,1,.3,1), off under reduced motion) and the description is struck through in green. The row keeps its place; "Hide fixed" is the reader's choice.
 
+### Screenshot Thumbnail and Viewer
+Every row of a finding with screenshots leads with the same 96 by 72 thumbnail, centre-cropped, in a thin Rule Line Strong frame, so a long list keeps one column and one row height; a row without a capture keeps the column with a dashed "No screenshot" box. The drawing's own colours stay inside the frame and are never read as state. A room carries a red rectangle drawn into the image on its bounding box, and its thumbnail crops to that rectangle; this red marks where, not a status, and the viewer's caption says so. Clicking opens a native dialog: a blue head with the object, the rule and the view, Previous and Next through the rows the filters leave, and the image on white, fit to the window, with a click for actual size. The AP edition shows at most three per task.
+
 ### Verdict Sign
 A white plate on the band: a 10px square mark in the verdict's state colour, the verdict words at 14px/600, then the severity counts in muted text.
 

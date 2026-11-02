@@ -164,14 +164,54 @@ def main():
 
     # ------------------------------------------------------------ V02 floor plans
     plans = [r for r in vos if r["view_type"] == "FloorPlan" and not r["view_name"].endswith("_pat")]
+
+    def _is_part_plan(row):
+        return "part plan" in row["view_name"].lower() or "TR/F" in row["view_name"]
+
+    # Same-sheet main plans that carry grids — used so cropped part / TR·F plans
+    # can Pass without local grid bubbles when they are located off the main plan.
+    sheet_main_grids = {}
+    for x in plans:
+        if _is_part_plan(x):
+            continue
+        g = n(x["view_id"], "OST_Grids")
+        if g:
+            sheet_main_grids.setdefault(x["sheet"], []).append((x["view_name"], g))
+
     for r in plans:
         v = r["view_id"]
-        part = "part plan" in r["view_name"].lower() or "TR/F" in r["view_name"]
+        part = _is_part_plan(r)
         nm = vname[v]
-        O.add("V02-L2-%s" % v, "AUD-V02", "Grid lines shown", nm, "> 0", n(v, "OST_Grids"),
-              "PASS" if n(v, "OST_Grids") else "FAIL", cite="%s §5.2.2(b)" % BIMGBPS, method="query_model in the view",
-              fix="" if n(v, "OST_Grids") else "Show the grids in this view (or its crop) so the part plan can be located",
-              object_id=int(v))
+        grids = n(v, "OST_Grids")
+        dims = n(v, "OST_Dimensions")
+        mains = sheet_main_grids.get(r["sheet"], [])
+        if grids:
+            g_status, g_ev, g_fix = "PASS", "", ""
+            g_expected = "> 0"
+        elif part and mains and dims:
+            g_status = "PASS"
+            g_expected = "> 0 here, or locate via same-sheet main plan + dimensions"
+            g_ev = ("0 grids in this crop; same sheet main plan(s) with grids: %s; dimensions %d"
+                    % ("; ".join("%s (%d)" % t for t in mains), dims))
+            g_fix = ""
+        elif part and mains and not dims:
+            g_status = "UNCLEAR"
+            g_expected = "> 0 here, or locate via same-sheet main plan + dimensions / projection"
+            g_ev = ("0 grids in this crop; same sheet has main plan grids (%s) but this view has 0 dimensions — "
+                    "confirm projection / alignment lines on the sheet export"
+                    % "; ".join("%s (%d)" % t for t in mains))
+            g_fix = "Add dimensions on the part plan, or confirm sheet projection lines locate it"
+        else:
+            g_status = "FAIL"
+            g_expected = "> 0"
+            g_ev = ""
+            g_fix = ("Show the grids in this view (or its crop) so the plan can be located"
+                     if not part else
+                     "Show grids in this part plan, or place it on a sheet whose main plan already shows grids "
+                     "and dimension / project it from that main plan")
+        O.add("V02-L2-%s" % v, "AUD-V02", "Grid lines shown", nm, g_expected, grids,
+              g_status, cite="%s §5.2.2(b)" % BIMGBPS, method="query_model in the view; same-sheet main plan for part plans",
+              evidence=g_ev, fix=g_fix, object_id=int(v))
         O.add("V02-DIM-%s" % v, "AUD-V02", "Dimensions shown", nm, "> 0", n(v, "OST_Dimensions"),
               "PASS" if n(v, "OST_Dimensions") else "FAIL", cite="%s §5.2.2(d)(f)" % BIMGBPS, object_id=int(v))
         if not part:

@@ -19,6 +19,7 @@
            labels FACT / INFERENCE / GAP become Verified / Inferred / Not determinable;
            Decisions required and Information required come right after the verdict.
   Sheet readings are never checked by a person in this audit: list every one as "not checked by a person", with its crop.
+  An issue with `shot` shows its 96x72 thumbnail before the plate, linked to the full image in assets/; AP: at most three per task.
   Every status shows its text, not colour alone. All image paths are relative: assets/<file>.
 -->
 <style id="report-css">
@@ -114,6 +115,13 @@ p{max-width:75ch}
 .obj{display:grid;grid-template-columns:auto minmax(220px,340px) 1fr auto;gap:12px;align-items:center;
   padding:8px 0;border-top:1px dashed var(--line)}
 .obj:first-child{border-top:0}
+.with-shots .obj{grid-template-columns:auto 96px minmax(220px,340px) 1fr auto}
+.shot{display:block;width:96px;height:72px;border:1px solid var(--line-2);border-radius:3px;background:var(--ground);overflow:hidden;cursor:zoom-in}
+.shot img{display:block;width:100%;height:100%;object-fit:cover}
+a.shot:hover{border-color:var(--sign-text);outline:1px solid var(--sign-text)}
+.shot.none{display:flex;align-items:center;justify-content:center;text-align:center;border-style:dashed;
+  font-size:11.5px;line-height:1.25;color:var(--muted);padding:0 8px;cursor:default}
+.obj.fixed .shot{opacity:.5}
 .obj .tick{width:18px;height:18px;accent-color:var(--pass);cursor:pointer;margin:0}
 .obj .what{font-size:13.5px;color:var(--ink-2);min-width:0}
 .obj .acts{display:flex;gap:6px}
@@ -132,6 +140,24 @@ p{max-width:75ch}
 .plate-line{display:block;font-size:12px;line-height:1.35;color:#3e4650;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .plate-line .plate-id{font-weight:700;color:var(--plate-ink)}
 .plate.no-id{border-style:dashed}
+
+/* ---------- screenshot viewer: the object's plate over the drawing ---------- */
+.shots{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:8px}
+.shots-more{font-size:12.5px;color:var(--muted)}
+.viewer{width:min(1200px,calc(100vw - 32px));height:calc(100vh - 32px);max-width:none;max-height:none;margin:auto;padding:0;
+  border:0;border-radius:5px;background:var(--ground);color:var(--ink)}
+.viewer[open]{display:grid;grid-template-rows:auto 1fr}
+.viewer::backdrop{background:rgba(10,25,50,.72)}
+.v-head{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:10px 14px;background:var(--sign);color:var(--sign-ink)}
+.v-title{min-width:0}
+.v-name{display:block;font-size:14px;font-weight:650;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.v-sub{display:block;font-size:12.5px;color:var(--sign-soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.v-acts{display:flex;align-items:center;gap:6px}
+.v-pos{font-size:12.5px;color:var(--sign-soft);font-variant-numeric:tabular-nums;margin-right:6px;white-space:nowrap}
+.v-stage{min-height:0;overflow:auto;background:var(--ground);display:flex;cursor:zoom-in}
+.v-stage img{display:block;margin:auto;max-width:100%;max-height:100%}
+.v-stage.full{cursor:zoom-out}
+.v-stage.full img{max-width:none;max-height:none}
 
 /* ---------- readings to check ---------- */
 .readings{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin-top:10px}
@@ -184,8 +210,8 @@ details.task .inner{padding:4px 0 18px 5.2em}
 .about td:first-child{color:var(--muted);width:12em}
 
 @media (max-width:820px){
-  .obj{grid-template-columns:auto 1fr;grid-template-areas:"tick plate" ". what" ". acts"}
-  .obj .tick{grid-area:tick}.obj .plate{grid-area:plate}.obj .what{grid-area:what}.obj .acts{grid-area:acts}
+  .obj,.with-shots .obj{grid-template-columns:auto 1fr;grid-template-areas:"tick plate" ". what" ". shot" ". acts"}
+  .obj .tick{grid-area:tick}.obj .plate{grid-area:plate}.obj .what{grid-area:what}.obj .acts{grid-area:acts}.obj .shot{grid-area:shot}
   .objs{padding-left:0}
   details.task>summary{grid-template-columns:4.6em 1fr}
   details.task>summary .st{display:none}
@@ -206,7 +232,8 @@ details.task .inner{padding:4px 0 18px 5.2em}
 }
 @media print{
   .band{position:static;box-shadow:none;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .toolbar,.acts,.f-actions,.tick,.toast{display:none!important}
+  .toolbar,.acts,.f-actions,.tick,.toast,.viewer,.shot.none{display:none!important}
+  .with-shots .obj{grid-template-columns:96px minmax(220px,340px) 1fr;break-inside:avoid}
   details.task{break-inside:avoid-page}
   .finding{break-inside:avoid-page}
 }
@@ -297,6 +324,37 @@ details.task .inner{padding:4px 0 18px 5.2em}
   doc.querySelectorAll('.seg [data-sev]').forEach(function(b){b.addEventListener('click',function(){
     sev=b.dataset.sev;doc.querySelectorAll('.seg [data-sev]').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false');});apply();});});
   var qi=doc.querySelector('.toolbar [name="q"]');if(qi)qi.addEventListener('input',apply);
+  /* screenshot viewer: over the report, moving only through the rows the filters leave */
+  var viewer=null,cur=null;
+  function shotsInView(){return Array.prototype.filter.call(doc.querySelectorAll('a.shot[data-shot]'),function(a){return a.offsetParent!==null;});}
+  function buildViewer(){
+    viewer=doc.createElement('dialog');viewer.className='viewer';viewer.setAttribute('aria-label','Screenshot');
+    viewer.innerHTML='<div class="v-head"><div class="v-title"><span class="v-name"></span><span class="v-sub"></span></div><div class="v-acts"><span class="v-pos"></span>'
+      +'<button type="button" class="btn" data-go="-1">Previous</button><button type="button" class="btn" data-go="1">Next</button><button type="button" class="btn" data-close>Close</button></div></div>'
+      +'<div class="v-stage"><img alt=""></div>';
+    doc.body.appendChild(viewer);
+    viewer.addEventListener('click',function(ev){
+      if(ev.target===viewer){viewer.close();return;}
+      var go=ev.target.closest('[data-go]');if(go){step(+go.dataset.go);return;}
+      if(ev.target.closest('[data-close]')){viewer.close();return;}
+      if(ev.target.tagName==='IMG')ev.target.parentNode.classList.toggle('full');});
+    viewer.addEventListener('keydown',function(ev){if(ev.key==='ArrowRight')step(1);else if(ev.key==='ArrowLeft')step(-1);});
+    viewer.addEventListener('close',function(){if(cur)cur.focus();});
+  }
+  function show(a){
+    var list=shotsInView(),i=list.indexOf(a);cur=a;
+    viewer.querySelector('.v-name').textContent=a.dataset.name;
+    viewer.querySelector('.v-sub').textContent=a.dataset.rule+' · '+a.dataset.where;
+    viewer.querySelector('.v-pos').textContent=(i+1)+' of '+list.length;
+    viewer.querySelector('.v-stage').classList.remove('full');
+    var img=viewer.querySelector('.v-stage img');img.src=a.getAttribute('href');img.alt='Screenshot of '+a.dataset.name;
+    viewer.querySelectorAll('[data-go]').forEach(function(b){b.disabled=list.length<2;});
+  }
+  function step(d){var list=shotsInView(),i=list.indexOf(cur);if(list.length)show(list[(i+d+list.length)%list.length]);}
+  doc.addEventListener('click',function(ev){
+    var a=ev.target.closest('a.shot[data-shot]');
+    if(!a||!window.HTMLDialogElement||ev.ctrlKey||ev.metaKey||ev.shiftKey)return;
+    ev.preventDefault();if(!viewer)buildViewer();show(a);viewer.showModal();});
   /* links to a task open its card */
   function openTarget(){var id=decodeURIComponent(location.hash.slice(1));var el=id&&doc.getElementById(id);if(el&&el.tagName==='DETAILS')el.open=true;}
   window.addEventListener('hashchange',openTarget);openTarget();

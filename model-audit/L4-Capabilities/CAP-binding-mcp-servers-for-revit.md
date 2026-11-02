@@ -27,7 +27,7 @@ Layer 4。把 [CAP-catalog](CAP-catalog.md) 的能力 ID（摘自知识库 Capab
 | CAP-MEASURE-WIDTH | V02、S10 | 无（只能读门参数） | Partial | 待试 | — |
 | CAP-UI-SHOW | 人工复核时 | `select_elements`、`zoom_to_elements`、`open_view` | Full | 待试 | 只改界面显示，不改模型 |
 | CAP-EXPORT-TABLE | GEN-06 | `export_views`（CSV）；`get_schedule_data` | Partial | 实测 2026-10-14 | CSV 用制表符分隔（脚本已兼容） |
-| CAP-EXPORT-IMAGE | GEN-03、GEN-05、报告截图 | `export_views`（PNG） | Full | 待试 | — |
+| CAP-EXPORT-IMAGE | GEN-03、GEN-05、报告截图 | `export_views`（PNG；`VisibleRegion` 配 `zoom_to_elements` 截单个对象） | Full | 实测 2026-11-02 | 文件名在第一个点处截断（`FFL 0.png`）：每张存独立文件夹 |
 | CAP-EXPORT-PDF | A03 | `export_views`（PDF） | Partial | 待试 | — |
 
 ## 各组需要的能力与本 MCP 的情况

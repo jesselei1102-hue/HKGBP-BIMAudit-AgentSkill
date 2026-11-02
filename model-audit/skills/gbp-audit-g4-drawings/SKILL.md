@@ -12,6 +12,7 @@ description: Use when checking the drawings themselves in a Revit model for a Ho
 `<PKG>/L2-Task-Logic/Groups/G4_Drawings.md`。要点：
 
 - 能计数的用计数（每个图上视图的轴网、尺寸、标记数）；不能计数的读图，写 `readings.tsv`，**只对读过的图纸下结论**，没读的 → UNCLEAR。
+- **V02 局部 / TR·F 平面**：本视图轴网可为 0；同图纸主平面有轴网且本视图有尺寸 → Pass（靠主平面投影定位）；同图主平面也无轴网 → Fail。只标 FR 门 → Partial，不算整项硬 Fail。
 - 颜色只按像素取样判，不目测：Table 1 RGB 完全相等才 Pass；粉红占区域 < 20 % → Fail；灰阶 > 5 % 才算有半色调。
 - V13 要专门的规定窗图；S14 明细表不算图。
 - 不画区域框也能取色（整图统计判粉红有无、Table 1）；半色调要区域框。链接数写 `model_counts.json`，没有就 UNCLEAR。

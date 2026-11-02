@@ -582,6 +582,19 @@
               "null"
             ]
           },
+          "shot": {
+            "description": "Screenshot of the object, set by tools/common/shots.py attach. Files are in assets/; their names carry no Revit ID.",
+            "type": "object",
+            "required": ["file", "thumb", "view", "mode"],
+            "additionalProperties": false,
+            "properties": {
+              "file": {"type": "string"},
+              "thumb": {"type": "string"},
+              "view": {"type": "string"},
+              "mode": {"type": "string", "enum": ["view", "zoom"]},
+              "framed": {"type": "boolean"}
+            }
+          },
           "id_from": {
             "type": [
               "string",

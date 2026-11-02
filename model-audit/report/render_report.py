@@ -235,8 +235,25 @@ def plate(i):
     return f'<span class="{cls}" title="{attr(i["object"])}"><span class="plate-name">{name}</span><span class="plate-line">{" · ".join(bits)}</span></span>'
 
 
-def obj_row(c, i, n):
-    """One object to fix or check: Fixed mark, plate, expected → actual, copy actions."""
+def shot_caption(i):
+    s = i["shot"]
+    if s.get("framed"):
+        return f'In view {s["view"]}; the red frame marks this object'
+    return f'In view {s["view"]}, zoomed to this object' if s["mode"] == "zoom" else f'Whole view {s["view"]}'
+
+
+def shot_link(c, i):
+    """A fixed-size thumbnail that opens the full screenshot; one size for all, so the rows stay in line."""
+    s = i["shot"]
+    name = VIEW_TYPE.sub("", i["object"] or "")
+    return (f'<a class="shot" href="assets/{attr(s["file"])}" data-shot data-name="{c.text(name)}" data-rule="{c.text(i["rule"])}" '
+            f'data-where="{attr(shot_caption(i))}" aria-label="Open the screenshot of {c.text(name)}">'
+            f'<img src="assets/{attr(s["thumb"])}" loading="lazy" width="96" height="72" alt=""></a>')
+
+
+def obj_row(c, i, n, shots=False):
+    """One object to fix or check: Fixed mark, screenshot, plate, expected → actual, copy actions."""
+    shot = (shot_link(c, i) if i.get("shot") else '<span class="shot none">No screenshot</span>') if shots else ""
     exp, act = c.text(i.get("expected")), c.text(i.get("actual"))
     what = (f'<span class="muted">expected</span> {exp} · <span class="muted">found</span> {act}' if exp and act
             else act or exp or c.text(i.get("status")))
@@ -248,7 +265,7 @@ def obj_row(c, i, n):
     agent = f'<button type="button" class="btn" data-copy="{attr(agent_line(i))}" data-copied="Instruction copied: paste it to the agent">{ICON_AGENT}Copy for agent</button>'
     text = attr(" ".join(str(i.get(k) or "") for k in ("object", "actual", "element_id", "sheet")).lower())
     return (f'<li class="obj" data-key="{attr(key)}" data-id="{attr(i.get("element_id") or "")}" data-kind="{attr(i.get("kind") or "")}" '
-            f'data-text="{text}"><input type="checkbox" class="tick" aria-label="{label}">{plate(i)}'
+            f'data-text="{text}"><input type="checkbox" class="tick" aria-label="{label}">{shot}{plate(i)}'
             f'<span class="what">{what}</span><span class="acts">{copy_id}{agent}</span></li>')
 
 
@@ -288,10 +305,11 @@ def finding_block(c, rows, action):
     ids_btn = ('<span class="f-actions"><button type="button" class="btn" data-copy-ids>' + ICON_COPY + 'Copy IDs</button></span>'
                if any(i.get("element_id") for _, i in rows) else "")
     text = attr((head["rule"] + " " + " ".join(fixes) + " " + head["tl"]).lower())
-    objs = "".join(obj_row(c, i, k) for k, i in rows)
+    shots = any(i.get("shot") for _, i in rows)
+    objs = "".join(obj_row(c, i, k, shots) for k, i in rows)
     return (f'<article class="finding" data-sev="{attr(sev or "check")}" data-task="{attr(task)}" data-text="{text}">'
             f'<div class="f-head">{sev_html}<h3>{code} · {c.text(head["rule"])}</h3>{ids_btn}'
-            f'<p class="f-meta">{" · ".join(meta)}</p>{fix_html}</div><ul class="objs">{objs}</ul></article>')
+            f'<p class="f-meta">{" · ".join(meta)}</p>{fix_html}</div><ul class="objs{" with-shots" if shots else ""}">{objs}</ul></article>')
 
 
 def evidence_html(c, ids):
@@ -358,7 +376,9 @@ def s_fix(c):
            f'<button type="button" class="btn primary" data-copy-ids>{ICON_COPY}Copy IDs in view</button></div>')
     lead = (f'<p class="lead">{len(issues)} object{"s" if len(issues) != 1 else ""} to fix in {len(groups)} finding'
             f'{"s" if len(groups) != 1 else ""}; {with_id} with a Revit ID. Paste IDs into Revit (Manage › Select by ID, '
-            f'several at once separated by “;”), or copy one line for the agent. Fixed marks stay in this browser.</p>')
+            f'several at once separated by “;”), or copy one line for the agent. Fixed marks stay in this browser.'
+            + (" Click a screenshot to enlarge it; the arrow keys move between objects." if any(i.get("shot") for i in issues) else "")
+            + '</p>')
     body = "".join(finding_block(c, g, "fix") for g in groups)
     return (f'<section id="fix"><h2>Fix list</h2>{lead}{bar}{body}'
             '<p id="fix-empty" class="empty" hidden>Nothing matches these filters.</p></section>')
@@ -553,6 +573,19 @@ def s_verdict(c):
             + (f'<h3>Main reasons</h3><ol class="verdict-list">{reasons}</ol>' if reasons else "") + "</section>")
 
 
+def ap_shots(c, t):
+    """AP edition: at most three locations per task, one per file; the BIM team edition has them all."""
+    seen = {}
+    for i in issues_of(c.r):
+        if i["task"] == t["id"] and i.get("shot") and c.show(i):
+            seen.setdefault(i["shot"]["file"], i)
+    if not seen:
+        return ""
+    more = len(seen) - 3
+    tail = f'<span class="shots-more">and {more} more location{"s" if more != 1 else ""}</span>' if more > 0 else ""
+    return '<div class="shots">' + "".join(shot_link(c, i) for i in list(seen.values())[:3]) + tail + "</div>"
+
+
 def s_problems(c):
     rows = []
     for t in sorted(c.r["tasks"], key=lambda t: task_order(t["id"])):
@@ -562,7 +595,7 @@ def s_problems(c):
         what = "<br>".join(f'<span class="sev sev-{f["severity"]}">{f["severity"]}</span> {c.text(f.get("title"))} '
                            f'<span class="muted">({html.escape(LABELS["ap"][f["label"]])})</span>' for f in fs)
         fix = "<br>".join(c.text(x["text"]) for x in t.get("fix", []) if c.show(x)) or "—"
-        rows.append([html.escape(c.tl(t["id"])), c.text(t["name"]), what, fix])
+        rows.append([html.escape(c.tl(t["id"])), c.text(t["name"]), what + ap_shots(c, t), fix])
     return ('<section id="problems"><h2>Problems by task</h2><p class="lead">What is wrong in the model, task by task, and the '
             'direction of the fix. The BIM team edition lists every object to fix.</p>'
             + (table(["Task", "Name", "What is wrong", "Direction of fix"], rows) if rows else "<p>None.</p>") + "</section>")
@@ -622,6 +655,8 @@ def main(argv):
     assets = Path(a.results).resolve().parent / "assets"
     missing = [e["file"] for e in results["evidence"] if not (assets / e["file"]).is_file()]
     missing += [x["crop"] for x in readings_of(results) if x.get("crop") and not (assets / x["crop"]).is_file()]
+    missing += sorted({f for i in issues_of(results) if i.get("shot") for f in (i["shot"]["file"], i["shot"]["thumb"])
+                       if not (assets / f).is_file()})
     if missing:
         for m in missing:
             print(f"MISSING ASSET {m}")

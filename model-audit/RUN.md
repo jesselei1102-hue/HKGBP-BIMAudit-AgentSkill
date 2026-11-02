@@ -56,7 +56,7 @@
 
 1. `assets/`：截图等证据。文件名 `<task>-<序号>-<kind>.png`；宽度不超过 1600 px。
 2. `audit-results.json`：按 [audit-results.schema.json](templates/audit-results.schema.json)；findings 按 [finding.schema.json](templates/finding.schema.json)。
-3. 两份报告：
+3. 两份报告（先按 §6e 截不合格对象的图）：
 
    ```
    python "Model Audit/report/render_report.py" --results audit-<date>/audit-results.json --audience bim --out audit-<date>/report-bim.html
@@ -82,6 +82,21 @@
 3. 每组出报告：`tools/s14_lv/report.py`（G1）或 `tools/common/task_report.py`（G2–G5）。
 4. 汇总：`python tools/common/build_results.py --out <run>/audit-results.json … --s14 … --group <JSON> <目录> …`。它按各组 `_raw/` 的提取表补上每个对象的 Revit ID（`tools/common/resolve_ids.py`），写出问题清单（`issues`，每个对象一行）与图纸读数（`readings`）。再按 §6 出所选输出：`report/render_report.py` 的 bim / ap 两份报告、`report/issue_list.py` 的 Excel 问题清单；总报告的证据链接各组 Excel / HTML。
 5. 范例：`work/model-audit-runs/audit-2026-10-13-full/`（36 个 Task + A1）。
+
+## 6e. 不合格对象的截图（§6 出报告之前）
+
+每个 Fail / Partial / Missing 对象一张截图，同一对象只截一次。视图切换和缩放只改界面，不改模型；做完切回原来的视图。
+
+1. 汇总之后：`python tools/common/shots.py plan --results <run>/audit-results.json --views <run>/_raw/views_on_sheets.tsv`，写出 `<run>/_raw/shots/plan.tsv`。`view_id` 空的行截不了，`note` 写了原因；能确定视图就补上，否则报告显示 No screenshot。
+2. 照 plan 逐行截，每张存进自己的文件夹 `<run>/_raw/shots/<element_id>/`（工具会截断文件名，同名会互相覆盖）：
+   - `mode` = view：`export_views`（`viewIds: [view_id]`）。
+   - `mode` = zoom：`open_view` → `zoom_to_elements`（该对象）→ `export_views`（`exportMode: VisibleRegion`）。同一视图的行排在一起，只开一次。
+3. `python tools/common/shots.py attach --results <run>/audit-results.json`（需要 Pillow；没有则原图直接复制），再按 §6 出报告。
+4. 重跑 `build_results.py` 会清掉截图，之后要再跑 attach。回归或模型改过之后，先删 `_raw/shots/` 再截，旧图不能当证据。
+5. 红框：导出图不显示 Revit 的选中状态，所以 attach 按 `_raw/rooms*.tsv` 的边界框自己画。换算依据是 `zoom_to_elements` 把对象居中、按较紧的方向占窗口一半（Revit 2027 实测，`shots.py` 的 `ZOOM_FILL`）。框是外接矩形，L 形房间会框到别的空间；不是房间的对象不画框。不用 `send_code_to_revit`，也不用改颜色。
+6. 随机看 2–3 张，确认红框压在该房间的墙线上（`shot.view` 写在查看器标题里）；对不上就是换了 Revit 版本或视图有旋转，把 `ZOOM_FILL` 重新量过，修好前不要出带框的图。明细表行的截图是该房间的位置，不是明细表本身。
+
+BIM 版每行一张缩略图，点开看大图；AP 版每个 Task 最多三张，文件名不带 Revit ID。
 
 ## 6c. 按 Task 单独跑
 
