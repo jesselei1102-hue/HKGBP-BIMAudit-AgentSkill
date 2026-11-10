@@ -19,7 +19,7 @@
   --line2: rgba(18, 17, 24, 0.16);
   --tx: #121118;
   --tx2: #5d5b6b;
-  --tx3: #9a98a8;
+  --tx3: #706e80; /* 4.5:1 on --s1, so labels and placeholders stay legible */
   --accent: #7b61ff;
   --accent-tx: #5b41e0;
   --on-accent: #ffffff;
@@ -34,6 +34,7 @@
   --dock-hover: rgba(255, 255, 255, 0.1);
   --pop-shadow: 0 12px 32px rgba(18, 17, 24, 0.14), 0 2px 6px rgba(18, 17, 24, 0.06);
   --glow: none;
+  --ui-font: "Inter", "Noto Sans SC", var(--font-sans, var(--font-family, system-ui)), "PingFang SC", "Microsoft YaHei", sans-serif;
   --mono: var(--font-mono, ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace);
 }
 :root[data-theme="dark"] {
@@ -45,7 +46,7 @@
   --line2: rgba(255, 255, 255, 0.14);
   --tx: #ecebf3;
   --tx2: #9c9aae;
-  --tx3: #5f5d70;
+  --tx3: #858399; /* 4.9:1 on --s1 */
   --accent: #8f7bff;
   --accent-tx: #b3a6ff;
   --on-accent: #0e0d14;

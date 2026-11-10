@@ -6,7 +6,7 @@
 .runsheet { margin: 4px 16px 14px; padding: 14px 16px 12px; border-radius: 18px; background: var(--dock-bg);
             border: 0.5px solid var(--dock-line); color: var(--dock-tx); }
 .runsheet dl { margin: 0; display: grid; grid-template-columns: max-content 1fr auto; gap: 9px 16px; align-items: baseline; }
-.runsheet dt { font-family: var(--mono); font-size: 11px; color: var(--dock-tx2); }
+.runsheet dt { font-size: 11px; color: var(--dock-tx2); }
 .runsheet dd { margin: 0; font-size: 13px; min-width: 0; overflow-wrap: anywhere; }
 .runsheet dd .dim { color: var(--dock-tx2); }
 .runsheet dd .mono { font-size: 12px; }
@@ -34,7 +34,7 @@
 .side-item.sel { background: var(--accent-soft); color: var(--tx); font-weight: 500; }
 .side-item .side-label { flex: 1; }
 .side .side-extra { margin-top: 8px; padding-top: 8px; border-top: 0.5px solid var(--line); display: flex; flex-direction: column; gap: 2px; }
-.side-item .count { font-family: var(--mono); font-size: 11px; min-width: 22px; text-align: center; padding: 1px 6px; border-radius: 10px; background: var(--s1); color: var(--tx2); }
+.side-item .count { font-variant-numeric: tabular-nums; font-size: 11px; min-width: 22px; text-align: center; padding: 1px 6px; border-radius: 10px; background: var(--s1); color: var(--tx2); }
 .side-item .count.unclear { color: var(--accent-tx); }
 .side-item .count.muted { color: var(--tx3); }
 .pane { padding: 6px 16px 14px; min-width: 0; }
@@ -44,7 +44,7 @@
 .task-line { display: flex; gap: 10px; align-items: flex-start; padding: 7px 4px; border-bottom: 0.5px solid var(--line); cursor: pointer; }
 .task-line.sel { background: var(--accent-soft); }
 .task-line input { accent-color: var(--accent); margin-top: 3px; }
-.task-line .sub { font-family: var(--mono); font-size: 11px; color: var(--tx3); }
+.task-line .sub { font-size: 11px; color: var(--tx3); }
 
 /* ---------- Outputs ---------- */
 .outputs { padding: 4px 20px 16px; display: grid; gap: 0; }
