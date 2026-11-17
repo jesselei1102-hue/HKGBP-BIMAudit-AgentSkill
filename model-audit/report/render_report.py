@@ -346,8 +346,16 @@ def band(c, nav):
     sub = " · ".join([f"GBP Model Audit · {aud}", c.text(m["date"]), c.text(m["model"])])
     links = "".join(f'<a href="#{sid}">{ICON_ARROW}{name}{f"<span class=num>{n}</span>" if n is not None else ""}</a>'
                     for sid, name, n in nav)
+    theme_btn = (
+        '<button type="button" class="icon-btn" id="theme-toggle" aria-label="Toggle colour theme" title="Toggle colour theme">'
+        '<svg data-icon="moon" viewBox="0 0 16 16" aria-hidden="true"><path d="M13.2 9.2A5.5 5.5 0 0 1 6.8 2.8 5.6 5.6 0 1 0 13.2 9.2z"/></svg>'
+        '<svg data-icon="sun" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3"/>'
+        '<path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.2 3.2l1.4 1.4M11.4 11.4l1.4 1.4M3.2 12.8l1.4-1.4M11.4 4.6l1.4-1.4"/></svg>'
+        '</button>'
+    )
     return (f'<header class="band"><div class="band-in"><div><h1>{c.text(m["project"])}</h1><p class="sub">{sub}</p></div>'
-            f'<div class="verdict-sign {state}"><span class="mark" aria-hidden="true"></span>{label}<span class="count">{count}</span></div>'
+            f'<div class="band-actions"><div class="verdict-sign {state}"><span class="mark" aria-hidden="true"></span>'
+            f'{label}<span class="count">{count}</span></div>{theme_btn}</div>'
             f'<nav class="signs" aria-label="Sections">{links}</nav></div></header>')
 
 
